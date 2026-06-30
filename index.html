@@ -5,72 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Abashon Construction</title>
     <style>
-        /* CSS Design - sob kisu ekhanei ache */
-        body { margin: 0; font-family: 'Arial', sans-serif; background-color: #121212; color: #fff; }
-        
-        /* Navbar */
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; background: #1a1a1a; }
-        .logo { font-size: 24px; font-weight: bold; color: #d4af37; }
-        .nav-links a { color: white; text-decoration: none; margin: 0 15px; font-size: 16px; }
-        .btn-gold { background: #d4af37; padding: 10px 20px; color: black; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        /* General Reset */
+        body { margin: 0; font-family: 'Arial', sans-serif; color: #fff; }
 
-        /* Hero Section */
-        .hero { text-align: center; padding: 150px 20px; 
-                background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://github.com/abusaleh37/Abashon/blob/main/pexels-marviio-15641049.jpg?raw=true'); 
-                background-size: cover; background-position: center; }
-        .hero h1 { font-size: 3.5rem; margin-bottom: 10px; }
-        .hero p { font-size: 1.2rem; margin-bottom: 30px; }
-
-      /* Portfolio Section */
-        .portfolio { padding: 50px 20px; background-color: #1a1a1a; }
-        .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .gallery img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; border: 2px solid #d4af37; 
-    }
-        
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .gallery { grid-template-columns: 1fr; }
-            .hero h1 { font-size: 2rem; }
-        }
-        @media (max-width: 600px) {
-        nav {
-            flex-direction: column;
-            text-align: center;
-        }
-        .nav-links {
-            margin-top: 15px;
+        /* Hero & Portfolio Section eksathe full screen background */
+        .hero-portfolio-wrapper {
+            position: relative;
+            min-height: 100vh; /* Full viewport height */
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            /* Background image setup */
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://github.com/abusaleh37/Abashon/blob/main/pexels-marviio-15641049.jpg?raw=true');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Optional: background stationary on scroll */
         }
-    }
+
+        /* Hero Text Content */
+        .hero-content { text-align: center; margin-bottom: 60px; }
+        .hero-content h1 { font-size: 3rem; margin-bottom: 10px; }
+        .hero-content p { font-size: 1.2rem; margin-bottom: 25px; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+        /* Gold Button */
+        .btn-gold { background: #d4af37; padding: 10px 20px; color: black; text-decoration: none; border-radius: 5px; font-weight: bold; }
+
+        /* Portfolio/Project Section */
+        .portfolio-section { text-align: center; width: 100%; max-width: 1200px; }
+        .portfolio-section h2 { font-size: 2rem; margin-bottom: 40px; text-transform: uppercase; }
+        
+        /* Gallery - 3 Columns */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        /* Transparent Project Boxes */
+        .project-box {
+            /* Glassmorphism effect for transparency */
+            background: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
+            backdrop-filter: blur(10px); /* Blur the background behind the box */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            transition: transform 0.3s ease, background 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .project-box:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.2); /* Slightly more opaque on hover */
+        }
+
+        .project-box img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .project-box h3 { margin: 0; font-size: 1.2rem; color: #fff; }
+        .project-box p { margin: 5px 0 0; font-size: 0.9rem; color: #ddd; }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .gallery { grid-template-columns: 1fr; gap: 20px; }
+            .hero-content h1 { font-size: 2rem; }
+            .hero-portfolio-wrapper { padding: 50px 15px; }
+        }
     </style>
 </head>
 <body>
 
-<nav>
-    <div class="logo">ABASHON consultancy & construction</div>
-    <div class="nav-links">
-        <a href="#">প্রজেক্ট</a>
-        <a href="#">সেবা</a>
-        <a href="#">আমাদের সম্পর্কে</a>
-        <a href="#" class="btn-gold">যোগাযোগ করুন</a>
+<!-- Ei wrapper ti background image-ke dhore rakhbe r sob content-ke majhkhan e rakhbe -->
+<div class="hero-portfolio-wrapper">
+    
+    <!-- Hero Text Content -->
+    <div class="hero-content">
+        <h1>আপনার স্বপ্নের ভিত্তি</h1>
+        <p>আমরা আধুনিক প্রযুক্তি দিয়ে আপনার স্বপ্নকে বাস্তবে রূপান্তর করি।</p>
+        <a href="#" class="btn-gold">আমাদের সেবা</a>
     </div>
-</nav>
 
-<div class="hero">
-    <h1>আপনার স্বপ্নের ভিত্তি</h1>
-    <p>আমরা আধুনিক প্রযুক্তি দিয়ে আপনার স্বপ্নকে বাস্তবে রূপান্তর করি।</p>
-    <a href="#" class="btn-gold">আমাদের সেবা</a>
-</div>
+    <!-- Portfolio/Project Section -->
+    <div class="portfolio-section">
+        <h2>আমাদের পোর্টফোলিও</h2>
+        <div class="gallery">
+            
+            <!-- Project 1 -->
+            <div class="project-box">
+                <img src="YOUR_PROJECT_1_IMAGE_URL" alt="Project 1">
+                <h3>প্রোজেক্ট ১</h3>
+                <p>আধুনিক অ্যাপার্টমেন্ট কমপ্লেক্স</p>
+            </div>
 
-<div class="portfolio">
-    <h2 style="text-align:center; margin-bottom: 40px;">আমাদের পোর্টফোলিও</h2>
-    <div class="gallery">
-        <img src="https://github.com/abusaleh37/Abashon/blob/main/pexels-eneszn-11615246.jpg?raw=true" alt="Project 1">
-        <img src="https://github.com/abusaleh37/Abashon/blob/main/pexels-shox-37700951.jpg?raw=true" alt="Project 2">
-        <img src="https://github.com/abusaleh37/Abashon/blob/main/pexels-troopper84-18261218.jpg?raw=true" alt="Project 3">
+            <!-- Project 2 -->
+            <div class="project-box">
+                <img src="YOUR_PROJECT_2_IMAGE_URL" alt="Project 2">
+                <h3>প্রোজেক্ট ২</h3>
+                <p>কমার্শিয়াল টাওয়ার</p>
+            </div>
+
+            <!-- Project 3 -->
+            <div class="project-box">
+                <img src="YOUR_PROJECT_3_IMAGE_URL" alt="Project 3">
+                <h3>প্রোজেক্ট ৩</h3>
+                <p>রেসিডেন্সিয়াল এরিয়া</p>
+            </div>
+
+        </div>
     </div>
+
 </div>
 
 </body>
