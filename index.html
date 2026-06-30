@@ -4,17 +4,27 @@
     <meta charset="UTF-8">
     <title>Abashon - Official Website</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; text-align: center; }
-        header { background: #333; color: #fff; padding: 1rem; }
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            padding: 40px;
-        }
-        .card { background: #f4f4f4; padding: 20px; border-radius: 8px; border: 1px solid #ccc; }
-        footer { background: #333; color: #fff; padding: 10px; position: fixed; bottom: 0; width: 100%; }
-    </style>
+    body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; text-align: center; background-color: #f0f2f5; }
+    header { background: #2c3e50; color: #fff; padding: 2rem; }
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        padding: 50px;
+    }
+    .card { 
+        background: linear-gradient(145deg, #6c5ce7, #a29bfe); 
+        color: white;
+        padding: 40px 20px; 
+        border-radius: 15px; 
+        font-size: 1.2rem;
+        font-weight: bold;
+        box-shadow: 10px 10px 20px #bebebe, -10px -10px 20px #ffffff;
+        transition: transform 0.3s;
+    }
+    .card:hover { transform: scale(1.05); }
+    footer { background: #2c3e50; color: #fff; padding: 15px; position: fixed; bottom: 0; width: 100%; }
+</style>
 </head>
 <body>
     <header>
