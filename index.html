@@ -21,10 +21,15 @@
         .hero h1 { font-size: 3.5rem; margin-bottom: 10px; }
         .hero p { font-size: 1.2rem; margin-bottom: 30px; }
 
-        /* Portfolio Section */
-        .portfolio { padding: 50px 20px; background-color: #1a1a1a; }
-        .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .gallery img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; border: 2px solid #d4af37; }
+       .portfolio { padding: 50px 20px; }
+    .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .gallery img { 
+        background: rgba(255, 255, 255, 0.1); 
+        backdrop-filter: blur(10px); 
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        border-radius: 10px;
+    }
         
         /* Mobile Responsive */
         @media (max-width: 768px) {
