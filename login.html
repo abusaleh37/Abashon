@@ -5,17 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Portal</title>
     <style>
-        body { margin: 0; height: 100vh; display: flex; align-items: center; justify-content: center; background: #f0f2f5; font-family: Arial, sans-serif; }
-        .container { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #6c5ce7; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 16px; }
-        .hidden { display: none; }
-        h2 { text-align: center; color: #333; }
-        p { text-align: center; cursor: pointer; color: #6c5ce7; margin-top: 15px; }
-    </style>
+    body { margin: 0; height: 100vh; display: flex; align-items: center; justify-content: center; background: #f0f2f5; font-family: Arial, sans-serif; }
+    
+    .container { 
+        position: relative; 
+        background: white; 
+        padding: 40px 30px 30px 30px; /* বাটনটির জন্য উপরে বাড়তি জায়গা রাখা হয়েছে */
+        border-radius: 15px; 
+        width: 90%; 
+        max-width: 500px; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+    }
+
+    .back-btn { 
+        position: absolute; 
+        top: 15px; 
+        left: 15px; 
+        cursor: pointer; 
+        font-size: 16px; 
+        color: #6c5ce7; 
+        font-weight: bold;
+    }
+
+    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background: #6c5ce7; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 16px; }
+    .hidden { display: none; }
+    h2 { text-align: center; color: #333; }
+    p { text-align: center; cursor: pointer; color: #6c5ce7; margin-top: 15px; }
+</style>
 </head>
 <body>
     <div class="container">
+        <div class="back-btn" onclick="window.history.back()">&#8592; ব্যাক</div>
         <!-- লগইন ফর্ম -->
         <div id="login-form">
             <h2>লগইন</h2>
