@@ -2,47 +2,51 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Portal</title>
     <style>
-        body { margin: 0; height: 100vh; display: flex; align-items: center; justify-content: center; background: #f0f2f5; font-family: Arial; }
-        .container { background: white; padding: 40px; border-radius: 15px; width: 350px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        body { margin: 0; height: 100vh; display: flex; align-items: center; justify-content: center; background: #f0f2f5; font-family: Arial, sans-serif; }
+        .container { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #6c5ce7; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        button { width: 100%; padding: 12px; background: #6c5ce7; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 16px; }
         .hidden { display: none; }
+        h2 { text-align: center; color: #333; }
+        p { text-align: center; cursor: pointer; color: #6c5ce7; margin-top: 15px; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <!-- লগইন ফর্ম -->
+        <div id="login-form">
+            <h2>লগইন</h2>
+            <input type="email" placeholder="ইমেইল">
+            <input type="password" placeholder="পাসওয়ার্ড">
+            <button>লগইন করুন</button>
+            <p onclick="showRegister()">এখনো অ্যাকাউন্ট নেই? রেজিস্ট্রেশন করুন</p>
+        </div>
 
-<div class="container">
-    <div id="login-form">
-        <h2>Login</h2>
-        <input type="email" placeholder="Email">
-        <input type="password" placeholder="Password">
-        <button>Login</button>
-        <p style="text-align:center; cursor:pointer; color:blue;" onclick="showRegister()">Register</p>
+        <!-- রেজিস্ট্রেশন ফর্ম -->
+        <div id="register-form" class="hidden">
+            <h2>রেজিস্ট্রেশন</h2>
+            <input type="text" placeholder="পুরো নাম">
+            <input type="email" placeholder="ইমেইল">
+            <input type="text" placeholder="ফোন নম্বর">
+            <input type="password" placeholder="পাসওয়ার্ড">
+            <input type="password" placeholder="পাসওয়ার্ড নিশ্চিত করুন">
+            <button>রেজিস্ট্রেশন করুন</button>
+            <p onclick="showLogin()">লগইন পেজে ফিরে যান</p>
+        </div>
     </div>
 
-    <div id="register-form" class="hidden">
-        <h2>Register</h2>
-        <input type="text" placeholder="Full Name">
-        <input type="email" placeholder="Email">
-        <input type="text" placeholder="Phone Number">
-        <input type="password" placeholder="Password">
-        <input type="password" placeholder="Confirm Password">
-        <button>Register</button>
-        <p style="text-align:center; cursor:pointer; color:blue;" onclick="showLogin()">Back to Login</p>
-    </div>
-</div>
-
-<script>
-    function showRegister() {
-        document.getElementById('login-form').classList.add('hidden');
-        document.getElementById('register-form').classList.remove('hidden');
-    }
-    function showLogin() {
-        document.getElementById('register-form').classList.add('hidden');
-        document.getElementById('login-form').classList.remove('hidden');
-    }
-</script>
+    <script>
+        function showRegister() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+        }
+        function showLogin() {
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+        }
+    </script>
 </body>
 </html>
