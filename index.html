@@ -4,24 +4,30 @@
     <meta charset="UTF-8">
     <title>Abashon - Official Website</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; line-height: 1.6; }
-        header { background: #333; color: #fff; padding: 1rem; text-align: center; }
-        nav { background: #444; color: #fff; padding: 0.5rem; text-align: center; }
-        .container { padding: 20px; }
-        footer { background: #333; color: #fff; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; text-align: center; }
+        header { background: #333; color: #fff; padding: 1rem; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 40px;
+        }
+        .card { background: #f4f4f4; padding: 20px; border-radius: 8px; border: 1px solid #ccc; }
+        footer { background: #333; color: #fff; padding: 10px; position: fixed; bottom: 0; width: 100%; }
     </style>
 </head>
 <body>
     <header>
         <h1>Welcome to Abashon</h1>
     </header>
-    <nav>
-        <p>Home | Projects | About Us | Contact | Employee Login</p>
-    </nav>
-    <div class="container">
-        <h2>আমাদের লক্ষ্য</h2>
-        <p>আমরা সিভিল ইঞ্জিনিয়ারিং এবং প্রজেক্ট ম্যানেজমেন্টের মাধ্যমে আধুনিক অবকাঠামো তৈরি করি।</p>
+
+    <div class="grid-container">
+        <div class="card"><h3>Running Projects</h3></div>
+        <div class="card"><h3>Previous Projects</h3></div>
+        <div class="card"><h3>Contact Me</h3></div>
+        <div class="card"><h3>Employee Login</h3></div>
     </div>
+
     <footer>
         <p>&copy; 2026 Abashon. All rights reserved.</p>
     </footer>
