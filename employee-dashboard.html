@@ -1,110 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Employee Dashboard</title>
-<script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Employee Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-<script>
-/*
-  ────────────────────────────────────────────────────────────────────────
-  AUTH GATE — runs before the page paints, to minimize flash of content.
-  See the security note in employee-login.html: this check happens in
-  the browser, so it can be bypassed by anyone who knows to set
-  sessionStorage.employeeAuth = "true" manually. It stops casual/direct
-  URL access, not a motivated user. Don't put real sensitive data on
-  this page unless you add a real backend.
-  ────────────────────────────────────────────────────────────────────────
-*/
-(function gate() {
-  const isAuthed = sessionStorage.getItem("employeeAuth") === "true";
-  if (!isAuthed) {
-    window.location.replace("employee-login.html");
-  }
-})();
-</script>
+    <script>
+        (function gate() {
+            const isAuthed = sessionStorage.getItem("employeeAuth") === "true";
+            if (!isAuthed) {
+                window.location.replace("employee-login.html");
+            }
+        })();
+    </script>
 
-<style>
-  /* Hide body until the auth check above has run, avoiding a content flash */
-  body { visibility: hidden; }
-</style>
+    <style>
+        body { visibility: hidden; }
+    </style>
 </head>
 <body class="min-h-screen bg-slate-50">
 
-<script>
-  // If we got this far, the gate script didn't redirect — reveal the page.
-  document.body.style.visibility = "visible";
-</script>
+    <script>
+        document.body.style.visibility = "visible";
+    </script>
 
-  <header class="bg-white border-b border-slate-200">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-      <h1 class="text-lg font-semibold text-slate-900">Employee Dashboard</h1>
-      <div class="flex items-center gap-4">
-        <span id="userEmail" class="text-sm text-slate-500"></span>
-        <button
-          id="logoutBtn"
-          class="text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-300 rounded-lg px-3 py-1.5 hover:bg-slate-100 transition-colors"
-        >
-          Log out
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <main class="max-w-5xl mx-auto px-4 py-8">
-    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-8">
-      <h2 class="text-xl font-semibold text-slate-900 mb-2">Welcome back</h2>
-      <p class="text-slate-600 mb-6">
-        This is the restricted employee area. Replace this content with
-        whatever internal tools, links, or data your team needs.
-      </p>
-
-      <div class="grid sm:grid-cols-2 gap-4">
-        <div class="border border-slate-200 rounded-lg p-4">
-          <h3 class="font-medium text-slate-900 mb-1">Session info</h3>
-          <p class="text-sm text-slate-500">Signed in as <span id="userEmail2" class="font-medium text-slate-700"></span></p>
-          <p class="text-sm text-slate-500">Since <span id="loginTime" class="font-medium text-slate-700"></span></p>
+    <header class="bg-white border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 class="text-lg font-semibold text-slate-900">Employee Dashboard</h1>
+            <div class="flex items-center gap-4">
+                <span id="userEmail" class="text-sm text-slate-500"></span>
+                <button id="logoutBtn" class="text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-300 rounded-lg px-3 py-1.5 hover:bg-slate-100 transition-colors">
+                    Log out
+                </button>
+            </div>
         </div>
-        <div class="border border-slate-200 rounded-lg p-4">
-          <h3 class="font-medium text-slate-900 mb-1">Next steps</h3>
-          <p class="text-sm text-slate-500">
-            Add your internal links, embedded sheets, or tools here.
-          </p>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-8">
+        <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-8">
+            <h2 class="text-xl font-semibold text-slate-900 mb-2">Welcome back</h2>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div class="border border-slate-200 rounded-lg p-4">
+                    <h3 class="font-medium text-slate-900 mb-1">Session info</h3>
+                    <p class="text-sm text-slate-500">Signed in as <span id="userEmail2" class="font-medium text-slate-700"></span></p>
+                    <p class="text-sm text-slate-500">Login time: <span id="loginTime" class="font-medium text-slate-700"></span></p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </main>
+    </main>
 
-<script>
-  // Populate session info
-  const email = sessionStorage.getItem("employeeEmail") || "unknown";
-  const loginTimeMs = sessionStorage.getItem("employeeAuthTime");
-  const loginTimeStr = loginTimeMs ? new Date(parseInt(loginTimeMs, 10)).toLocaleString() : "unknown";
+    <script>
+        // ডেটা লোড করা
+        const email = sessionStorage.getItem("employeeEmail") || "User";
+        const loginTime = sessionStorage.getItem("employeeLoginTime") || "Not available";
 
-  document.getElementById("userEmail").textContent = email;
-  document.getElementById("userEmail2").textContent = email;
-  document.getElementById("loginTime").textContent = loginTimeStr;
+        document.getElementById("userEmail").textContent = email;
+        document.getElementById("userEmail2").textContent = email;
+        document.getElementById("loginTime").textContent = loginTime;
 
-  // Logout
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    sessionStorage.removeItem("employeeAuth");
-    sessionStorage.removeItem("employeeEmail");
-    sessionStorage.removeItem("employeeAuthTime");
-    window.location.href = "employee-login.html";
-  });
-
-  // Optional: re-check auth periodically in case sessionStorage was cleared
-  // in another tab, or auto-expire after N minutes of inactivity.
-  const SESSION_TIMEOUT_MINUTES = 60; // set to null to disable auto-expiry
-  if (SESSION_TIMEOUT_MINUTES && loginTimeMs) {
-    const elapsedMinutes = (Date.now() - parseInt(loginTimeMs, 10)) / 60000;
-    if (elapsedMinutes > SESSION_TIMEOUT_MINUTES) {
-      sessionStorage.clear();
-      window.location.replace("employee-login.html");
-    }
-  }
-</script>
-
+        // Logout লজিক
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+            sessionStorage.clear(); // সব ডাটা মুছে ফেলবে
+            window.location.href = "employee-login.html";
+        });
+    </script>
 </body>
 </html>
