@@ -1,156 +1,329 @@
+
 <!DOCTYPE html>
-<html lang="bn">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abashon Construction</title>
+<html lang="bn" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Abashon Construction Firm — আপনার স্বপ্নের ভিত্তি। প্রিমিয়াম নির্মাণ ও রিয়েল এস্টেট সেবা।"
+    />
+    <title>Abashon Construction Firm | আপনার স্বপ্নের ভিত্তি</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              slate: {
+                950: "#16181b",
+                900: "#1a1c1e",
+                850: "#222528",
+              },
+              gold: {
+                DEFAULT: "#c5a059",
+                light: "#d4b06a",
+                dark: "#a8843f",
+              },
+            },
+            fontFamily: {
+              display: ["Cormorant Garamond", "Georgia", "serif"],
+              sans: ["Noto Sans Bengali", "system-ui", "sans-serif"],
+            },
+            boxShadow: {
+              hero: "0 24px 80px rgba(0, 0, 0, 0.45)",
+              card: "0 8px 32px rgba(0, 0, 0, 0.35)",
+            },
+          },
+        },
+      };
+    </script>
+
     <style>
-        /* General Reset */
-        body { margin: 0; font-family: 'Arial', sans-serif; color: #fff; }
+      .hero-image {
+        background-image: linear-gradient(
+            90deg,
+            rgba(22, 24, 27, 0.92) 0%,
+            rgba(22, 24, 27, 0.55) 42%,
+            rgba(22, 24, 27, 0.15) 100%
+          ),
+          url("https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80");
+        background-size: cover;
+        background-position: center right;
+      }
 
-        /* Hero & Portfolio Section eksathe full screen background */
-        .hero-portfolio-wrapper {
-            position: relative;
-            min-height: 100vh; /* Full viewport height */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            /* Background image setup */
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                        url('https://github.com/abusaleh37/Abashon/blob/main/pexels-marviio-15641049.jpg?raw=true');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed; /* Optional: background stationary on scroll */
+      @media (max-width: 1023px) {
+        .hero-image {
+          background-image: linear-gradient(
+              180deg,
+              rgba(22, 24, 27, 0.88) 0%,
+              rgba(22, 24, 27, 0.72) 55%,
+              rgba(22, 24, 27, 0.35) 100%
+            ),
+            url("https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80");
+          background-position: center;
         }
+      }
 
-        /* Hero Text Content */
-        .hero-content { text-align: center; margin-bottom: 60px; }
-        .hero-content h1 { font-size: 3rem; margin-bottom: 10px; }
-        .hero-content p { font-size: 1.2rem; margin-bottom: 25px; max-width: 600px; margin-left: auto; margin-right: auto; }
+      .portfolio-track {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
 
-        /* Gold Button */
-        .btn-gold { background: #d4af37; padding: 10px 20px; color: black; text-decoration: none; border-radius: 5px; font-weight: bold; }
-
-        /* Portfolio/Project Section */
-        .portfolio-section { text-align: center; width: 100%; max-width: 1200px; }
-        .portfolio-section h2 { font-size: 2rem; margin-bottom: 40px; text-transform: uppercase; }
-        
-        /* Gallery - 3 Columns */
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-        }
-
-        /* Transparent Project Boxes */
-        .project-box {
-            /* Glassmorphism effect for transparency */
-            /* Transparent Project Boxes */
-    .project-box {
-        /* আগের কোডগুলো এখানে থাকবে */
-        background: rgba(255, 255, 255, 0.1); 
-        backdrop-filter: blur(10px); 
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 15px;
-        padding: 20px;
-        transition: transform 0.3s ease, background 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        /* নতুন এই ৩টি লাইন যোগ করুন */
-        width: 100%;
-        max-width: 300px;
-        margin: 0 auto;
-    }
-
-    /* ইমেজের জন্য আলাদা এই অংশটুকু বক্সের নিচে যোগ করুন */
-    .project-box img {
-        width: 100%;
-        height: 180px;
-        object-fit: cover;
-        border-radius: 10px;
-    }
-    }
-            background: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
-            backdrop-filter: blur(10px); /* Blur the background behind the box */
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 20px;
-            transition: transform 0.3s ease, background 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .project-box:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.2); /* Slightly more opaque on hover */
-        }
-
-        .project-box img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
-
-        .project-box h3 { margin: 0; font-size: 1.2rem; color: #fff; }
-        .project-box p { margin: 5px 0 0; font-size: 0.9rem; color: #ddd; }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .gallery { grid-template-columns: 1fr; gap: 20px; }
-            .hero-content h1 { font-size: 2rem; }
-            .hero-portfolio-wrapper { padding: 50px 15px; }
-        }
+      .portfolio-track::-webkit-scrollbar {
+        display: none;
+      }
     </style>
-</head>
-<body>
+  </head>
 
-<!-- Ei wrapper ti background image-ke dhore rakhbe r sob content-ke majhkhan e rakhbe -->
-<div class="hero-portfolio-wrapper">
-    
-    <!-- Hero Text Content -->
-    <div class="hero-content">
-        <h1>আপনার স্বপ্নের ভিত্তি</h1>
-        <p>আমরা আধুনিক প্রযুক্তি দিয়ে আপনার স্বপ্নকে বাস্তবে রূপান্তর করি।</p>
-        <a href="#" class="btn-gold">আমাদের সেবা</a>
-    </div>
+  <body class="bg-slate-950 font-sans text-white antialiased">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 border-b border-white/5 bg-slate-950/90 backdrop-blur-md">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <!-- Logo + Back -->
+        <div class="flex min-w-0 items-center gap-3 sm:gap-4">
+          <a href="#" class="group min-w-0 shrink">
+            <span class="block font-display text-xl font-semibold leading-none tracking-wide text-gold sm:text-2xl">
+              Abashon
+            </span>
+            <span class="mt-0.5 block text-[10px] font-medium uppercase tracking-[0.22em] text-white/55 sm:text-[11px]">
+              Construction Firm
+            </span>
+          </a>
 
-    <!-- Portfolio/Project Section -->
-    <div class="portfolio-section">
-        <h2>আমাদের পোর্টফোলিও</h2>
-        <div class="gallery">
-            
-            <!-- Project 1 -->
-            <div class="project-box">
-                <img src="YOUR_PROJECT_1_IMAGE_URL" alt="Project 1">
-                <h3>প্রোজেক্ট ১</h3>
-                <p>আধুনিক অ্যাপার্টমেন্ট কমপ্লেক্স</p>
-            </div>
-
-            <!-- Project 2 -->
-            <div class="project-box">
-                <img src="YOUR_PROJECT_2_IMAGE_URL" alt="Project 2">
-                <h3>প্রোজেক্ট ২</h3>
-                <p>কমার্শিয়াল টাওয়ার</p>
-            </div>
-
-            <!-- Project 3 -->
-            <div class="project-box">
-                <img src="YOUR_PROJECT_3_IMAGE_URL" alt="Project 3">
-                <h3>প্রোজেক্ট ৩</h3>
-                <p>রেসিডেন্সিয়াল এরিয়া</p>
-            </div>
-
+          <button
+            type="button"
+            class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/90 transition hover:border-white/35 hover:bg-white/10 sm:px-4 sm:text-sm"
+            aria-label="ফেরত যান"
+          >
+            <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            ফেরত
+          </button>
         </div>
-    </div>
 
-</div>
+        <!-- Desktop Nav -->
+        <nav class="hidden items-center gap-8 lg:flex" aria-label="প্রধান নেভিগেশন">
+          <a href="#profile" class="text-sm font-medium text-white/80 transition hover:text-gold">প্রোফাইল</a>
+          <a href="#services" class="text-sm font-medium text-white/80 transition hover:text-gold">সার্ভিসেস</a>
+          <a href="#properties" class="text-sm font-medium text-white/80 transition hover:text-gold">আমাদের প্রপার্টি</a>
+          <a
+            href="#contact"
+            class="rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-gold-light"
+          >
+            যোগাযোগ করুন
+          </a>
+        </nav>
 
-</body>
+        <!-- Mobile Menu Toggle -->
+        <button
+          id="menu-toggle"
+          type="button"
+          class="inline-flex items-center justify-center rounded-md border border-white/15 p-2 text-white lg:hidden"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+          aria-label="মেনু খুলুন"
+        >
+          <svg id="menu-icon-open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg id="menu-icon-close" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile Nav -->
+      <div id="mobile-menu" class="hidden border-t border-white/5 lg:hidden">
+        <nav class="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4 sm:px-6" aria-label="মোবাইল নেভিগেশন">
+          <a href="#profile" class="rounded-md px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/5">প্রোফাইল</a>
+          <a href="#services" class="rounded-md px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/5">সার্ভিসেস</a>
+          <a href="#properties" class="rounded-md px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/5">আমাদের প্রপার্টি</a>
+          <a
+            href="#contact"
+            class="mt-2 rounded-md bg-gold px-3 py-2.5 text-center text-sm font-semibold text-slate-950 hover:bg-gold-light"
+          >
+            যোগাযোগ করুন
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero Section -->
+      <section class="hero-image relative overflow-hidden">
+        <div class="mx-auto grid min-h-[calc(100vh-4.5rem)] max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:gap-8 lg:px-8 lg:py-16">
+          <!-- Left Column: Text -->
+          <div class="relative z-10 max-w-xl lg:max-w-none">
+            <p class="mb-4 text-xs font-semibold uppercase tracking-[0.28em] text-gold/90 sm:text-sm">
+              Premium Construction
+            </p>
+
+            <h1 class="text-4xl font-bold leading-[1.15] tracking-tight text-white sm:text-5xl lg:text-[3.35rem] lg:leading-[1.12]">
+              আপনার স্বপ্নের ভিত্তি
+            </h1>
+
+            <p class="mt-5 max-w-lg text-base leading-relaxed text-white/75 sm:text-lg">
+              Asmatas enge fofz — আধুনিক স্থাপত্য, নির্ভরযোগ্য নির্মাণ এবং আপনার স্বপ্নের বাড়ি বাস্তবায়নে আমরা পাশে
+              আছি। প্রিমিয়াম গুণমান, সময়মতো হস্তান্তর।
+            </p>
+
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <a
+                href="#contact"
+                class="inline-flex items-center justify-center rounded-md bg-gold px-7 py-3.5 text-sm font-semibold text-slate-950 shadow-lg shadow-gold/20 transition hover:bg-gold-light"
+              >
+                যোগাযোগ করুন
+              </a>
+              <a
+                href="#portfolio"
+                class="inline-flex items-center justify-center rounded-md border border-white/35 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-white/55 hover:bg-white/10"
+              >
+                প্রজেক্ট দেখুন
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Column: Visual -->
+          <div class="relative z-10 flex items-center justify-center lg:justify-end">
+            <div class="relative w-full max-w-xl overflow-hidden rounded-2xl shadow-hero lg:max-w-none">
+              <div class="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-900">
+                <img
+                  src="https://images.unsplash.com/photo-1471929480038-9e742b13d965?auto=format&fit=crop&w=1200&q=80"
+                  alt="আধুনিক গ্লাস ভবন ও সেতু — Abashon Construction Firm"
+                  class="h-full w-full object-cover object-center"
+                  loading="eager"
+                />
+              </div>
+              <div class="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Portfolio Section -->
+      <section id="portfolio" class="border-t border-white/5 bg-slate-900 px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
+        <div class="mx-auto max-w-7xl">
+          <div class="mb-8 flex items-center justify-between gap-4">
+            <h2 class="font-display text-2xl font-semibold tracking-wide text-gold sm:text-3xl">আমাদের পোর্টফোলিও</h2>
+
+            <div class="flex items-center gap-2">
+              <button
+                id="portfolio-prev"
+                type="button"
+                class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/80 transition hover:border-gold/50 hover:text-gold"
+                aria-label="আগের প্রজেক্ট"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                id="portfolio-next"
+                type="button"
+                class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/80 transition hover:border-gold/50 hover:text-gold"
+                aria-label="পরের প্রজেক্ট"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="portfolio-track"
+            class="portfolio-track grid snap-x snap-mandatory auto-cols-[85%] grid-flow-col gap-4 overflow-x-auto sm:auto-cols-[calc(50%-0.5rem)] lg:auto-cols-fr lg:grid-flow-row lg:grid-cols-3 lg:overflow-visible"
+          >
+            <article class="group snap-start overflow-hidden rounded-xl border border-white/8 bg-slate-850 shadow-card">
+              <div class="aspect-[4/3] overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+                  alt="আধুনিক আবাসিক ভবন — পোর্টফোলিও ১"
+                  class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+            </article>
+
+            <article class="group snap-start overflow-hidden rounded-xl border border-white/8 bg-slate-850 shadow-card">
+              <div class="aspect-[4/3] overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
+                  alt="আধুনিক আবাসিক ভবন — পোর্টফোলিও ২"
+                  class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+            </article>
+
+            <article class="group snap-start overflow-hidden rounded-xl border border-white/8 bg-slate-850 shadow-card">
+              <div class="aspect-[4/3] overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80"
+                  alt="আধুনিক আবাসিক ভবন — পোর্টফোলিও ৩"
+                  class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const menuToggle = document.getElementById("menu-toggle");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const menuIconOpen = document.getElementById("menu-icon-open");
+      const menuIconClose = document.getElementById("menu-icon-close");
+
+      menuToggle.addEventListener("click", () => {
+        const isOpen = !mobileMenu.classList.contains("hidden");
+        mobileMenu.classList.toggle("hidden");
+        menuIconOpen.classList.toggle("hidden", !isOpen);
+        menuIconClose.classList.toggle("hidden", isOpen);
+        menuToggle.setAttribute("aria-expanded", String(!isOpen));
+        menuToggle.setAttribute("aria-label", isOpen ? "মেনু খুলুন" : "মেনু বন্ধ করুন");
+      });
+
+      mobileMenu.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          mobileMenu.classList.add("hidden");
+          menuIconOpen.classList.remove("hidden");
+          menuIconClose.classList.add("hidden");
+          menuToggle.setAttribute("aria-expanded", "false");
+          menuToggle.setAttribute("aria-label", "মেনু খুলুন");
+        });
+      });
+
+      const portfolioTrack = document.getElementById("portfolio-track");
+      const portfolioPrev = document.getElementById("portfolio-prev");
+      const portfolioNext = document.getElementById("portfolio-next");
+
+      const scrollPortfolio = (direction) => {
+        const card = portfolioTrack.querySelector("article");
+        if (!card) return;
+
+        const gap = 16;
+        const scrollAmount = card.offsetWidth + gap;
+        portfolioTrack.scrollBy({
+          left: direction === "next" ? scrollAmount : -scrollAmount,
+          behavior: "smooth",
+        });
+      };
+
+      portfolioPrev.addEventListener("click", () => scrollPortfolio("prev"));
+      portfolioNext.addEventListener("click", () => scrollPortfolio("next"));
+    </script>
+  </body>
 </html>
