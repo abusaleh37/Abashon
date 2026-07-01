@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="bn" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>প্রজেক্ট এন্ট্রি | ABASHON Consultancy & Construction</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              slate: { 950: "#16181b", 900: "#1a1c1e", 850: "#222528" },
+              gold: { DEFAULT: "#c5a059", light: "#d4b06a", dark: "#a8843f" },
+            },
+            fontFamily: {
+              display: ["Cormorant Garamond", "Georgia", "serif"],
+              sans: ["Noto Sans Bengali", "system-ui", "sans-serif"],
+            },
+            boxShadow: { card: "0 8px 32px rgba(0, 0, 0, 0.35)" },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body class="bg-slate-950 font-sans text-white antialiased">
+    <header class="sticky top-0 z-50 border-b border-white/5 bg-slate-950/90 backdrop-blur-md">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <a href="index.html" class="group min-w-0 shrink">
+          <span class="block font-display text-xl font-semibold leading-none tracking-wide text-gold sm:text-2xl">ABASHON</span>
+          <span class="mt-0.5 block text-[10px] font-medium uppercase tracking-[0.18em] text-white/55 sm:text-[11px]">Consultancy &amp; Construction</span>
+        </a>
+        <nav class="hidden items-center gap-8 lg:flex" aria-label="কর্মচারী নেভিগেশন">
+          <a href="dashboard.html" class="text-sm font-medium text-white/80 transition hover:text-gold">ড্যাশবোর্ড</a>
+          <a href="project-entry.html" class="text-sm font-medium text-gold">প্রজেক্ট এন্ট্রি</a>
+          <a href="project-payments.html" class="text-sm font-medium text-white/80 transition hover:text-gold">প্রজেক্ট পেমেন্টস</a>
+          <button id="logout-btn" type="button" class="rounded-md border border-white/20 px-4 py-2 text-sm font-medium text-white/85 transition hover:border-gold/50 hover:text-gold">লগআউট</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <h1 class="font-display text-3xl font-semibold text-white sm:text-4xl">প্রজেক্ট এন্ট্রি</h1>
+      <p class="mt-2 max-w-2xl text-sm text-white/60">
+        নতুন এন্ট্রি নিচের ফর্মে জমা দিন — এটি নিরাপদে সার্ভারের মাধ্যমে মাস্টার শীটে সিঙ্ক হবে। শীটের বর্তমান অবস্থা নিচে দেখুন।
+      </p>
+
+      <!-- New entry form: written to Firestore only. A Cloud Function (not this
+           page) owns the Google credentials and appends the row to the Sheet.
+           The browser never talks to the Sheets API directly. -->
+      <section class="mt-8 rounded-lg border border-white/10 bg-slate-900 p-6 shadow-card sm:p-8">
+        <h2 class="font-display text-xl font-semibold text-gold">নতুন এন্ট্রি জমা দিন</h2>
+
+        <form id="entry-form" class="mt-5 grid gap-4 sm:grid-cols-2" novalidate>
+          <div class="sm:col-span-1">
+            <label for="project-name" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-white/60">প্রজেক্টের নাম</label>
+            <input id="project-name" required maxlength="120"
+              class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-gold/60 focus:ring-1 focus:ring-gold/40" />
+          </div>
+          <div class="sm:col-span-1">
+            <label for="entry-date" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-white/60">তারিখ</label>
+            <input id="entry-date" type="date" required
+              class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-gold/60 focus:ring-1 focus:ring-gold/40" />
+          </div>
+          <div class="sm:col-span-2">
+            <label for="entry-notes" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-white/60">বিবরণ</label>
+            <textarea id="entry-notes" rows="3" maxlength="1000"
+              class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-gold/60 focus:ring-1 focus:ring-gold/40"></textarea>
+          </div>
+
+          <p id="entry-message" class="hidden sm:col-span-2 rounded-md px-3.5 py-2.5 text-xs" role="alert"></p>
+
+          <button id="entry-submit" type="submit"
+            class="w-fit rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-60">
+            জমা দিন
+          </button>
+        </form>
+      </section>
+
+      <!-- Read-only view of the master sheet. Use a Sheet link shared as
+           "Viewer" (never "Editor") for this embed, since anything the iframe
+           can edit, any logged-in employee can edit — including rows they
+           shouldn't touch. -->
+      <section class="mt-8">
+        <h2 class="font-display text-xl font-semibold text-gold">মাস্টার শীট (শুধুমাত্র দেখার জন্য)</h2>
+        <div class="mt-4 overflow-hidden rounded-lg border border-white/10 shadow-card">
+          <iframe
+            title="Project Master Sheet"
+            src="https://docs.google.com/spreadsheets/d/__PLACEHOLDER_SHEET_ID__/preview"
+            class="h-[70vh] w-full border-0 bg-white"
+            loading="lazy"
+          ></iframe>
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      import { auth, db, requireAuth, signOut } from "./assets/firebase-config.js";
+      import {
+        collection, addDoc, serverTimestamp,
+      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+      let currentUser = null;
+      requireAuth((user) => { currentUser = user; });
+
+      document.getElementById("logout-btn").addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.replace("employee-login.html");
+      });
+
+      const form = document.getElementById("entry-form");
+      const submitBtn = document.getElementById("entry-submit");
+      const messageBox = document.getElementById("entry-message");
+
+      function showMessage(text, kind) {
+        messageBox.textContent = text;
+        messageBox.classList.remove("hidden");
+        messageBox.className =
+          "sm:col-span-2 rounded-md px-3.5 py-2.5 text-xs " +
+          (kind === "error"
+            ? "border border-red-500/30 bg-red-500/10 text-red-300"
+            : "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300");
+      }
+
+      // Minimal client-side sanitation: strip tags/control chars before the
+      // value ever reaches Firestore. This is a courtesy, not the real
+      // defense — firestore.rules validates types/length server-side, and
+      // anything rendered back to HTML later must still be escaped at
+      // render time (never use innerHTML with user-submitted text).
+      function sanitize(value) {
+        return value.replace(/<[^>]*>/g, "").trim();
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!currentUser) return;
+
+        const projectName = sanitize(document.getElementById("project-name").value).slice(0, 120);
+        const entryDate = document.getElementById("entry-date").value;
+        const notes = sanitize(document.getElementById("entry-notes").value).slice(0, 1000);
+
+        if (!projectName || !entryDate) {
+          showMessage("প্রজেক্টের নাম ও তারিখ আবশ্যক।", "error");
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "জমা হচ্ছে…";
+
+        try {
+          // Writing here only creates the Firestore doc. The onCreate Cloud
+          // Function (functions/index.js) picks it up and appends the row
+          // to Google Sheets using its own service-account credentials.
+          await addDoc(collection(db, "projectEntries"), {
+            projectName,
+            entryDate,
+            notes,
+            submittedBy: currentUser.uid,
+            submittedByEmail: currentUser.email,
+            createdAt: serverTimestamp(),
+            syncedToSheet: false,
+          });
+
+          showMessage("এন্ট্রি সফলভাবে জমা হয়েছে। শীঘ্রই মাস্টার শীটে যুক্ত হবে।", "success");
+          form.reset();
+        } catch (err) {
+          showMessage("এন্ট্রি জমা দেওয়া সম্ভব হয়নি। আবার চেষ্টা করুন।", "error");
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "জমা দিন";
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="bn" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>প্রজেক্ট পেমেন্টস | ABASHON Consultancy & Construction</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              slate: { 950: "#16181b", 900: "#1a1c1e", 850: "#222528" },
+              gold: { DEFAULT: "#c5a059", light: "#d4b06a", dark: "#a8843f" },
+            },
+            fontFamily: {
+              display: ["Cormorant Garamond", "Georgia", "serif"],
+              sans: ["Noto Sans Bengali", "system-ui", "sans-serif"],
+            },
+            boxShadow: { card: "0 8px 32px rgba(0, 0, 0, 0.35)" },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body class="bg-slate-950 font-sans text-white antialiased">
+    <header class="sticky top-0 z-50 border-b border-white/5 bg-slate-950/90 backdrop-blur-md">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <a href="index.html" class="group min-w-0 shrink">
+          <span class="block font-display text-xl font-semibold leading-none tracking-wide text-gold sm:text-2xl">ABASHON</span>
+          <span class="mt-0.5 block text-[10px] font-medium uppercase tracking-[0.18em] text-white/55 sm:text-[11px]">Consultancy &amp; Construction</span>
+        </a>
+        <nav class="hidden items-center gap-8 lg:flex" aria-label="কর্মচারী নেভিগেশন">
+          <a href="dashboard.html" class="text-sm font-medium text-white/80 transition hover:text-gold">ড্যাশবোর্ড</a>
+          <a href="project-entry.html" class="text-sm font-medium text-white/80 transition hover:text-gold">প্রজেক্ট এন্ট্রি</a>
+          <a href="project-payments.html" class="text-sm font-medium text-gold">প্রজেক্ট পেমেন্টস</a>
+          <button id="logout-btn" type="button" class="rounded-md border border-white/20 px-4 py-2 text-sm font-medium text-white/85 transition hover:border-gold/50 hover:text-gold">লগআউট</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <h1 class="font-display text-3xl font-semibold text-white sm:text-4xl">প্রজেক্ট পেমেন্টস</h1>
+      <p class="mt-2 max-w-2xl text-sm text-white/60">মাইলস্টোন ও খরচের হিসাব রাখুন এবং ডিজিটাল ভাউচার নিরাপদে আপলোড করুন।</p>
+
+      <!-- Log a payment / milestone -->
+      <section class="mt-8 rounded-lg border border-white/10 bg-slate-900 p-6 shadow-card sm:p-8">
+        <h2 class="font-display text-xl font-semibold text-gold">নতুন খরচ / মাইলস্টোন যোগ করুন</h2>
+
+        <form id="payment-form" class="mt-5 grid gap-4 sm:grid-cols-2" novalidate>
+          <div>
+            <label for="milestone-name" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-white/60">মাইলস্টোন</label>
+            <input id="milestone-name" required maxlength="120"
+              class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-gold/60 focus:ring-1 focus:ring-gold/40" />
+          </div>
+          <div>
+            <label for="payment-amount" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-white/60">পরিমাণ (৳)</label>
+            <input id="payment-amount" type="number" min="0" step="0.01" required
+              class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-gold/60 focus:ring-1 focus:ring-gold/40" />
+          </div>
+          <div class="sm:col-span-2">
+            <label for="voucher-file" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-white/60">
+              ভাউচার (PDF/JPG/PNG, সর্বোচ্চ ৫MB)
+            </label>
+            <input id="voucher-file" type="file" accept=".pdf,.jpg,.jpeg,.png"
+              class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white/80 outline-none file:mr-3 file:rounded file:border-0 file:bg-gold file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-slate-950" />
+            <p class="mt-1 text-xs text-white/40">ফাইলটি স্বয়ংক্রিয়ভাবে একটি অনন্য, নিরাপদ নাম দিয়ে সংরক্ষণ করা হবে।</p>
+          </div>
+
+          <p id="payment-message" class="hidden sm:col-span-2 rounded-md px-3.5 py-2.5 text-xs" role="alert"></p>
+
+          <button id="payment-submit" type="submit"
+            class="w-fit rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-60">
+            সংরক্ষণ করুন
+          </button>
+        </form>
+      </section>
+
+      <!-- Ledger -->
+      <section class="mt-8">
+        <h2 class="font-display text-xl font-semibold text-gold">খরচের তালিকা</h2>
+        <div class="mt-4 overflow-x-auto rounded-lg border border-white/10 shadow-card">
+          <table class="w-full min-w-[560px] text-left text-sm">
+            <thead class="bg-slate-900 text-xs uppercase tracking-wide text-white/50">
+              <tr>
+                <th class="px-4 py-3">মাইলস্টোন</th>
+                <th class="px-4 py-3">পরিমাণ</th>
+                <th class="px-4 py-3">জমাদাতা</th>
+                <th class="px-4 py-3">তারিখ</th>
+                <th class="px-4 py-3">ভাউচার</th>
+              </tr>
+            </thead>
+            <tbody id="payments-table-body" class="divide-y divide-white/5 bg-slate-950">
+              <tr><td colspan="5" class="px-4 py-6 text-center text-white/40">লোড হচ্ছে…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      import { auth, db, storage, requireAuth, signOut } from "./assets/firebase-config.js";
+      import {
+        collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, limit,
+      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+      import {
+        ref, uploadBytes, getDownloadURL,
+      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+
+      let currentUser = null;
+      requireAuth((user) => {
+        currentUser = user;
+        subscribeToPayments();
+      });
+
+      document.getElementById("logout-btn").addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.replace("employee-login.html");
+      });
+
+      const form = document.getElementById("payment-form");
+      const submitBtn = document.getElementById("payment-submit");
+      const messageBox = document.getElementById("payment-message");
+      const fileInput = document.getElementById("voucher-file");
+
+      const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5MB
+      const ALLOWED_EXT = ["pdf", "jpg", "jpeg", "png"];
+
+      function showMessage(text, kind) {
+        messageBox.textContent = text;
+        messageBox.classList.remove("hidden");
+        messageBox.className =
+          "sm:col-span-2 rounded-md px-3.5 py-2.5 text-xs " +
+          (kind === "error"
+            ? "border border-red-500/30 bg-red-500/10 text-red-300"
+            : "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300");
+      }
+
+      function sanitize(value) {
+        return value.replace(/<[^>]*>/g, "").trim();
+      }
+
+      // Builds a safe, unique, collision-proof storage path.
+      // - Ignores the original filename for the *stored* name (only the
+      //   extension is kept) so path traversal / weird characters / very
+      //   long names can never reach Cloud Storage.
+      // - Namespaces by uid so Storage rules can restrict each employee to
+      //   their own folder if you want that later.
+      function buildSecureVoucherPath(uid, originalName) {
+        const extMatch = /\.([a-zA-Z0-9]+)$/.exec(originalName || "");
+        const ext = extMatch ? extMatch[1].toLowerCase() : "bin";
+        const unique = `${Date.now()}-${crypto.randomUUID()}`;
+        return { path: `vouchers/${uid}/${unique}.${ext}`, ext };
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!currentUser) return;
+
+        const milestoneName = sanitize(document.getElementById("milestone-name").value).slice(0, 120);
+        const amountRaw = document.getElementById("payment-amount").value;
+        const amount = Number(amountRaw);
+        const file = fileInput.files[0];
+
+        if (!milestoneName || !Number.isFinite(amount) || amount < 0) {
+          showMessage("সঠিক মাইলস্টোন ও পরিমাণ দিন।", "error");
+          return;
+        }
+
+        let voucherPath = null;
+        let voucherExt = null;
+
+        if (file) {
+          const ext = (file.name.split(".").pop() || "").toLowerCase();
+          if (!ALLOWED_EXT.includes(ext)) {
+            showMessage("শুধুমাত্র PDF, JPG অথবা PNG ফাইল আপলোড করা যাবে।", "error");
+            return;
+          }
+          if (file.size > MAX_FILE_BYTES) {
+            showMessage("ফাইলের আকার ৫MB এর বেশি হতে পারবে না।", "error");
+            return;
+          }
+          const built = buildSecureVoucherPath(currentUser.uid, file.name);
+          voucherPath = built.path;
+          voucherExt = built.ext;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "সংরক্ষণ হচ্ছে…";
+
+        try {
+          let voucherURL = null;
+
+          if (file) {
+            // storage.rules (see project deliverables) restricts this path
+            // to authenticated users and enforces the same size/type limits
+            // server-side — the checks above are UX, not the real gate.
+            const storageRef = ref(storage, voucherPath);
+            await uploadBytes(storageRef, file, { contentType: file.type });
+            voucherURL = await getDownloadURL(storageRef);
+          }
+
+          await addDoc(collection(db, "projectPayments"), {
+            milestoneName,
+            amount,
+            submittedBy: currentUser.uid,
+            submittedByEmail: currentUser.email,
+            voucherPath,
+            voucherExt,
+            voucherURL,
+            createdAt: serverTimestamp(),
+          });
+
+          showMessage("খরচের হিসাব সংরক্ষণ করা হয়েছে।", "success");
+          form.reset();
+        } catch (err) {
+          showMessage("সংরক্ষণ করা সম্ভব হয়নি। আবার চেষ্টা করুন।", "error");
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "সংরক্ষণ করুন";
+        }
+      });
+
+      function subscribeToPayments() {
+        const tbody = document.getElementById("payments-table-body");
+        const q = query(collection(db, "projectPayments"), orderBy("createdAt", "desc"), limit(50));
+
+        onSnapshot(q, (snapshot) => {
+          if (snapshot.empty) {
+            tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-white/40">কোনো এন্ট্রি নেই।</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = "";
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const tr = document.createElement("tr");
+
+            const dateStr = data.createdAt?.toDate
+              ? data.createdAt.toDate().toLocaleDateString("bn-BD")
+              : "—";
+
+            // Built with textContent / createElement, never innerHTML with
+            // user data — this is what actually prevents stored-XSS here,
+            // not the client-side sanitize() step on the way in.
+            const cells = [
+              data.milestoneName || "—",
+              typeof data.amount === "number" ? `৳${data.amount.toLocaleString("bn-BD")}` : "—",
+              data.submittedByEmail || "—",
+              dateStr,
+            ];
+
+            cells.forEach((text) => {
+              const td = document.createElement("td");
+              td.className = "px-4 py-3 text-white/85";
+              td.textContent = text;
+              tr.appendChild(td);
+            });
+
+            const voucherTd = document.createElement("td");
+            voucherTd.className = "px-4 py-3";
+            if (data.voucherURL) {
+              const a = document.createElement("a");
+              a.href = data.voucherURL;
+              a.target = "_blank";
+              a.rel = "noopener noreferrer";
+              a.className = "text-gold underline decoration-gold/40 underline-offset-2 hover:text-gold-light";
+              a.textContent = "দেখুন";
+              voucherTd.appendChild(a);
+            } else {
+              voucherTd.textContent = "—";
+              voucherTd.className += " text-white/40";
+            }
+            tr.appendChild(voucherTd);
+
+            tbody.appendChild(tr);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

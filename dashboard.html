@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="bn" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ড্যাশবোর্ড | ABASHON Consultancy & Construction</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              slate: { 950: "#16181b", 900: "#1a1c1e", 850: "#222528" },
+              gold: { DEFAULT: "#c5a059", light: "#d4b06a", dark: "#a8843f" },
+            },
+            fontFamily: {
+              display: ["Cormorant Garamond", "Georgia", "serif"],
+              sans: ["Noto Sans Bengali", "system-ui", "sans-serif"],
+            },
+            boxShadow: {
+              hero: "0 24px 80px rgba(0, 0, 0, 0.45)",
+              card: "0 8px 32px rgba(0, 0, 0, 0.35)",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body class="bg-slate-950 font-sans text-white antialiased">
+    <!-- Header: same shell as index.html, with employee-portal nav swapped in -->
+    <header class="sticky top-0 z-50 border-b border-white/5 bg-slate-950/90 backdrop-blur-md">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <a href="index.html" class="group min-w-0 shrink">
+          <span class="block font-display text-xl font-semibold leading-none tracking-wide text-gold sm:text-2xl">
+            ABASHON
+          </span>
+          <span class="mt-0.5 block text-[10px] font-medium uppercase tracking-[0.18em] text-white/55 sm:text-[11px]">
+            Consultancy &amp; Construction
+          </span>
+        </a>
+
+        <nav class="hidden items-center gap-8 lg:flex" aria-label="কর্মচারী নেভিগেশন">
+          <a href="dashboard.html" class="text-sm font-medium text-gold">ড্যাশবোর্ড</a>
+          <a href="project-entry.html" class="text-sm font-medium text-white/80 transition hover:text-gold">প্রজেক্ট এন্ট্রি</a>
+          <a href="project-payments.html" class="text-sm font-medium text-white/80 transition hover:text-gold">প্রজেক্ট পেমেন্টস</a>
+          <button
+            id="logout-btn"
+            type="button"
+            class="rounded-md border border-white/20 px-4 py-2 text-sm font-medium text-white/85 transition hover:border-gold/50 hover:text-gold"
+          >
+            লগআউট
+          </button>
+        </nav>
+
+        <button id="menu-toggle" type="button" class="inline-flex items-center justify-center rounded-md border border-white/15 p-2 text-white lg:hidden" aria-expanded="false" aria-controls="mobile-menu" aria-label="মেনু খুলুন">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+
+      <div id="mobile-menu" class="hidden border-t border-white/5 lg:hidden">
+        <nav class="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4 sm:px-6" aria-label="মোবাইল কর্মচারী নেভিগেশন">
+          <a href="dashboard.html" class="rounded-md px-3 py-2.5 text-sm font-medium text-gold">ড্যাশবোর্ড</a>
+          <a href="project-entry.html" class="rounded-md px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/5">প্রজেক্ট এন্ট্রি</a>
+          <a href="project-payments.html" class="rounded-md px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/5">প্রজেক্ট পেমেন্টস</a>
+          <button id="logout-btn-mobile" type="button" class="mt-2 rounded-md border border-white/15 px-3 py-2.5 text-left text-sm font-medium text-white/85 hover:bg-white/5">
+            লগআউট
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <div class="mb-8">
+        <h1 class="font-display text-3xl font-semibold text-white sm:text-4xl">স্বাগতম, <span id="user-email" class="text-gold">…</span></h1>
+        <p class="mt-2 text-sm text-white/60">আপনার প্রজেক্ট এন্ট্রি ও পেমেন্ট মডিউলে দ্রুত প্রবেশ করুন।</p>
+      </div>
+
+      <!-- Quick links -->
+      <div class="grid gap-6 sm:grid-cols-2">
+        <a href="project-entry.html" class="rounded-lg border border-white/10 bg-slate-900 p-6 shadow-card transition hover:border-gold/40">
+          <h2 class="font-display text-xl font-semibold text-gold">প্রজেক্ট এন্ট্রি</h2>
+          <p class="mt-2 text-sm text-white/65">মাস্টার শীট দেখুন এবং নতুন এন্ট্রি জমা দিন।</p>
+        </a>
+        <a href="project-payments.html" class="rounded-lg border border-white/10 bg-slate-900 p-6 shadow-card transition hover:border-gold/40">
+          <h2 class="font-display text-xl font-semibold text-gold">প্রজেক্ট পেমেন্টস</h2>
+          <p class="mt-2 text-sm text-white/65">মাইলস্টোন ও খরচের হিসাব, ভাউচার আপলোড করুন।</p>
+        </a>
+      </div>
+
+      <!-- Profile / Change Password -->
+      <section id="profile" class="mt-10 rounded-lg border border-white/10 bg-slate-900 p-6 shadow-card sm:p-8">
+        <h2 class="font-display text-xl font-semibold text-white">প্রোফাইল সেটিংস</h2>
+        <p class="mt-1 text-sm text-white/60">পাসওয়ার্ড পরিবর্তন করতে আপনার বর্তমান পাসওয়ার্ড নিশ্চিত করুন।</p>
+
+        <form id="change-password-form" class="mt-6 grid gap-4 sm:max-w-md" novalidate>
+          <div>
+            <label for="current-password" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-white/60">বর্তমান পাসওয়ার্ড</label>
+            <input id="current-password" type="password" autocomplete="current-password" required
+              class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-gold/60 focus:ring-1 focus:ring-gold/40" />
+          </div>
+          <div>
+            <label for="new-password" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-white/60">নতুন পাসওয়ার্ড</label>
+            <input id="new-password" type="password" autocomplete="new-password" required minlength="8"
+              class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-gold/60 focus:ring-1 focus:ring-gold/40" />
+            <p class="mt-1 text-xs text-white/40">ন্যূনতম ৮ অক্ষর।</p>
+          </div>
+          <div>
+            <label for="confirm-password" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-white/60">নতুন পাসওয়ার্ড নিশ্চিত করুন</label>
+            <input id="confirm-password" type="password" autocomplete="new-password" required minlength="8"
+              class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-gold/60 focus:ring-1 focus:ring-gold/40" />
+          </div>
+
+          <p id="password-message" class="hidden rounded-md px-3.5 py-2.5 text-xs" role="alert"></p>
+
+          <button id="change-password-submit" type="submit"
+            class="w-fit rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-60">
+            পাসওয়ার্ড আপডেট করুন
+          </button>
+        </form>
+      </section>
+    </main>
+
+    <script type="module">
+      import {
+        auth, requireAuth, signOut,
+        reauthenticateWithCredential, EmailAuthProvider, updatePassword,
+      } from "./assets/firebase-config.js";
+
+      // --- Route guard: redirects to employee-login.html if not signed in ---
+      requireAuth((user) => {
+        document.getElementById("user-email").textContent = user.email;
+      });
+
+      // --- Mobile menu (same pattern as index.html) ---
+      const menuToggle = document.getElementById("menu-toggle");
+      const mobileMenu = document.getElementById("mobile-menu");
+      menuToggle.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+        menuToggle.setAttribute("aria-expanded", String(!mobileMenu.classList.contains("hidden")));
+      });
+
+      // --- Logout (desktop + mobile buttons) ---
+      async function handleLogout() {
+        await signOut(auth);
+        window.location.replace("employee-login.html");
+      }
+      document.getElementById("logout-btn").addEventListener("click", handleLogout);
+      document.getElementById("logout-btn-mobile").addEventListener("click", handleLogout);
+
+      // --- Change password: re-verify current password, then update ---
+      const form = document.getElementById("change-password-form");
+      const submitBtn = document.getElementById("change-password-submit");
+      const messageBox = document.getElementById("password-message");
+
+      function showMessage(text, kind) {
+        messageBox.textContent = text;
+        messageBox.className =
+          kind === "error"
+            ? "rounded-md border border-red-500/30 bg-red-500/10 px-3.5 py-2.5 text-xs text-red-300"
+            : "rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2.5 text-xs text-emerald-300";
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const currentPassword = document.getElementById("current-password").value;
+        const newPassword = document.getElementById("new-password").value;
+        const confirmPassword = document.getElementById("confirm-password").value;
+
+        if (newPassword !== confirmPassword) {
+          showMessage("নতুন পাসওয়ার্ড দুটি মিলছে না।", "error");
+          return;
+        }
+        if (newPassword.length < 8) {
+          showMessage("নতুন পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।", "error");
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "আপডেট হচ্ছে…";
+
+        try {
+          const user = auth.currentUser;
+          // Firebase requires a fresh credential before a sensitive op like
+          // updatePassword — this IS the "Current Password verification step".
+          const credential = EmailAuthProvider.credential(user.email, currentPassword);
+          await reauthenticateWithCredential(user, credential);
+          await updatePassword(user, newPassword);
+
+          showMessage("পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে।", "success");
+          form.reset();
+        } catch (err) {
+          const msg =
+            err.code === "auth/invalid-credential" || err.code === "auth/wrong-password"
+              ? "বর্তমান পাসওয়ার্ডটি সঠিক নয়।"
+              : "পাসওয়ার্ড পরিবর্তন করা সম্ভব হয়নি। আবার চেষ্টা করুন।";
+          showMessage(msg, "error");
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "পাসওয়ার্ড আপডেট করুন";
+        }
+      });
+    </script>
+  </body>
+</html>
