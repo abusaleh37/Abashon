@@ -3,17 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>কর্মচারী লগইন | ABASHON Consultancy & Construction</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <title>Employee Login | ABASHON Consultancy & Construction</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      // Same token overrides as index.html — keep in sync if the palette changes there.
       tailwind.config = {
         theme: {
           extend: {
@@ -21,137 +14,40 @@
               slate: { 950: "#16181b", 900: "#1a1c1e", 850: "#222528" },
               gold: { DEFAULT: "#c5a059", light: "#d4b06a", dark: "#a8843f" },
             },
-            fontFamily: {
-              display: ["Cormorant Garamond", "Georgia", "serif"],
-              sans: ["Noto Sans Bengali", "system-ui", "sans-serif"],
-            },
-            boxShadow: {
-              hero: "0 24px 80px rgba(0, 0, 0, 0.45)",
-              card: "0 8px 32px rgba(0, 0, 0, 0.35)",
-            },
           },
         },
       };
     </script>
   </head>
-
   <body class="flex min-h-screen items-center justify-center bg-slate-950 px-4 font-sans text-white antialiased">
     <div class="w-full max-w-md">
-      <div class="mb-8 text-center">
-        <a href="index.html" class="inline-block">
-          <span class="block font-display text-2xl font-semibold leading-none tracking-wide text-gold">
-            ABASHON
-          </span>
-          <span class="mt-1 block text-[11px] font-medium uppercase tracking-[0.18em] text-white/55">
-            Consultancy &amp; Construction
-          </span>
-        </a>
-      </div>
-
-      <div class="rounded-lg border border-white/10 bg-slate-900 p-6 shadow-card sm:p-8">
-        <h1 class="font-display text-2xl font-semibold text-white">কর্মচারী লগইন</h1>
-        <p class="mt-1 text-sm text-white/60">অনুগ্রহ করে আপনার প্রদত্ত ইমেইল ও পাসওয়ার্ড দিয়ে প্রবেশ করুন।</p>
-
-        <form id="login-form" class="mt-6 space-y-4" novalidate>
-          <div>
-            <label for="email" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-white/60">
-              ইমেইল
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autocomplete="username"
-              required
-              class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:border-gold/60 focus:ring-1 focus:ring-gold/40"
-              placeholder="you@abashon.com"
-            />
-          </div>
-
-          <div>
-            <label for="password" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-white/60">
-              পাসওয়ার্ড
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              required
-              minlength="8"
-              class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:border-gold/60 focus:ring-1 focus:ring-gold/40"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <!-- Error region: kept out of the form's visual flow until populated, announced to screen readers -->
-          <p id="login-error" class="hidden rounded-md border border-red-500/30 bg-red-500/10 px-3.5 py-2.5 text-xs text-red-300" role="alert"></p>
-
-          <button
-            id="login-submit"
-            type="submit"
-            class="mt-2 w-full rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            প্রবেশ করুন
-          </button>
+      <div class="rounded-lg border border-white/10 bg-slate-900 p-8 shadow-card">
+        <h1 class="text-2xl font-semibold text-white">Employee Login</h1>
+        <form id="login-form" class="mt-6 space-y-4">
+          <input id="email" type="email" placeholder="ইমেইল" class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white" required />
+          <input id="password" type="password" placeholder="পাসওয়ার্ড" class="w-full rounded-md border border-white/15 bg-slate-950 px-3.5 py-2.5 text-sm text-white" required />
+          <p id="login-error" class="hidden text-xs text-red-400"></p>
+          <button id="login-submit" type="submit" class="w-full rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-gold-light">প্রবেশ করুন</button>
         </form>
       </div>
-
-      <a href="index.html" class="mt-6 block text-center text-xs text-white/50 transition hover:text-gold">
-        ← মূল ওয়েবসাইটে ফিরে যান
-      </a>
     </div>
 
-    <script type="module">
-      import { auth, signInWithEmailAndPassword, onAuthStateChanged } from "./assets/firebase-config.js";
+    <script>
+      const supabase = supabase.createClient('আপনার_PROJECT_URL_এখানে_দিন', 'sb_publishable_FZN4P-Pof8H3txLTOVb2oA_DSsTTMAo');
 
-      // If already signed in, skip the login screen entirely.
-      onAuthStateChanged(auth, (user) => {
-        if (user) window.location.replace("dashboard.html");
-      });
-
-      const form = document.getElementById("login-form");
-      const submitBtn = document.getElementById("login-submit");
-      const errorBox = document.getElementById("login-error");
-
-      // Map Firebase's internal error codes to a message an employee can act on.
-      // Deliberately vague between "wrong email" and "wrong password" so the
-      // login form can't be used to enumerate valid employee email addresses.
-      function friendlyError(code) {
-        switch (code) {
-          case "auth/invalid-email":
-            return "ইমেইল ঠিকানাটি সঠিক নয়।";
-          case "auth/user-disabled":
-            return "এই অ্যাকাউন্টটি নিষ্ক্রিয় করা হয়েছে। অ্যাডমিনের সাথে যোগাযোগ করুন।";
-          case "auth/invalid-credential":
-          case "auth/wrong-password":
-          case "auth/user-not-found":
-            return "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।";
-          case "auth/too-many-requests":
-            return "একাধিকবার ভুল চেষ্টার কারণে সাময়িকভাবে বন্ধ রাখা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।";
-          default:
-            return "লগইন করা সম্ভব হয়নি। আবার চেষ্টা করুন।";
-        }
-      }
-
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        errorBox.classList.add("hidden");
-
-        const email = form.email.value.trim();
-        const password = form.password.value;
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = "প্রবেশ করা হচ্ছে…";
-
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
+      document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        
+        if (error) {
+          const errEl = document.getElementById('login-error');
+          errEl.textContent = "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।";
+          errEl.classList.remove('hidden');
+        } else {
           window.location.href = "dashboard.html";
-        } catch (err) {
-          errorBox.textContent = friendlyError(err.code);
-          errorBox.classList.remove("hidden");
-          submitBtn.disabled = false;
-          submitBtn.textContent = "প্রবেশ করুন";
         }
       });
     </script>
