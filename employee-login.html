@@ -33,6 +33,10 @@
     </div>
 
     <script>
+      // Supabase Client ইনিশিয়ালাইজ করা
+const supabase = supabase.createClient('https://your-project-id.supabase.co', 'sb_publishable_FZN4P-Pof8H3txLTOVb2oA_DSsTTMAo');
+
+// লগইন বাটনের ইভেন্ট হ্যান্ডলার... (বাকি অংশ ঠিক আছে)
       const supabase = supabase.createClient('আপনার_PROJECT_URL_এখানে_দিন', 'sb_publishable_FZN4P-Pof8H3txLTOVb2oA_DSsTTMAo');
 
       document.getElementById('login-form').addEventListener('submit', async (e) => {
