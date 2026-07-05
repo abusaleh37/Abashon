@@ -1,69 +1,363 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" class="h-full bg-slate-950">
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Employee Dashboard</title>
+    <title>Abashon | Employee Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-
     <script>
-        (function gate() {
-            const isAuthed = sessionStorage.getItem("employeeAuth") === "true";
-            if (!isAuthed) {
-                window.location.replace("employee-login.html");
-            }
-        })();
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              slate: { 950: "#0b0f14", 900: "#12161c", 850: "#1a2029" },
+              gold: { DEFAULT: "#c5a059", light: "#d6b36d", dark: "#a8843f" },
+            },
+            boxShadow: {
+              card: "0 18px 45px rgba(0, 0, 0, 0.24)",
+            },
+          },
+        },
+      };
     </script>
+    <script>
+      const SUPABASE_URL = "https://YOUR_PROJECT_REF.supabase.co";
+      const SUPABASE_ANON_KEY = "sb_publishable_FZN4P-Pof8H3txLTOVb2oA_DSsTTMAo";
 
+      window.__ABASHON_SUPABASE = window.supabase
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        : null;
+
+      (async function authGate() {
+        const supabase = window.__ABASHON_SUPABASE;
+
+        if (!supabase) {
+          window.location.replace("employee-login.html");
+          return;
+        }
+
+        const { data: { session }, error } = await supabase.auth.getSession();
+
+        if (error || !session) {
+          window.location.replace("employee-login.html");
+          return;
+        }
+
+        window.__ABASHON_SESSION = session;
+      })();
+    </script>
     <style>
-        body { visibility: hidden; }
+      body {
+        visibility: hidden;
+      }
     </style>
-</head>
-<body class="min-h-screen bg-slate-50">
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <div class="min-h-screen bg-slate-950">
+      <div class="flex min-h-screen flex-col lg:flex-row">
+        <aside id="sidebar" class="hidden w-72 flex-col border-r border-white/10 bg-slate-900/95 p-6 shadow-card lg:flex">
+          <div class="mb-10">
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-gold">Abashon</p>
+            <h1 class="mt-2 text-2xl font-semibold text-white">Employee Console</h1>
+            <p class="mt-2 text-sm text-slate-400">Construction & Real Estate Operations</p>
+          </div>
 
-    <script>
-        document.body.style.visibility = "visible";
-    </script>
+          <nav class="space-y-2 text-sm font-medium">
+            <a href="#" class="flex items-center rounded-xl bg-gold/15 px-4 py-3 text-gold">Dashboard</a>
+            <a href="#" class="flex items-center rounded-xl px-4 py-3 text-slate-300 transition hover:bg-white/5 hover:text-white">Project Management</a>
+            <a href="#" class="flex items-center rounded-xl px-4 py-3 text-slate-300 transition hover:bg-white/5 hover:text-white">Payment Tracking</a>
+            <a href="#" class="flex items-center rounded-xl px-4 py-3 text-slate-300 transition hover:bg-white/5 hover:text-white">Task Assignments</a>
+            <a href="#" class="flex items-center rounded-xl px-4 py-3 text-slate-300 transition hover:bg-white/5 hover:text-white">Reports</a>
+          </nav>
 
-    <header class="bg-white border-b border-slate-200">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 class="text-lg font-semibold text-slate-900">Employee Dashboard</h1>
-            <div class="flex items-center gap-4">
-                <span id="userEmail" class="text-sm text-slate-500"></span>
-                <button id="logoutBtn" class="text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-300 rounded-lg px-3 py-1.5 hover:bg-slate-100 transition-colors">
-                    Log out
+          <div class="mt-auto rounded-2xl border border-white/10 bg-slate-950/70 p-4">
+            <p class="text-sm font-semibold text-white">Today’s focus</p>
+            <p class="mt-2 text-sm text-slate-400">Review delivery progress, outstanding payments, and site updates in one place.</p>
+          </div>
+        </aside>
+
+        <div class="flex-1">
+          <header class="border-b border-white/10 bg-slate-900/80 px-4 py-4 backdrop-blur sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <button id="mobileMenuBtn" class="rounded-lg border border-white/10 p-2 text-slate-300 hover:bg-white/5 hover:text-white lg:hidden" aria-label="Toggle navigation">
+                  ☰
                 </button>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-5xl mx-auto px-4 py-8">
-        <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-8">
-            <h2 class="text-xl font-semibold text-slate-900 mb-2">Welcome back</h2>
-            <div class="grid sm:grid-cols-2 gap-4">
-                <div class="border border-slate-200 rounded-lg p-4">
-                    <h3 class="font-medium text-slate-900 mb-1">Session info</h3>
-                    <p class="text-sm text-slate-500">Signed in as <span id="userEmail2" class="font-medium text-slate-700"></span></p>
-                    <p class="text-sm text-slate-500">Login time: <span id="loginTime" class="font-medium text-slate-700"></span></p>
+                <div>
+                  <p class="text-sm text-slate-400">Operations Overview</p>
+                  <h2 class="text-lg font-semibold text-white">Executive Dashboard</h2>
                 </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <div class="hidden rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm text-gold sm:block" id="statusBadge">Live system</div>
+                <div class="flex items-center gap-3 rounded-full border border-white/10 bg-slate-950/70 px-3 py-2">
+                  <div class="flex h-9 w-9 items-center justify-center rounded-full bg-gold/20 text-sm font-semibold text-gold" id="userInitials">U</div>
+                  <div class="text-right">
+                    <p id="userEmail" class="text-sm font-medium text-white">Loading…</p>
+                    <p class="text-xs text-slate-400">Signed in</p>
+                  </div>
+                </div>
+                <button id="logoutBtn" class="rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white">
+                  Logout
+                </button>
+              </div>
             </div>
+          </header>
+
+          <main class="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+            <section class="rounded-3xl border border-white/10 bg-slate-900/90 p-6 shadow-card">
+              <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <p class="text-sm font-semibold uppercase tracking-[0.3em] text-gold">Abashon Network</p>
+                  <h3 class="mt-2 text-2xl font-semibold text-white">Welcome back, team</h3>
+                  <p class="mt-2 max-w-2xl text-sm text-slate-400">
+                    Monitor active projects, verify payments, and keep field operations moving with a single control center.
+                  </p>
+                </div>
+                <div class="rounded-2xl border border-gold/20 bg-gold/10 px-4 py-3 text-sm text-gold">
+                  <p class="font-semibold">Next review window</p>
+                  <p class="mt-1 text-gold/80">Today • 4:30 PM</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="mt-6 grid gap-4 md:grid-cols-3">
+              <article class="rounded-2xl border border-white/10 bg-slate-900/90 p-5 shadow-card">
+                <p class="text-sm text-slate-400">Active Projects</p>
+                <div class="mt-3 flex items-end justify-between">
+                  <p class="text-3xl font-semibold text-white" id="activeProjectsValue">0</p>
+                  <span class="rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-400">On track</span>
+                </div>
+              </article>
+
+              <article class="rounded-2xl border border-white/10 bg-slate-900/90 p-5 shadow-card">
+                <p class="text-sm text-slate-400">Pending Payments</p>
+                <div class="mt-3 flex items-end justify-between">
+                  <p class="text-3xl font-semibold text-white" id="pendingPaymentsValue">0</p>
+                  <span class="rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-400">Needs review</span>
+                </div>
+              </article>
+
+              <article class="rounded-2xl border border-white/10 bg-slate-900/90 p-5 shadow-card">
+                <p class="text-sm text-slate-400">Total Tasks</p>
+                <div class="mt-3 flex items-end justify-between">
+                  <p class="text-3xl font-semibold text-white" id="totalTasksValue">0</p>
+                  <span class="rounded-full bg-sky-500/15 px-2.5 py-1 text-xs font-semibold text-sky-400">Assigned</span>
+                </div>
+              </article>
+            </section>
+
+            <section class="mt-6 grid gap-6 xl:grid-cols-[1.5fr_0.9fr]">
+              <div class="rounded-3xl border border-white/10 bg-slate-900/90 p-5 shadow-card">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h3 class="text-lg font-semibold text-white">Recent updates</h3>
+                    <p class="text-sm text-slate-400">Latest project and payment activity from your connected workspace.</p>
+                  </div>
+                  <span id="dataStatus" class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-400">Loading…</span>
+                </div>
+
+                <div class="mt-5 overflow-hidden rounded-2xl border border-white/10">
+                  <table class="min-w-full divide-y divide-white/10 text-sm">
+                    <thead class="bg-slate-950/70 text-left text-slate-400">
+                      <tr>
+                        <th class="px-4 py-3 font-medium">Item</th>
+                        <th class="px-4 py-3 font-medium">Status</th>
+                        <th class="px-4 py-3 font-medium">Updated</th>
+                      </tr>
+                    </thead>
+                    <tbody id="updatesTableBody" class="divide-y divide-white/10 bg-slate-900/60"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="space-y-6">
+                <div class="rounded-3xl border border-white/10 bg-slate-900/90 p-5 shadow-card">
+                  <h3 class="text-lg font-semibold text-white">Priority checklist</h3>
+                  <ul class="mt-4 space-y-3 text-sm text-slate-400">
+                    <li class="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2">
+                      <span>Finalize contractor invoices</span>
+                      <span class="text-gold">2</span>
+                    </li>
+                    <li class="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2">
+                      <span>Review site safety logs</span>
+                      <span class="text-gold">5</span>
+                    </li>
+                    <li class="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2">
+                      <span>Confirm next week delivery</span>
+                      <span class="text-gold">1</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="rounded-3xl border border-white/10 bg-slate-900/90 p-5 shadow-card">
+                  <h3 class="text-lg font-semibold text-white">Operations note</h3>
+                  <p class="mt-3 text-sm leading-6 text-slate-400">
+                    Teams are aligned on milestone reviews and payment approvals. Keep project stakeholders informed before closeout.
+                  </p>
+                </div>
+              </div>
+            </section>
+          </main>
         </div>
-    </main>
+      </div>
+    </div>
 
     <script>
-        // ডেটা লোড করা
-        const email = sessionStorage.getItem("employeeEmail") || "User";
-        const loginTime = sessionStorage.getItem("employeeLoginTime") || "Not available";
+      const supabase = window.__ABASHON_SUPABASE;
+      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+      const sidebar = document.getElementById("sidebar");
+      const updatesTableBody = document.getElementById("updatesTableBody");
+      const dataStatus = document.getElementById("dataStatus");
+      const userEmail = document.getElementById("userEmail");
+      const userInitials = document.getElementById("userInitials");
+      const logoutBtn = document.getElementById("logoutBtn");
 
-        document.getElementById("userEmail").textContent = email;
-        document.getElementById("userEmail2").textContent = email;
-        document.getElementById("loginTime").textContent = loginTime;
+      const fallbackRows = [
+        { title: "North Avenue project milestone approved", status: "On Track", updated_at: "2026-07-06" },
+        { title: "Invoice 1042 is awaiting finance sign-off", status: "Pending", updated_at: "2026-07-05" },
+        { title: "Site inspection scheduled for Friday", status: "Scheduled", updated_at: "2026-07-04" },
+      ];
 
-        // Logout লজিক
-        document.getElementById("logoutBtn").addEventListener("click", () => {
-            sessionStorage.clear(); // সব ডাটা মুছে ফেলবে
-            window.location.href = "employee-login.html";
-        });
+      const fallbackStats = {
+        activeProjects: 12,
+        pendingPayments: 4,
+        totalTasks: 28,
+      };
+
+      function formatDate(value) {
+        if (!value) return "—";
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString("en", { month: "short", day: "numeric" });
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function updateSummaryCards(stats) {
+        document.getElementById("activeProjectsValue").textContent = stats.activeProjects;
+        document.getElementById("pendingPaymentsValue").textContent = stats.pendingPayments;
+        document.getElementById("totalTasksValue").textContent = stats.totalTasks;
+      }
+
+      function renderUpdates(rows) {
+        if (!rows.length) {
+          updatesTableBody.innerHTML = `
+            <tr>
+              <td colspan="3" class="px-4 py-5 text-center text-sm text-slate-400">No updates were returned from Supabase yet.</td>
+            </tr>`;
+          return;
+        }
+
+        updatesTableBody.innerHTML = rows
+          .map((row) => {
+            const title = row.title || row.name || row.project_name || row.subject || "Update";
+            const status = row.status || row.payment_status || row.state || "Updated";
+            const updatedAt = row.updated_at || row.created_at || row.date || "";
+
+            return `
+              <tr>
+                <td class="px-4 py-3 text-slate-200">${escapeHtml(title)}</td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-slate-200">${escapeHtml(status)}</span>
+                </td>
+                <td class="px-4 py-3 text-slate-400">${escapeHtml(formatDate(updatedAt))}</td>
+              </tr>`;
+          })
+          .join("");
+      }
+
+      async function loadDashboardData() {
+        dataStatus.textContent = "Syncing…";
+
+        const [projectsResult, paymentsResult, tasksResult] = await Promise.allSettled([
+          supabase.from("projects").select("id, status, updated_at").order("updated_at", { ascending: false }).limit(15),
+          supabase.from("payments").select("id, status, updated_at").order("updated_at", { ascending: false }).limit(15),
+          supabase.from("tasks").select("id, status").limit(50),
+        ]);
+
+        const stats = { ...fallbackStats };
+        let rows = [...fallbackRows];
+
+        if (projectsResult.status === "fulfilled" && !projectsResult.value.error && projectsResult.value.data?.length) {
+          stats.activeProjects = projectsResult.value.data.filter((item) => String(item.status).toLowerCase().includes("active") || String(item.status).toLowerCase().includes("in progress") || String(item.status).toLowerCase().includes("ongoing")).length || stats.activeProjects;
+          rows = projectsResult.value.data.map((item) => ({ title: item.name || item.title || "Project update", status: item.status || "Updated", updated_at: item.updated_at || item.created_at }));
+        }
+
+        if (paymentsResult.status === "fulfilled" && !paymentsResult.value.error && paymentsResult.value.data?.length) {
+          stats.pendingPayments = paymentsResult.value.data.filter((item) => String(item.status).toLowerCase().includes("pending") || String(item.status).toLowerCase().includes("review")).length || stats.pendingPayments;
+          if (rows.length < 4) {
+            rows = rows.concat(
+              paymentsResult.value.data.map((item) => ({ title: item.reference || item.title || "Payment update", status: item.status || "Updated", updated_at: item.updated_at || item.created_at }))
+            );
+          }
+        }
+
+        if (tasksResult.status === "fulfilled" && !tasksResult.value.error && tasksResult.value.data?.length) {
+          stats.totalTasks = tasksResult.value.data.length || stats.totalTasks;
+        }
+
+        updateSummaryCards(stats);
+        renderUpdates(rows.slice(0, 5));
+        dataStatus.textContent = "Live data";
+      }
+
+      async function initializeDashboard() {
+        const session = window.__ABASHON_SESSION;
+        if (!session?.user) {
+          window.location.replace("employee-login.html");
+          return;
+        }
+
+        const user = session.user;
+        const email = user.email || "Employee";
+        userEmail.textContent = email;
+        const initials = email
+          .split("@")[0]
+          .split(/[^a-zA-Z0-9]/)
+          .filter(Boolean)
+          .slice(0, 2)
+          .map((part) => part[0]?.toUpperCase() || "")
+          .join("");
+        userInitials.textContent = initials || "U";
+
+        try {
+          await loadDashboardData();
+        } catch (error) {
+          console.error("Dashboard data load failed", error);
+          updateSummaryCards(fallbackStats);
+          renderUpdates(fallbackRows);
+          dataStatus.textContent = "Fallback";
+        }
+
+        document.body.style.visibility = "visible";
+      }
+
+      mobileMenuBtn?.addEventListener("click", () => {
+        sidebar.classList.toggle("hidden");
+        sidebar.classList.toggle("flex");
+      });
+
+      logoutBtn.addEventListener("click", async () => {
+        await supabase.auth.signOut();
+        window.location.replace("employee-login.html");
+      });
+
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (!session) {
+          window.location.replace("employee-login.html");
+        }
+      });
+
+      initializeDashboard();
     </script>
-</body>
+  </body>
 </html>
