@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="bn" class="scroll-smooth">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Employee Login | ABASHON Consultancy & Construction</title>
@@ -18,8 +18,8 @@
         },
       };
     </script>
-  </head>
-  <body class="flex min-h-screen items-center justify-center bg-slate-950 px-4 font-sans text-white antialiased">
+</head>
+<body class="flex min-h-screen items-center justify-center bg-slate-950 px-4 font-sans text-white antialiased">
     <div class="w-full max-w-md">
       <div class="rounded-lg border border-white/10 bg-slate-900 p-8 shadow-card">
         <h1 class="text-2xl font-semibold text-white">Employee Login</h1>
@@ -33,24 +33,33 @@
     </div>
 
     <script>
-     
-      const supabase = supabase.createClient('আপনার_PROJECT_URL_এখানে_দিন', 'sb_publishable_FZN4P-Pof8H3txLTOVb2oA_DSsTTMAo');
+      // আপনার Supabase কনফিগারেশন
+      const SUPABASE_URL = 'আপনার_PROJECT_URL_এখানে_বসিয়ে_দিন'; // এখান থেকে URL টি বসাবেন
+      const SUPABASE_ANON_KEY = 'sb_publishable_FZN4P-Pof8H3txLTOVb2oA_DSsTTMAo';
+
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
       document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        
+        const errorEl = document.getElementById('login-error');
+
+        // লগইন করার চেষ্টা
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+
         if (error) {
-          const errEl = document.getElementById('login-error');
-          errEl.textContent = "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।";
-          errEl.classList.remove('hidden');
+          errorEl.textContent = "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।";
+          errorEl.classList.remove('hidden');
         } else {
-          window.location.href = "dashboard.html";
+          // সফল লগইন হলে ড্যাশবোর্ডে নিয়ে যাবে
+          window.location.href = "employee-dashboard.html";
         }
       });
     </script>
-  </body>
+</body>
 </html>
