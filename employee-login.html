@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="bn" class="scroll-smooth">
   <head>
+    <script>
+    // যদি সেশন না থাকে, লগইন পেজে পাঠিয়ে দেবে
+    if (!localStorage.getItem('sb-flwlpvavlsomhuoywvz-auth-token')) {
+        window.location.href = 'employee-login.html';
+    }
+</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Employee Login | ABASHON Consultancy & Construction</title>
