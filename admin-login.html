@@ -8,7 +8,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Supabase JS v2 -->
+  <!-- Supabase JS v2 (single import only) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -130,6 +130,8 @@
     // IMPORTANT: Paste your real Supabase credentials below.
     const SUPABASE_URL = "https://flwlpvavvlsomhuoywvz.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_FZN4P-Pof8H3txLTOVb2oA_DSsTTMAo";
+
+    // Single Supabase client initialization only
     const supabase = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_ANON_KEY
