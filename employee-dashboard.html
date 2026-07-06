@@ -25,63 +25,83 @@
       const SUPABASE_URL = "https://flwlpvavvlsomhuoywvz.supabase.co";
       const SUPABASE_ANON_KEY = "sb_publishable_FZN4P-Pof8H3txLTOVb2oA_DSsTTMAo";
 
-      window.__ABASHON_SUPABASE = window.supabase
-        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-        : null;
-
-      (async function authGate() {
-        const supabase = window.__ABASHON_SUPABASE;
-
-        if (!supabase) {
-          window.location.replace("employee-login.html");
-          return;
-        }
-
-        const { data: { session }, error } = await supabase.auth.getSession();
-
-        if (error || !session) {
-          window.location.replace("employee-login.html");
-          return;
-        }
-
-        window.__ABASHON_SESSION = session;
-      })();
+      window.__ABASHON_SUPABASE =
+        window.__ABASHON_SUPABASE ||
+        (window.supabase
+          ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+          : null);
     </script>
     <style>
       body {
-        visibility: hidden;
+        visibility: visible;
       }
     </style>
   </head>
   <body class="min-h-screen bg-slate-950 text-slate-100">
     <div class="min-h-screen bg-slate-950">
       <div class="flex min-h-screen flex-col lg:flex-row">
-        <aside id="sidebar" class="hidden w-72 flex-col border-r border-white/10 bg-slate-900/95 p-6 shadow-card lg:flex">
+        <aside
+          id="sidebar"
+          class="hidden w-72 flex-col border-r border-white/10 bg-slate-900/95 p-6 shadow-card lg:flex"
+        >
           <div class="mb-10">
-            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-gold">Abashon</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-gold">
+              Abashon
+            </p>
             <h1 class="mt-2 text-2xl font-semibold text-white">Employee Console</h1>
-            <p class="mt-2 text-sm text-slate-400">Construction & Real Estate Operations</p>
+            <p class="mt-2 text-sm text-slate-400">
+              Construction & Real Estate Operations
+            </p>
           </div>
 
           <nav class="space-y-2 text-sm font-medium">
-            <a href="#" class="flex items-center rounded-xl bg-gold/15 px-4 py-3 text-gold">Dashboard</a>
-            <a href="#" class="flex items-center rounded-xl px-4 py-3 text-slate-300 transition hover:bg-white/5 hover:text-white">Project Management</a>
-            <a href="#" class="flex items-center rounded-xl px-4 py-3 text-slate-300 transition hover:bg-white/5 hover:text-white">Payment Tracking</a>
-            <a href="#" class="flex items-center rounded-xl px-4 py-3 text-slate-300 transition hover:bg-white/5 hover:text-white">Task Assignments</a>
-            <a href="#" class="flex items-center rounded-xl px-4 py-3 text-slate-300 transition hover:bg-white/5 hover:text-white">Reports</a>
+            <a
+              href="#"
+              class="flex items-center rounded-xl bg-gold/15 px-4 py-3 text-gold"
+              >Dashboard</a
+            >
+            <a
+              href="#"
+              class="flex items-center rounded-xl px-4 py-3 text-slate-300 transition hover:bg-white/5 hover:text-white"
+              >Project Management</a
+            >
+            <a
+              href="#"
+              class="flex items-center rounded-xl px-4 py-3 text-slate-300 transition hover:bg-white/5 hover:text-white"
+              >Payment Tracking</a
+            >
+            <a
+              href="#"
+              class="flex items-center rounded-xl px-4 py-3 text-slate-300 transition hover:bg-white/5 hover:text-white"
+              >Task Assignments</a
+            >
+            <a
+              href="#"
+              class="flex items-center rounded-xl px-4 py-3 text-slate-300 transition hover:bg-white/5 hover:text-white"
+              >Reports</a
+            >
           </nav>
 
           <div class="mt-auto rounded-2xl border border-white/10 bg-slate-950/70 p-4">
             <p class="text-sm font-semibold text-white">Today’s focus</p>
-            <p class="mt-2 text-sm text-slate-400">Review delivery progress, outstanding payments, and site updates in one place.</p>
+            <p class="mt-2 text-sm text-slate-400">
+              Review delivery progress, outstanding payments, and site updates in one
+              place.
+            </p>
           </div>
         </aside>
 
         <div class="flex-1">
-          <header class="border-b border-white/10 bg-slate-900/80 px-4 py-4 backdrop-blur sm:px-6 lg:px-8">
+          <header
+            class="border-b border-white/10 bg-slate-900/80 px-4 py-4 backdrop-blur sm:px-6 lg:px-8"
+          >
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-3">
-                <button id="mobileMenuBtn" class="rounded-lg border border-white/10 p-2 text-slate-300 hover:bg-white/5 hover:text-white lg:hidden" aria-label="Toggle navigation">
+                <button
+                  id="mobileMenuBtn"
+                  class="rounded-lg border border-white/10 p-2 text-slate-300 hover:bg-white/5 hover:text-white lg:hidden"
+                  aria-label="Toggle navigation"
+                >
                   ☰
                 </button>
                 <div>
@@ -91,15 +111,30 @@
               </div>
 
               <div class="flex items-center gap-3">
-                <div class="hidden rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm text-gold sm:block" id="statusBadge">Live system</div>
-                <div class="flex items-center gap-3 rounded-full border border-white/10 bg-slate-950/70 px-3 py-2">
-                  <div class="flex h-9 w-9 items-center justify-center rounded-full bg-gold/20 text-sm font-semibold text-gold" id="userInitials">U</div>
+                <div
+                  class="hidden rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm text-gold sm:block"
+                  id="statusBadge"
+                >
+                  Live system
+                </div>
+                <div
+                  class="flex items-center gap-3 rounded-full border border-white/10 bg-slate-950/70 px-3 py-2"
+                >
+                  <div
+                    class="flex h-9 w-9 items-center justify-center rounded-full bg-gold/20 text-sm font-semibold text-gold"
+                    id="userInitials"
+                  >
+                    U
+                  </div>
                   <div class="text-right">
                     <p id="userEmail" class="text-sm font-medium text-white">Loading…</p>
                     <p class="text-xs text-slate-400">Signed in</p>
                   </div>
                 </div>
-                <button id="logoutBtn" class="rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white">
+                <button
+                  id="logoutBtn"
+                  class="rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white"
+                >
                   Logout
                 </button>
               </div>
@@ -107,13 +142,20 @@
           </header>
 
           <main class="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-            <section class="rounded-3xl border border-white/10 bg-slate-900/90 p-6 shadow-card">
+            <section
+              class="rounded-3xl border border-white/10 bg-slate-900/90 p-6 shadow-card"
+            >
               <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <p class="text-sm font-semibold uppercase tracking-[0.3em] text-gold">Abashon Network</p>
-                  <h3 class="mt-2 text-2xl font-semibold text-white">Welcome back, team</h3>
+                  <p class="text-sm font-semibold uppercase tracking-[0.3em] text-gold">
+                    Abashon Network
+                  </p>
+                  <h3 class="mt-2 text-2xl font-semibold text-white">
+                    Welcome back, team
+                  </h3>
                   <p class="mt-2 max-w-2xl text-sm text-slate-400">
-                    Monitor active projects, verify payments, and keep field operations moving with a single control center.
+                    Monitor active projects, verify payments, and keep field operations
+                    moving with a single control center.
                   </p>
                 </div>
                 <div class="rounded-2xl border border-gold/20 bg-gold/10 px-4 py-3 text-sm text-gold">
@@ -122,30 +164,44 @@
                 </div>
               </div>
             </section>
-          
 
             <section class="mt-6 grid gap-4 md:grid-cols-3">
-              <article class="rounded-2xl border border-white/10 bg-slate-900/90 p-5 shadow-card">
+              <article
+                class="rounded-2xl border border-white/10 bg-slate-900/90 p-5 shadow-card"
+              >
                 <p class="text-sm text-slate-400">Active Projects</p>
                 <div class="mt-3 flex items-end justify-between">
                   <p class="text-3xl font-semibold text-white" id="activeProjectsValue">0</p>
-                  <span class="rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-400">On track</span>
+                  <span
+                    class="rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-400"
+                    >On track</span
+                  >
                 </div>
               </article>
 
-              <article class="rounded-2xl border border-white/10 bg-slate-900/90 p-5 shadow-card">
+              <article
+                class="rounded-2xl border border-white/10 bg-slate-900/90 p-5 shadow-card"
+              >
                 <p class="text-sm text-slate-400">Pending Payments</p>
                 <div class="mt-3 flex items-end justify-between">
                   <p class="text-3xl font-semibold text-white" id="pendingPaymentsValue">0</p>
-                  <span class="rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-400">Needs review</span>
+                  <span
+                    class="rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-400"
+                    >Needs review</span
+                  >
                 </div>
               </article>
 
-              <article class="rounded-2xl border border-white/10 bg-slate-900/90 p-5 shadow-card">
+              <article
+                class="rounded-2xl border border-white/10 bg-slate-900/90 p-5 shadow-card"
+              >
                 <p class="text-sm text-slate-400">Total Tasks</p>
                 <div class="mt-3 flex items-end justify-between">
                   <p class="text-3xl font-semibold text-white" id="totalTasksValue">0</p>
-                  <span class="rounded-full bg-sky-500/15 px-2.5 py-1 text-xs font-semibold text-sky-400">Assigned</span>
+                  <span
+                    class="rounded-full bg-sky-500/15 px-2.5 py-1 text-xs font-semibold text-sky-400"
+                    >Assigned</span
+                  >
                 </div>
               </article>
             </section>
@@ -155,9 +211,15 @@
                 <div class="flex items-center justify-between">
                   <div>
                     <h3 class="text-lg font-semibold text-white">Recent updates</h3>
-                    <p class="text-sm text-slate-400">Latest project and payment activity from your connected workspace.</p>
+                    <p class="text-sm text-slate-400">
+                      Latest project and payment activity from your connected workspace.
+                    </p>
                   </div>
-                  <span id="dataStatus" class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-400">Loading…</span>
+                  <span
+                    id="dataStatus"
+                    class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-400"
+                    >Loading…</span
+                  >
                 </div>
 
                 <div class="mt-5 overflow-hidden rounded-2xl border border-white/10">
@@ -169,7 +231,10 @@
                         <th class="px-4 py-3 font-medium">Updated</th>
                       </tr>
                     </thead>
-                    <tbody id="updatesTableBody" class="divide-y divide-white/10 bg-slate-900/60"></tbody>
+                    <tbody
+                      id="updatesTableBody"
+                      class="divide-y divide-white/10 bg-slate-900/60"
+                    ></tbody>
                   </table>
                 </div>
               </div>
@@ -178,15 +243,21 @@
                 <div class="rounded-3xl border border-white/10 bg-slate-900/90 p-5 shadow-card">
                   <h3 class="text-lg font-semibold text-white">Priority checklist</h3>
                   <ul class="mt-4 space-y-3 text-sm text-slate-400">
-                    <li class="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2">
+                    <li
+                      class="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2"
+                    >
                       <span>Finalize contractor invoices</span>
                       <span class="text-gold">2</span>
                     </li>
-                    <li class="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2">
+                    <li
+                      class="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2"
+                    >
                       <span>Review site safety logs</span>
                       <span class="text-gold">5</span>
                     </li>
-                    <li class="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2">
+                    <li
+                      class="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2"
+                    >
                       <span>Confirm next week delivery</span>
                       <span class="text-gold">1</span>
                     </li>
@@ -196,7 +267,8 @@
                 <div class="rounded-3xl border border-white/10 bg-slate-900/90 p-5 shadow-card">
                   <h3 class="text-lg font-semibold text-white">Operations note</h3>
                   <p class="mt-3 text-sm leading-6 text-slate-400">
-                    Teams are aligned on milestone reviews and payment approvals. Keep project stakeholders informed before closeout.
+                    Teams are aligned on milestone reviews and payment approvals. Keep
+                    project stakeholders informed before closeout.
                   </p>
                 </div>
               </div>
@@ -207,158 +279,287 @@
     </div>
 
     <script>
-      const supabase = window.__ABASHON_SUPABASE;
-      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
-      const sidebar = document.getElementById("sidebar");
-      const updatesTableBody = document.getElementById("updatesTableBody");
-      const dataStatus = document.getElementById("dataStatus");
-      const userEmail = document.getElementById("userEmail");
-      const userInitials = document.getElementById("userInitials");
-      const logoutBtn = document.getElementById("logoutBtn");
+      (() => {
+        const supabaseClient = window.__ABASHON_SUPABASE;
 
-      const fallbackRows = [
-        { title: "North Avenue project milestone approved", status: "On Track", updated_at: "2026-07-06" },
-        { title: "Invoice 1042 is awaiting finance sign-off", status: "Pending", updated_at: "2026-07-05" },
-        { title: "Site inspection scheduled for Friday", status: "Scheduled", updated_at: "2026-07-04" },
-      ];
+        const fallbackRows = [
+          {
+            title: "North Avenue project milestone approved",
+            status: "On Track",
+            updated_at: "2026-07-06",
+          },
+          {
+            title: "Invoice 1042 is awaiting finance sign-off",
+            status: "Pending",
+            updated_at: "2026-07-05",
+          },
+          {
+            title: "Site inspection scheduled for Friday",
+            status: "Scheduled",
+            updated_at: "2026-07-04",
+          },
+        ];
 
-      const fallbackStats = {
-        activeProjects: 12,
-        pendingPayments: 4,
-        totalTasks: 28,
-      };
+        const fallbackStats = {
+          activeProjects: 12,
+          pendingPayments: 4,
+          totalTasks: 28,
+        };
 
-      function formatDate(value) {
-        if (!value) return "—";
-        const date = new Date(value);
-        return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString("en", { month: "short", day: "numeric" });
-      }
+        const dom = {
+          mobileMenuBtn: document.getElementById("mobileMenuBtn"),
+          sidebar: document.getElementById("sidebar"),
+          updatesTableBody: document.getElementById("updatesTableBody"),
+          dataStatus: document.getElementById("dataStatus"),
+          userEmail: document.getElementById("userEmail"),
+          userInitials: document.getElementById("userInitials"),
+          logoutBtn: document.getElementById("logoutBtn"),
+          activeProjectsValue: document.getElementById("activeProjectsValue"),
+          pendingPaymentsValue: document.getElementById("pendingPaymentsValue"),
+          totalTasksValue: document.getElementById("totalTasksValue"),
+        };
 
-      function escapeHtml(value) {
-        return String(value)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/\"/g, "&quot;")
-          .replace(/'/g, "&#39;");
-      }
-
-      function updateSummaryCards(stats) {
-        document.getElementById("activeProjectsValue").textContent = stats.activeProjects;
-        document.getElementById("pendingPaymentsValue").textContent = stats.pendingPayments;
-        document.getElementById("totalTasksValue").textContent = stats.totalTasks;
-      }
-
-      function renderUpdates(rows) {
-        if (!rows.length) {
-          updatesTableBody.innerHTML = `
-            <tr>
-              <td colspan="3" class="px-4 py-5 text-center text-sm text-slate-400">No updates were returned from Supabase yet.</td>
-            </tr>`;
-          return;
+        function showPage() {
+          document.body.style.visibility = "visible";
         }
 
-        updatesTableBody.innerHTML = rows
-          .map((row) => {
-            const title = row.title || row.name || row.project_name || row.subject || "Update";
-            const status = row.status || row.payment_status || row.state || "Updated";
-            const updatedAt = row.updated_at || row.created_at || row.date || "";
+        function formatDate(value) {
+          if (!value) return "—";
+          const date = new Date(value);
+          return Number.isNaN(date.getTime())
+            ? value
+            : date.toLocaleDateString("en", { month: "short", day: "numeric" });
+        }
 
-            return `
+        function escapeHtml(value) {
+          return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
+        function updateSummaryCards(stats) {
+          dom.activeProjectsValue.textContent = String(stats.activeProjects ?? 0);
+          dom.pendingPaymentsValue.textContent = String(stats.pendingPayments ?? 0);
+          dom.totalTasksValue.textContent = String(stats.totalTasks ?? 0);
+        }
+
+        function renderUpdates(rows) {
+          if (!Array.isArray(rows) || rows.length === 0) {
+            dom.updatesTableBody.innerHTML = `
               <tr>
-                <td class="px-4 py-3 text-slate-200">${escapeHtml(title)}</td>
-                <td class="px-4 py-3">
-                  <span class="inline-flex rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-slate-200">${escapeHtml(status)}</span>
-                </td>
-                <td class="px-4 py-3 text-slate-400">${escapeHtml(formatDate(updatedAt))}</td>
+                <td colspan="3" class="px-4 py-5 text-center text-sm text-slate-400">No updates were returned from Supabase yet.</td>
               </tr>`;
-          })
-          .join("");
-      }
+            return;
+          }
 
-      async function loadDashboardData() {
-        dataStatus.textContent = "Syncing…";
+          dom.updatesTableBody.innerHTML = rows
+            .map((row) => {
+              const title =
+                row.title || row.name || row.project_name || row.subject || "Update";
+              const status =
+                row.status || row.payment_status || row.state || "Updated";
+              const updatedAt =
+                row.updated_at || row.created_at || row.date || "";
 
-        const [projectsResult, paymentsResult, tasksResult] = await Promise.allSettled([
-          supabase.from("projects").select("id, status, updated_at").order("updated_at", { ascending: false }).limit(15),
-          supabase.from("payments").select("id, status, updated_at").order("updated_at", { ascending: false }).limit(15),
-          supabase.from("tasks").select("id, status").limit(50),
-        ]);
-
-        const stats = { ...fallbackStats };
-        let rows = [...fallbackRows];
-
-        if (projectsResult.status === "fulfilled" && !projectsResult.value.error && projectsResult.value.data?.length) {
-          stats.activeProjects = projectsResult.value.data.filter((item) => String(item.status).toLowerCase().includes("active") || String(item.status).toLowerCase().includes("in progress") || String(item.status).toLowerCase().includes("ongoing")).length || stats.activeProjects;
-          rows = projectsResult.value.data.map((item) => ({ title: item.name || item.title || "Project update", status: item.status || "Updated", updated_at: item.updated_at || item.created_at }));
+              return `
+                <tr>
+                  <td class="px-4 py-3 text-slate-200">${escapeHtml(title)}</td>
+                  <td class="px-4 py-3">
+                    <span class="inline-flex rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-slate-200">${escapeHtml(
+                      status
+                    )}</span>
+                  </td>
+                  <td class="px-4 py-3 text-slate-400">${escapeHtml(
+                    formatDate(updatedAt)
+                  )}</td>
+                </tr>`;
+            })
+            .join("");
         }
 
-        if (paymentsResult.status === "fulfilled" && !paymentsResult.value.error && paymentsResult.value.data?.length) {
-          stats.pendingPayments = paymentsResult.value.data.filter((item) => String(item.status).toLowerCase().includes("pending") || String(item.status).toLowerCase().includes("review")).length || stats.pendingPayments;
-          if (rows.length < 4) {
-            rows = rows.concat(
-              paymentsResult.value.data.map((item) => ({ title: item.reference || item.title || "Payment update", status: item.status || "Updated", updated_at: item.updated_at || item.created_at }))
-            );
+        async function loadDashboardData() {
+          const stats = { ...fallbackStats };
+          let rows = [...fallbackRows];
+
+          dom.dataStatus.textContent = "Syncing…";
+
+          try {
+            const [projectsResult, paymentsResult, tasksResult] =
+              await Promise.allSettled([
+                supabaseClient
+                  .from("projects")
+                  .select("id, name, title, status, updated_at, created_at")
+                  .order("updated_at", { ascending: false })
+                  .limit(15),
+                supabaseClient
+                  .from("payments")
+                  .select("id, reference, title, status, updated_at, created_at")
+                  .order("updated_at", { ascending: false })
+                  .limit(15),
+                supabaseClient.from("tasks").select("id, status").limit(50),
+              ]);
+
+            if (projectsResult.status === "fulfilled") {
+              const { data, error } = projectsResult.value;
+              if (error) {
+                console.error("Projects query failed:", error);
+              } else if (Array.isArray(data) && data.length) {
+                const activeCount = data.filter((item) => {
+                  const s = String(item.status || "").toLowerCase();
+                  return (
+                    s.includes("active") ||
+                    s.includes("in progress") ||
+                    s.includes("ongoing")
+                  );
+                }).length;
+
+                stats.activeProjects = activeCount || stats.activeProjects;
+
+                rows = data.map((item) => ({
+                  title: item.name || item.title || "Project update",
+                  status: item.status || "Updated",
+                  updated_at: item.updated_at || item.created_at,
+                }));
+              }
+            } else {
+              console.error("Projects query promise rejected:", projectsResult.reason);
+            }
+
+            if (paymentsResult.status === "fulfilled") {
+              const { data, error } = paymentsResult.value;
+              if (error) {
+                console.error("Payments query failed:", error);
+              } else if (Array.isArray(data) && data.length) {
+                const pendingCount = data.filter((item) => {
+                  const s = String(item.status || "").toLowerCase();
+                  return s.includes("pending") || s.includes("review");
+                }).length;
+
+                stats.pendingPayments = pendingCount || stats.pendingPayments;
+
+                if (rows.length < 4) {
+                  rows = rows.concat(
+                    data.map((item) => ({
+                      title: item.reference || item.title || "Payment update",
+                      status: item.status || "Updated",
+                      updated_at: item.updated_at || item.created_at,
+                    }))
+                  );
+                }
+              }
+            } else {
+              console.error("Payments query promise rejected:", paymentsResult.reason);
+            }
+
+            if (tasksResult.status === "fulfilled") {
+              const { data, error } = tasksResult.value;
+              if (error) {
+                console.error("Tasks query failed:", error);
+              } else if (Array.isArray(data) && data.length) {
+                stats.totalTasks = data.length;
+              }
+            } else {
+              console.error("Tasks query promise rejected:", tasksResult.reason);
+            }
+
+            updateSummaryCards(stats);
+            renderUpdates(rows.slice(0, 5));
+            dom.dataStatus.textContent = "Live data";
+          } catch (error) {
+            console.error("Dashboard data load failed:", error);
+            updateSummaryCards(fallbackStats);
+            renderUpdates(fallbackRows);
+            dom.dataStatus.textContent = "Fallback";
           }
         }
 
-        if (tasksResult.status === "fulfilled" && !tasksResult.value.error && tasksResult.value.data?.length) {
-          stats.totalTasks = tasksResult.value.data.length || stats.totalTasks;
+        function bindEvents() {
+          dom.mobileMenuBtn?.addEventListener("click", () => {
+            dom.sidebar.classList.toggle("hidden");
+            dom.sidebar.classList.toggle("flex");
+          });
+
+          dom.logoutBtn?.addEventListener("click", async () => {
+            try {
+              const { error } = await supabaseClient.auth.signOut();
+              if (error) {
+                console.error("Logout failed:", error);
+              }
+            } catch (error) {
+              console.error("Logout exception:", error);
+            } finally {
+              window.location.replace("employee-login.html");
+            }
+          });
+
+          supabaseClient.auth.onAuthStateChange((_event, session) => {
+            if (!session) {
+              window.location.replace("employee-login.html");
+            }
+          });
         }
 
-        updateSummaryCards(stats);
-        renderUpdates(rows.slice(0, 5));
-        dataStatus.textContent = "Live data";
-      }
+        async function initializeDashboard() {
+          try {
+            if (!supabaseClient) {
+              console.error("Supabase client is not initialized.");
+              window.location.replace("employee-login.html");
+              return;
+            }
 
-      async function initializeDashboard() {
-        const session = window.__ABASHON_SESSION;
-        if (!session?.user) {
-          window.location.replace("employee-login.html");
-          return;
+            let session = window.__ABASHON_SESSION || null;
+
+            if (!session) {
+              try {
+                const { data, error } = await supabaseClient.auth.getSession();
+                if (error) {
+                  console.error("Failed to get session:", error);
+                }
+                session = data?.session || null;
+              } catch (error) {
+                console.error("Session check failed:", error);
+                session = null;
+              }
+            }
+
+            if (!session?.user) {
+              window.location.replace("employee-login.html");
+              return;
+            }
+
+            window.__ABASHON_SESSION = session;
+
+            const user = session.user;
+            const email = user.email || "Employee";
+            dom.userEmail.textContent = email;
+
+            const initials = email
+              .split("@")[0]
+              .split(/[^a-zA-Z0-9]/)
+              .filter(Boolean)
+              .slice(0, 2)
+              .map((part) => part[0]?.toUpperCase() || "")
+              .join("");
+
+            dom.userInitials.textContent = initials || "U";
+
+            bindEvents();
+            await loadDashboardData();
+          } catch (error) {
+            console.error("Dashboard initialization failed:", error);
+            updateSummaryCards(fallbackStats);
+            renderUpdates(fallbackRows);
+            dom.dataStatus.textContent = "Fallback";
+          } finally {
+            showPage();
+          }
         }
 
-        const user = session.user;
-        const email = user.email || "Employee";
-        userEmail.textContent = email;
-        const initials = email
-          .split("@")[0]
-          .split(/[^a-zA-Z0-9]/)
-          .filter(Boolean)
-          .slice(0, 2)
-          .map((part) => part[0]?.toUpperCase() || "")
-          .join("");
-        userInitials.textContent = initials || "U";
-
-        try {
-          await loadDashboardData();
-        } catch (error) {
-          console.error("Dashboard data load failed", error);
-          updateSummaryCards(fallbackStats);
-          renderUpdates(fallbackRows);
-          dataStatus.textContent = "Fallback";
-        }
-
-        document.body.style.visibility = "visible";
-      }
-
-      mobileMenuBtn?.addEventListener("click", () => {
-        sidebar.classList.toggle("hidden");
-        sidebar.classList.toggle("flex");
-      });
-
-      logoutBtn.addEventListener("click", async () => {
-        await supabase.auth.signOut();
-        window.location.replace("employee-login.html");
-      });
-
-      supabase.auth.onAuthStateChange((_event, session) => {
-        if (!session) {
-          window.location.replace("employee-login.html");
-        }
-      });
-
-      initializeDashboard();
+        initializeDashboard();
+      })();
     </script>
   </body>
 </html>
