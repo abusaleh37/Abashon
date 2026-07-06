@@ -1,0 +1,240 @@
+<!-- employee-profile.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Profile - ABASHON Consultancy & Construction</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      background: radial-gradient(circle at top, #0f172a, #020617);
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+
+<body class="text-white min-h-screen flex">
+
+<!-- Sidebar -->
+<aside class="w-64 min-h-screen glass p-5 hidden md:block">
+  <h1 class="text-xl font-bold mb-8">ABASHON</h1>
+
+  <nav class="space-y-4 text-sm">
+    <a href="employee-dashboard.html" class="block hover:text-blue-400">Dashboard</a>
+    <a href="employee-profile.html" class="block text-blue-400 font-semibold">My Profile</a>
+    <a href="#" class="block hover:text-blue-400">Attendance</a>
+    <a href="#" class="block hover:text-blue-400">My Tasks</a>
+    <a href="#" class="block hover:text-blue-400">Salary</a>
+    <a href="#" class="block hover:text-blue-400">Leave Request</a>
+    <a href="#" class="block hover:text-blue-400">Notifications</a>
+    <a href="employee-login.html" class="block hover:text-red-400">Logout</a>
+  </nav>
+</aside>
+
+<!-- Main -->
+<main class="flex-1 p-6">
+
+  <!-- Top Bar -->
+  <div class="flex justify-between items-center mb-6 glass p-4 rounded-xl">
+    <h2 class="text-lg font-semibold">Employee Profile</h2>
+    <button id="logoutBtn" class="text-red-400 hover:text-red-300">Logout</button>
+  </div>
+
+  <!-- Message -->
+  <div id="msgBox" class="mb-4 hidden p-3 rounded-lg text-sm"></div>
+
+  <!-- Profile Card -->
+  <div class="glass rounded-2xl p-6 max-w-3xl mx-auto">
+
+    <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
+
+      <div class="text-center">
+        <img id="profilePhoto" class="w-32 h-32 rounded-full border-2 border-blue-500 object-cover"
+             src="https://via.placeholder.com/150" />
+        <input id="photoInput" type="text" placeholder="Profile Photo URL"
+               class="mt-3 w-full p-2 rounded bg-white/10 text-xs hidden"/>
+      </div>
+
+      <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+
+        <div>
+          <label class="text-gray-400">Full Name</label>
+          <p id="fullName" class="font-semibold"></p>
+        </div>
+
+        <div>
+          <label class="text-gray-400">Email</label>
+          <p id="email"></p>
+        </div>
+
+        <div>
+          <label class="text-gray-400">Phone</label>
+          <p id="phoneText"></p>
+          <input id="phoneInput" class="w-full mt-1 p-2 rounded bg-white/10 hidden"/>
+        </div>
+
+        <div>
+          <label class="text-gray-400">Department</label>
+          <p id="department"></p>
+        </div>
+
+        <div>
+          <label class="text-gray-400">Designation</label>
+          <p id="designation"></p>
+        </div>
+
+        <div>
+          <label class="text-gray-400">Joining Date</label>
+          <p id="joiningDate"></p>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="text-gray-400">Address</label>
+          <p id="addressText"></p>
+          <textarea id="addressInput" class="w-full mt-1 p-2 rounded bg-white/10 hidden"></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="mt-6 flex gap-3">
+      <button id="editBtn" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500">Edit Profile</button>
+      <button id="saveBtn" class="px-4 py-2 bg-green-600 rounded hover:bg-green-500 hidden">Save Changes</button>
+      <button id="cancelBtn" class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-500 hidden">Cancel</button>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  // =======================
+  // Supabase Config (ONLY ONE CLIENT)
+  // =======================
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentUser = null;
+  let employeeData = null;
+
+  const msgBox = document.getElementById("msgBox");
+
+  function showMsg(text, type="success") {
+    msgBox.classList.remove("hidden");
+    msgBox.textContent = text;
+
+    if(type === "success") {
+      msgBox.className = "mb-4 p-3 rounded-lg text-sm bg-green-600/30 text-green-300";
+    } else {
+      msgBox.className = "mb-4 p-3 rounded-lg text-sm bg-red-600/30 text-red-300";
+    }
+
+    setTimeout(() => msgBox.classList.add("hidden"), 3000);
+  }
+
+  function toggleEdit(mode) {
+    document.getElementById("phoneText").classList.toggle("hidden", mode);
+    document.getElementById("addressText").classList.toggle("hidden", mode);
+
+    document.getElementById("phoneInput").classList.toggle("hidden", !mode);
+    document.getElementById("addressInput").classList.toggle("hidden", !mode);
+    document.getElementById("photoInput").classList.toggle("hidden", !mode);
+
+    document.getElementById("editBtn").classList.toggle("hidden", mode);
+    document.getElementById("saveBtn").classList.toggle("hidden", !mode);
+    document.getElementById("cancelBtn").classList.toggle("hidden", !mode);
+  }
+
+  async function checkSession() {
+    const { data } = await supabase.auth.getUser();
+
+    if(!data.user) {
+      window.location.href = "employee-login.html";
+      return;
+    }
+
+    currentUser = data.user;
+    loadProfile();
+  }
+
+  async function loadProfile() {
+    const { data, error } = await supabase
+      .from("Employees")
+      .select("*")
+      .eq("auth_user_id", currentUser.id)
+      .single();
+
+    if(error) {
+      showMsg("Failed to load profile", "error");
+      return;
+    }
+
+    employeeData = data;
+
+    document.getElementById("fullName").textContent = data.full_name || "";
+    document.getElementById("email").textContent = data.email || "";
+    document.getElementById("phoneText").textContent = data.phone || "";
+    document.getElementById("department").textContent = data.department || "";
+    document.getElementById("designation").textContent = data.designation || "";
+    document.getElementById("joiningDate").textContent = data.joining_date || "";
+    document.getElementById("addressText").textContent = data.address || "";
+    document.getElementById("profilePhoto").src = data.profile_photo || "https://via.placeholder.com/150";
+
+    document.getElementById("phoneInput").value = data.phone || "";
+    document.getElementById("addressInput").value = data.address || "";
+    document.getElementById("photoInput").value = data.profile_photo || "";
+  }
+
+  document.getElementById("editBtn").addEventListener("click", () => {
+    toggleEdit(true);
+  });
+
+  document.getElementById("cancelBtn").addEventListener("click", () => {
+    toggleEdit(false);
+    loadProfile();
+  });
+
+  document.getElementById("saveBtn").addEventListener("click", async () => {
+    const updates = {
+      phone: document.getElementById("phoneInput").value,
+      address: document.getElementById("addressInput").value,
+      profile_photo: document.getElementById("photoInput").value
+    };
+
+    const { error } = await supabase
+      .from("Employees")
+      .update(updates)
+      .eq("auth_user_id", currentUser.id);
+
+    if(error) {
+      showMsg("Update failed!", "error");
+      return;
+    }
+
+    showMsg("Profile updated successfully!");
+    toggleEdit(false);
+    loadProfile();
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    await supabase.auth.signOut();
+    window.location.href = "employee-login.html";
+  });
+
+  checkSession();
+</script>
+
+</body>
+</html>
