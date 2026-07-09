@@ -1,63 +1,1361 @@
-<!-- Navbar -->
-<header class="glass flex items-center justify-between px-6 py-4">
-  <button id="toggleSidebar" class="md:hidden px-3 py-1 glass rounded">☰</button>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>ABASHON | Employee Dashboard</title>
+<meta name="description" content="ABASHON Consultancy & Construction — Employee Management System" />
 
-  <div>
-    <h2 class="text-lg font-semibold">ABASHON Consultancy & Construction</h2>
-    <p id="currentDate" class="text-sm text-gray-400"></p>
+<!-- ============================================================
+     FONTS
+============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<!-- ============================================================
+     TAILWIND CSS (CDN)
+============================================================ -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+        colors: {
+          ink: {
+            950: '#070B14',
+            900: '#0A0F1C',
+            850: '#0D1424',
+            800: '#131B2E',
+            700: '#1A2338',
+            600: '#243149',
+          },
+          amber: {
+            400: '#FBC56A',
+            500: '#F5A524',
+            600: '#D98A0F',
+          },
+        },
+        boxShadow: {
+          glass: '0 8px 32px rgba(0,0,0,0.35)',
+          'glow-amber': '0 0 0 1px rgba(245,165,36,0.25), 0 0 24px rgba(245,165,36,0.12)',
+        },
+      },
+    },
+  };
+</script>
+
+<!-- ============================================================
+     ICONS / CHARTS / SUPABASE
+============================================================ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- ============================================================
+     GLOBAL DESIGN SYSTEM (shared across every future page)
+============================================================ -->
+<style>
+  :root{
+    --bg-0:#070B14;
+    --bg-1:#0A0F1C;
+    --bg-2:#0D1424;
+    --bg-3:#131B2E;
+    --glass-bg: rgba(255,255,255,0.045);
+    --glass-bg-strong: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.09);
+    --glass-border-hover: rgba(245,165,36,0.35);
+    --line-blueprint: rgba(148,178,255,0.055);
+    --amber: #F5A524;
+    --amber-soft: #FBC56A;
+    --blue: #3B82F6;
+    --cyan: #22D3EE;
+    --green: #22C55E;
+    --red: #EF4444;
+    --violet:#8B7CF6;
+    --text-hi:#EDF1F7;
+    --text-mid:#93A0B4;
+    --text-low:#5C6B82;
+    --sidebar-w: 272px;
+    --sidebar-w-collapsed: 84px;
+    --navbar-h: 76px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    background:
+      radial-gradient(1100px 600px at 85% -10%, rgba(245,165,36,0.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 20%, rgba(59,130,246,0.08), transparent 55%),
+      var(--bg-0);
+    color:var(--text-hi);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---- Blueprint grid backdrop : the signature texture of this system ---- */
+  .blueprint{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line-blueprint) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-blueprint) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(1200px 800px at 30% 10%, #000 0%, transparent 75%);
+            mask-image: radial-gradient(1200px 800px at 30% 10%, #000 0%, transparent 75%);
+    opacity:.7;
+  }
+
+  h1,h2,h3,h4,.font-display{ font-family:'Space Grotesk', sans-serif; letter-spacing:-0.01em; }
+  .font-mono{ font-family:'JetBrains Mono', monospace; }
+
+  /* ---- Scrollbars ---- */
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:rgba(245,165,36,0.25); border-radius:99px; }
+  ::-webkit-scrollbar-thumb:hover{ background:rgba(245,165,36,0.45); }
+
+  /* ---- Glass primitives (reused by every card, every future page) ---- */
+  .glass{
+    background: var(--glass-bg);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    border-radius: 20px;
+  }
+  .glass-strong{
+    background: var(--glass-bg-strong);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-radius: 20px;
+  }
+  .glass-card{
+    position:relative;
+    overflow:hidden;
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .35s ease, box-shadow .35s ease;
+  }
+  .glass-card::before{
+    content:"";
+    position:absolute; inset:0; border-radius:inherit; padding:1px;
+    background: linear-gradient(135deg, rgba(245,165,36,0.35), rgba(255,255,255,0) 35%, rgba(59,130,246,0.25) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity:0; transition:opacity .35s ease;
+    pointer-events:none;
+  }
+  .glass-card:hover{ transform:translateY(-3px); box-shadow:0 16px 40px rgba(0,0,0,0.45); }
+  .glass-card:hover::before{ opacity:1; }
+
+  .divider-blueprint{
+    height:1px;
+    background: repeating-linear-gradient(90deg, rgba(245,165,36,0.35) 0 6px, transparent 6px 12px);
+  }
+
+  /* ---- Sidebar ---- */
+  #sidebar{
+    width:var(--sidebar-w);
+    transition: width .3s cubic-bezier(.2,.8,.2,1), transform .3s ease;
+  }
+  body.sidebar-collapsed #sidebar{ width:var(--sidebar-w-collapsed); }
+  body.sidebar-collapsed .sidebar-label{ opacity:0; width:0; }
+  body.sidebar-collapsed #brandText{ opacity:0; width:0; }
+  #mainWrap{ margin-left:var(--sidebar-w); transition:margin-left .3s cubic-bezier(.2,.8,.2,1); }
+  body.sidebar-collapsed #mainWrap{ margin-left:var(--sidebar-w-collapsed); }
+
+  .nav-item{
+    position:relative;
+    display:flex; align-items:center; gap:14px;
+    padding:11px 16px; margin:2px 12px;
+    border-radius:12px;
+    color:var(--text-mid);
+    font-size:14px; font-weight:500;
+    transition:all .25s ease;
+    white-space:nowrap;
+  }
+  .nav-item:hover{ color:var(--text-hi); background:rgba(255,255,255,0.05); }
+  .nav-item.active{
+    color:#0A0F1C;
+    background: linear-gradient(135deg, var(--amber-soft), var(--amber));
+    box-shadow: 0 6px 18px rgba(245,165,36,0.28);
+    font-weight:600;
+  }
+  .nav-item.active svg{ stroke:#0A0F1C; }
+  .sidebar-label{ transition:opacity .2s ease, width .2s ease; overflow:hidden; }
+
+  /* ---- Badges ---- */
+  .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.02em; }
+  .badge-green{ color:var(--green); background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); }
+  .badge-amber{ color:var(--amber-soft); background:rgba(245,165,36,0.12); border:1px solid rgba(245,165,36,0.28); }
+  .badge-red{ color:var(--red); background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.28); }
+  .badge-blue{ color:#93C5FD; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.28); }
+
+  .btn-primary{
+    background:linear-gradient(135deg, var(--amber-soft), var(--amber));
+    color:#0A0F1C; font-weight:600; border-radius:12px;
+    transition:transform .2s ease, box-shadow .2s ease;
+    box-shadow:0 8px 20px rgba(245,165,36,0.22);
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(245,165,36,0.32); }
+  .btn-primary:active{ transform:translateY(0); }
+
+  .btn-ghost{
+    background:rgba(255,255,255,0.04); border:1px solid var(--glass-border); color:var(--text-hi);
+    border-radius:12px; transition:all .2s ease;
+  }
+  .btn-ghost:hover{ background:rgba(255,255,255,0.08); border-color:var(--glass-border-hover); }
+
+  /* ---- Loading skeleton ---- */
+  .skel{ position:relative; overflow:hidden; background:rgba(255,255,255,0.06); border-radius:8px; color:transparent !important; }
+  .skel::after{
+    content:""; position:absolute; inset:0; transform:translateX(-100%);
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent);
+    animation:shimmer 1.4s infinite;
+  }
+  @keyframes shimmer{ 100%{ transform:translateX(100%); } }
+
+  /* ---- Progress ring ---- */
+  .ring-svg{ transform:rotate(-90deg); }
+  .ring-bg{ stroke:rgba(255,255,255,0.07); }
+  .ring-fg{ stroke-linecap:round; transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1); }
+
+  /* ---- Entrance animations ---- */
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes scaleIn{ from{ opacity:0; transform:scale(.96); } to{ opacity:1; transform:scale(1); } }
+  .anim-fade-up{ animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both; }
+  .anim-scale-in{ animation:scaleIn .5s cubic-bezier(.2,.8,.2,1) both; }
+  .anim-fade-in{ animation:fadeIn .6s ease both; }
+
+  /* ---- Live pulse dot ---- */
+  .pulse-dot{ position:relative; }
+  .pulse-dot::after{
+    content:""; position:absolute; inset:-4px; border-radius:99px;
+    border:1.5px solid var(--green); animation:pulseRing 1.8s ease-out infinite;
+  }
+  @keyframes pulseRing{ 0%{ opacity:.9; transform:scale(.7);} 100%{ opacity:0; transform:scale(1.9);} }
+
+  /* ---- Timeline ---- */
+  .timeline-line{ background:linear-gradient(180deg, var(--amber), rgba(245,165,36,0)); width:2px; }
+
+  /* ---- Scroll marquee for announcements ---- */
+  .scroll-y-fade{ mask-image:linear-gradient(180deg, transparent, #000 8%, #000 92%, transparent); }
+
+  input[type="text"]:focus, input[type="search"]:focus{ outline:none; }
+  ::placeholder{ color:var(--text-low); }
+
+  @media (max-width: 1024px){
+    #sidebar{ position:fixed; z-index:50; top:0; left:0; height:100vh; transform:translateX(-100%); }
+    body.sidebar-mobile-open #sidebar{ transform:translateX(0); }
+    #mainWrap, body.sidebar-collapsed #mainWrap{ margin-left:0; }
+    #sidebarBackdrop{ display:none; }
+    body.sidebar-mobile-open #sidebarBackdrop{ display:block; }
+  }
+</style>
+</head>
+
+<body class="font-body">
+<div class="blueprint"></div>
+
+<!-- Mobile backdrop -->
+<div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden" onclick=""></div>
+
+<!-- ============================================================
+     SIDEBAR  (reusable across every page)
+============================================================ -->
+<aside id="sidebar" class="fixed top-0 left-0 h-screen z-50 flex flex-col glass-strong border-r border-white/5">
+  <!-- Brand -->
+  <div class="flex items-center gap-3 px-5 h-[76px] shrink-0 border-b border-white/5">
+    <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-glow-amber">
+      <i data-lucide="hard-hat" class="w-5 h-5 text-ink-900"></i>
+    </div>
+    <div id="brandText" class="sidebar-label leading-tight overflow-hidden">
+      <p class="font-display font-bold text-[15px] text-white tracking-tight">ABASHON</p>
+      <p class="text-[10.5px] text-[var(--text-mid)] tracking-wide">Consultancy &amp; Construction</p>
+    </div>
   </div>
 
-  <div class="flex items-center gap-4">
-    <a href="employee-profile.html" class="text-sm underline hover:text-white">Profile</a>
-    <span id="employeeName" class="text-sm"></span>
-    <img id="profilePic" class="w-10 h-10 rounded-full border border-white/20" src="https://i.pravatar.cc/100" />
+  <!-- Nav -->
+  <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4">
+    <p class="sidebar-label px-6 mb-2 text-[10.5px] font-semibold tracking-[.14em] text-[var(--text-low)] uppercase">Workspace</p>
+    <a href="employee-dashboard.html" data-page="dashboard" class="nav-item active">
+      <i data-lucide="layout-dashboard" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Dashboard</span>
+    </a>
+    <a href="employee-profile.html" data-page="profile" class="nav-item">
+      <i data-lucide="user-circle-2" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">My Profile</span>
+    </a>
+    <a href="attendance.html" data-page="attendance" class="nav-item">
+      <i data-lucide="calendar-check-2" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Attendance</span>
+    </a>
+    <a href="my-tasks.html" data-page="tasks" class="nav-item">
+      <i data-lucide="list-checks" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">My Tasks</span>
+    </a>
+    <a href="employee-salary.html" data-page="salary" class="nav-item">
+      <i data-lucide="wallet" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Salary</span>
+    </a>
+    <a href="leave-request.html" data-page="leave" class="nav-item">
+      <i data-lucide="plane" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Leave Request</span>
+    </a>
+    <a href="notifications.html" data-page="notifications" class="nav-item">
+      <i data-lucide="bell" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Notifications</span>
+    </a>
+
+    <p class="sidebar-label px-6 mt-5 mb-2 text-[10.5px] font-semibold tracking-[.14em] text-[var(--text-low)] uppercase">System</p>
+    <a href="settings.html" data-page="settings" class="nav-item">
+      <i data-lucide="settings" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Settings</span>
+    </a>
+    <button id="logoutBtn" class="nav-item w-[calc(100%-24px)] text-left">
+      <i data-lucide="log-out" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Logout</span>
+    </button>
+  </nav>
+
+  <!-- Collapse toggle -->
+  <div class="p-3 border-t border-white/5 shrink-0">
+    <button id="collapseBtn" class="nav-item w-full justify-center lg:justify-start">
+      <i data-lucide="panel-left-close" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Collapse</span>
+    </button>
   </div>
-</header>
+</aside>
 
-<!-- Content -->
-<main class="p-6 overflow-y-auto">
+<!-- ============================================================
+     MAIN WRAPPER
+============================================================ -->
+<div id="mainWrap" class="relative z-10 min-h-screen flex flex-col">
 
-  <!-- Welcome -->
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold">Welcome back, <span id="welcomeName">User</span></h1>
-    <p class="text-gray-400">Here is your dashboard overview</p>
-  </div>
-
-  <!-- Stats -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-
-    <div class="glass p-4 rounded-xl glass-hover">
-      <p>Total Tasks</p>
-      <h2 id="totalTasks" class="text-2xl font-bold">0</h2>
+  <!-- ============================================================
+       NAVBAR (reusable across every page)
+  ============================================================ -->
+  <header id="navbar" class="sticky top-0 z-30 h-[76px] shrink-0 glass-strong border-b border-white/5 flex items-center justify-between gap-4 px-4 lg:px-8">
+    <div class="flex items-center gap-3 min-w-0">
+      <button id="mobileMenuBtn" class="lg:hidden btn-ghost w-10 h-10 flex items-center justify-center shrink-0">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+      <div class="hidden md:flex items-center gap-2.5 glass px-4 py-2.5 w-72 xl:w-96">
+        <i data-lucide="search" class="w-4 h-4 text-[var(--text-low)] shrink-0"></i>
+        <input type="text" placeholder="Search employees, tasks, documents…" class="bg-transparent text-sm w-full text-[var(--text-hi)]" />
+      </div>
     </div>
 
-    <div class="glass p-4 rounded-xl glass-hover">
-      <p>Completed</p>
-      <h2 id="completedTasks" class="text-2xl font-bold">0</h2>
+    <div class="flex items-center gap-2 lg:gap-3 shrink-0">
+      <!-- Digital clock -->
+      <div class="hidden md:flex flex-col items-end leading-tight mr-1">
+        <span id="liveClock" class="font-mono text-[15px] font-semibold text-amber-400 tracking-wider">--:--:--</span>
+        <span id="liveDate" class="text-[11px] text-[var(--text-mid)]">Loading date…</span>
+      </div>
+
+      <div class="hidden md:block w-px h-8 bg-white/10 mx-1"></div>
+
+      <!-- Theme toggle (prepared) -->
+      <button id="themeToggleBtn" class="btn-ghost w-10 h-10 flex items-center justify-center" title="Toggle theme">
+        <i data-lucide="moon" class="w-[18px] h-[18px]"></i>
+      </button>
+
+      <!-- Notification bell -->
+      <button id="notifBellBtn" class="btn-ghost relative w-10 h-10 flex items-center justify-center" title="Notifications">
+        <i data-lucide="bell" class="w-[18px] h-[18px]"></i>
+        <span id="notifBadge" class="hidden absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[10px] font-bold flex items-center justify-center text-white">0</span>
+      </button>
+
+      <div class="hidden md:block w-px h-8 bg-white/10 mx-1"></div>
+
+      <!-- Profile -->
+      <button id="profileMenuBtn" class="flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full glass hover:border-amber-500/30 transition-colors">
+        <img id="navProfilePhoto" src="" alt="" class="w-9 h-9 rounded-full object-cover skel bg-ink-700" />
+        <div class="hidden sm:block text-left leading-tight">
+          <p id="navProfileName" class="text-[13px] font-semibold text-white skel rounded w-24">&nbsp;</p>
+          <p id="navProfileRole" class="text-[11px] text-[var(--text-mid)] skel rounded w-16 mt-0.5">&nbsp;</p>
+        </div>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--text-mid)] hidden sm:block"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       PAGE CONTENT
+  ============================================================ -->
+  <main class="flex-1 px-4 lg:px-8 py-6 lg:py-8 max-w-[1680px] w-full mx-auto">
+
+    <!-- Page heading -->
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-6 anim-fade-up">
+      <div>
+        <p class="text-[11px] font-semibold tracking-[.16em] text-amber-400 uppercase mb-1">Employee Workspace</p>
+        <h1 class="font-display text-2xl lg:text-[28px] font-bold text-white">Dashboard Overview</h1>
+      </div>
+      <div class="flex items-center gap-2 text-[13px] text-[var(--text-mid)]">
+        <i data-lucide="map-pin" class="w-4 h-4 text-amber-400"></i>
+        <span id="siteLocationLabel">Locating site…</span>
+      </div>
     </div>
 
-    <div class="glass p-4 rounded-xl glass-hover">
-      <p>Pending</p>
-      <h2 id="pendingTasks" class="text-2xl font-bold">0</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+      <!-- ============ 1. WELCOME CARD ============ -->
+      <section class="lg:col-span-8 glass glass-card p-6 lg:p-7 anim-fade-up" style="animation-delay:.03s">
+        <div class="flex flex-col md:flex-row md:items-center gap-6 justify-between">
+          <div class="min-w-0">
+            <p id="greetingLine" class="text-[13px] font-semibold text-amber-400 flex items-center gap-2 mb-2">
+              <i data-lucide="sunrise" class="w-4 h-4"></i> <span id="greetingText">Good morning</span>
+            </p>
+            <h2 id="welcomeName" class="font-display text-2xl lg:text-3xl font-bold text-white skel rounded w-52">&nbsp;</h2>
+            <p class="text-sm text-[var(--text-mid)] mt-1.5">
+              <span id="welcomeDesignation" class="skel rounded inline-block w-24">&nbsp;</span> ·
+              <span id="welcomeDepartment" class="skel rounded inline-block w-28">&nbsp;</span>
+            </p>
+            <div class="flex flex-wrap gap-2 mt-4">
+              <span class="badge badge-amber"><i data-lucide="calendar" class="w-3 h-3"></i> Joined <span id="welcomeJoinDate">—</span></span>
+              <span class="badge badge-blue"><i data-lucide="clock-4" class="w-3 h-3"></i> Shift: <span id="welcomeShift">—</span></span>
+            </div>
+          </div>
+          <img id="welcomePhoto" src="" alt="" class="w-24 h-24 lg:w-28 lg:h-28 rounded-2xl object-cover border-2 border-amber-500/30 shadow-glow-amber shrink-0 skel bg-ink-700" />
+        </div>
+      </section>
+
+      <!-- ============ 13. WEATHER CARD ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up flex flex-col justify-between" style="animation-delay:.06s">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-[11px] font-semibold tracking-[.12em] text-[var(--text-mid)] uppercase">Site Weather</p>
+            <p id="weatherLocation" class="text-sm text-white font-medium mt-1 skel rounded w-24">&nbsp;</p>
+          </div>
+          <div id="weatherIconWrap" class="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+            <i data-lucide="cloud-sun" class="w-6 h-6 text-cyan-300"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-end gap-2">
+          <span id="weatherTemp" class="font-display text-4xl font-bold text-white skel rounded w-20">&nbsp;</span>
+          <span class="text-sm text-[var(--text-mid)] mb-1.5" id="weatherDesc">—</span>
+        </div>
+        <p class="text-[11px] text-[var(--text-low)] mt-3">Live from Open-Meteo, based on your device location.</p>
+      </section>
+
+      <!-- ============ 2. EMPLOYEE INFORMATION CARD ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.09s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Employee Information</h3>
+          <i data-lucide="id-card" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="flex items-center gap-3 mb-4">
+          <img id="infoPhoto" src="" class="w-14 h-14 rounded-xl object-cover skel bg-ink-700" alt="" />
+          <div>
+            <p id="infoName" class="text-sm font-semibold text-white skel rounded w-28">&nbsp;</p>
+            <p id="infoEmpId" class="text-[12px] text-amber-400 font-mono skel rounded w-16 mt-1">&nbsp;</p>
+          </div>
+        </div>
+        <div class="space-y-2.5 text-[13px]">
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)] flex items-center gap-2"><i data-lucide="building-2" class="w-3.5 h-3.5"></i>Department</span><span id="infoDept" class="text-white skel rounded w-20">&nbsp;</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)] flex items-center gap-2"><i data-lucide="briefcase" class="w-3.5 h-3.5"></i>Designation</span><span id="infoDesignation" class="text-white skel rounded w-20">&nbsp;</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)] flex items-center gap-2"><i data-lucide="mail" class="w-3.5 h-3.5"></i>Email</span><span id="infoEmail" class="text-white truncate max-w-[130px] skel rounded">&nbsp;</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)] flex items-center gap-2"><i data-lucide="phone" class="w-3.5 h-3.5"></i>Phone</span><span id="infoPhone" class="text-white skel rounded w-20">&nbsp;</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)] flex items-center gap-2"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i>Joined</span><span id="infoJoinDate" class="text-white skel rounded w-16">&nbsp;</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)] flex items-center gap-2"><i data-lucide="badge-check" class="w-3.5 h-3.5"></i>Status</span><span id="infoStatus">—</span></div>
+        </div>
+      </section>
+
+      <!-- ============ 3. TODAY'S ATTENDANCE ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.12s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Today's Attendance</h3>
+          <span id="attendanceStatusBadge" class="badge badge-amber">Loading</span>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div class="glass rounded-xl p-3">
+            <p class="text-[11px] text-[var(--text-mid)] mb-1">Clock In</p>
+            <p id="clockInTime" class="font-mono text-lg font-semibold text-green-400">--:--</p>
+          </div>
+          <div class="glass rounded-xl p-3">
+            <p class="text-[11px] text-[var(--text-mid)] mb-1">Clock Out</p>
+            <p id="clockOutTime" class="font-mono text-lg font-semibold text-red-400">--:--</p>
+          </div>
+        </div>
+        <div class="mb-4">
+          <div class="flex items-center justify-between text-[12px] mb-1.5">
+            <span class="text-[var(--text-mid)]">Working hours</span>
+            <span id="attendanceHoursLabel" class="text-white font-medium">0h 0m / 8h</span>
+          </div>
+          <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+            <div id="attendanceProgressBar" class="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-1000" style="width:0%"></div>
+          </div>
+        </div>
+        <p id="attendanceLateNote" class="text-[12px] text-[var(--text-mid)] flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5"></i> Checking today's log…</p>
+      </section>
+
+      <!-- ============ 4. WORKING HOURS CARD ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.15s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Working Hours</h3>
+          <i data-lucide="timer" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="flex items-center gap-5">
+          <div class="relative w-24 h-24 shrink-0">
+            <svg class="ring-svg w-24 h-24">
+              <circle cx="48" cy="48" r="40" fill="none" stroke-width="8" class="ring-bg"></circle>
+              <circle id="hoursRing" cx="48" cy="48" r="40" fill="none" stroke-width="8" class="ring-fg" stroke="url(#ringGrad)" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+              <defs>
+                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#FBC56A"/><stop offset="100%" stop-color="#F5A524"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="hoursRingPct" class="text-sm font-bold text-white">0%</span>
+              <span class="text-[9px] text-[var(--text-mid)]">of week</span>
+            </div>
+          </div>
+          <div class="space-y-2.5 flex-1 text-[13px]">
+            <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Today</span><span id="hoursToday" class="text-white font-medium font-mono">0h 0m</span></div>
+            <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">This week</span><span id="hoursWeek" class="text-white font-medium font-mono">0h 0m</span></div>
+            <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">This month</span><span id="hoursMonth" class="text-white font-medium font-mono">0h 0m</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 11. ANALYTICS : ATTENDANCE TREND ============ -->
+      <section class="lg:col-span-8 glass glass-card p-6 anim-fade-up" style="animation-delay:.18s">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h3 class="font-display font-semibold text-white text-[15px]">Attendance & Performance Trend</h3>
+            <p class="text-[12px] text-[var(--text-mid)]">Last 7 working days</p>
+          </div>
+          <div class="flex items-center gap-3 text-[11px] text-[var(--text-mid)]">
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>Hours</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-cyan-400 inline-block"></span>Performance</span>
+          </div>
+        </div>
+        <div class="h-64 mt-2"><canvas id="attendanceChart"></canvas></div>
+      </section>
+
+      <!-- ============ 11b. ANALYTICS : TASK COMPLETION ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.21s">
+        <h3 class="font-display font-semibold text-white text-[15px] mb-1">Task Completion</h3>
+        <p class="text-[12px] text-[var(--text-mid)] mb-2">All-time breakdown</p>
+        <div class="h-56 flex items-center justify-center"><canvas id="taskChart"></canvas></div>
+      </section>
+
+      <!-- ============ 5. MY TASKS ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.24s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">My Tasks</h3>
+          <a href="my-tasks.html" class="text-[12px] text-amber-400 hover:text-amber-300 flex items-center gap-1">View all <i data-lucide="arrow-up-right" class="w-3 h-3"></i></a>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mb-4">
+          <div class="glass rounded-xl p-3 text-center">
+            <p id="taskPendingCount" class="text-xl font-bold text-amber-400 font-mono skel rounded">0</p>
+            <p class="text-[10.5px] text-[var(--text-mid)] mt-0.5">Pending</p>
+          </div>
+          <div class="glass rounded-xl p-3 text-center">
+            <p id="taskCompletedCount" class="text-xl font-bold text-green-400 font-mono skel rounded">0</p>
+            <p class="text-[10.5px] text-[var(--text-mid)] mt-0.5">Completed</p>
+          </div>
+          <div class="glass rounded-xl p-3 text-center">
+            <p id="taskUrgentCount" class="text-xl font-bold text-red-400 font-mono skel rounded">0</p>
+            <p class="text-[10.5px] text-[var(--text-mid)] mt-0.5">Urgent</p>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between text-[12px] mb-1.5">
+            <span class="text-[var(--text-mid)]">Overall progress</span>
+            <span id="taskProgressPct" class="text-white font-medium">0%</span>
+          </div>
+          <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+            <div id="taskProgressBar" class="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-1000" style="width:0%"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 6. SALARY SUMMARY ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.27s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Salary Summary</h3>
+          <span id="salaryStatusBadge" class="badge badge-green">—</span>
+        </div>
+        <p class="text-[11px] text-[var(--text-mid)] uppercase tracking-wide mb-1">Net salary (this month)</p>
+        <p id="salaryNet" class="font-display text-3xl font-bold text-white mb-4 skel rounded w-32">&nbsp;</p>
+        <div class="space-y-2 text-[13px]">
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Base salary</span><span id="salaryBase" class="text-white font-mono">—</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Bonus</span><span id="salaryBonus" class="text-green-400 font-mono">—</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Allowance</span><span id="salaryAllowance" class="text-green-400 font-mono">—</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Deduction</span><span id="salaryDeduction" class="text-red-400 font-mono">—</span></div>
+        </div>
+      </section>
+
+      <!-- ============ 7. LEAVE BALANCE ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.30s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Leave Balance</h3>
+          <i data-lucide="plane-takeoff" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="space-y-4" id="leaveBalanceList">
+          <div>
+            <div class="flex items-center justify-between text-[12px] mb-1.5"><span class="text-[var(--text-mid)]">Casual leave</span><span id="leaveCasualLabel" class="text-white font-medium">0 / 0</span></div>
+            <div class="h-2 rounded-full bg-white/5 overflow-hidden"><div id="leaveCasualBar" class="h-full rounded-full bg-amber-400" style="width:0%"></div></div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-[12px] mb-1.5"><span class="text-[var(--text-mid)]">Medical leave</span><span id="leaveMedicalLabel" class="text-white font-medium">0 / 0</span></div>
+            <div class="h-2 rounded-full bg-white/5 overflow-hidden"><div id="leaveMedicalBar" class="h-full rounded-full bg-cyan-400" style="width:0%"></div></div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-[12px] mb-1.5"><span class="text-[var(--text-mid)]">Annual leave</span><span id="leaveAnnualLabel" class="text-white font-medium">0 / 0</span></div>
+            <div class="h-2 rounded-full bg-white/5 overflow-hidden"><div id="leaveAnnualBar" class="h-full rounded-full bg-green-400" style="width:0%"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 8. NOTIFICATIONS ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.33s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px] flex items-center gap-2">Notifications
+            <span id="notifUnreadPill" class="hidden text-[10px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-bold">0</span>
+          </h3>
+          <a href="notifications.html" class="text-[12px] text-amber-400 hover:text-amber-300 flex items-center gap-1">View all <i data-lucide="arrow-up-right" class="w-3 h-3"></i></a>
+        </div>
+        <div id="notifList" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+          <div class="skel h-14 rounded-xl"></div>
+          <div class="skel h-14 rounded-xl"></div>
+          <div class="skel h-14 rounded-xl"></div>
+        </div>
+      </section>
+
+      <!-- ============ 9. RECENT ACTIVITY TIMELINE ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.36s">
+        <h3 class="font-display font-semibold text-white text-[15px] mb-4">Recent Activity</h3>
+        <div id="activityTimeline" class="space-y-0 max-h-64 overflow-y-auto pr-1">
+          <div class="skel h-10 rounded-lg mb-3"></div>
+          <div class="skel h-10 rounded-lg mb-3"></div>
+          <div class="skel h-10 rounded-lg"></div>
+        </div>
+      </section>
+
+      <!-- ============ 10. COMPANY ANNOUNCEMENT ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.39s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Company Announcements</h3>
+          <i data-lucide="megaphone" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div id="announcementList" class="space-y-3 max-h-64 overflow-y-auto pr-1 scroll-y-fade">
+          <div class="skel h-16 rounded-xl"></div>
+          <div class="skel h-16 rounded-xl"></div>
+        </div>
+      </section>
+
+      <!-- ============ 12. QUICK ACTIONS ============ -->
+      <section class="lg:col-span-8 glass glass-card p-6 anim-fade-up" style="animation-delay:.42s">
+        <h3 class="font-display font-semibold text-white text-[15px] mb-4">Quick Actions</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <button id="qaClockIn" class="btn-primary flex flex-col items-center justify-center gap-2 py-4 rounded-2xl">
+            <i data-lucide="log-in" class="w-5 h-5"></i>
+            <span class="text-[12.5px]">Clock In</span>
+          </button>
+          <button id="qaClockOut" class="btn-ghost flex flex-col items-center justify-center gap-2 py-4 rounded-2xl">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+            <span class="text-[12.5px]">Clock Out</span>
+          </button>
+          <a href="leave-request.html" class="btn-ghost flex flex-col items-center justify-center gap-2 py-4 rounded-2xl">
+            <i data-lucide="send" class="w-5 h-5"></i>
+            <span class="text-[12.5px]">Apply Leave</span>
+          </a>
+          <a href="employee-profile.html" class="btn-ghost flex flex-col items-center justify-center gap-2 py-4 rounded-2xl">
+            <i data-lucide="user-cog" class="w-5 h-5"></i>
+            <span class="text-[12.5px]">Update Profile</span>
+          </a>
+          <button id="qaDownloadSlip" class="btn-ghost flex flex-col items-center justify-center gap-2 py-4 rounded-2xl">
+            <i data-lucide="file-down" class="w-5 h-5"></i>
+            <span class="text-[12.5px]">Salary Slip</span>
+          </button>
+          <a href="my-tasks.html" class="btn-ghost flex flex-col items-center justify-center gap-2 py-4 rounded-2xl">
+            <i data-lucide="list-todo" class="w-5 h-5"></i>
+            <span class="text-[12.5px]">View Tasks</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- ============ 14. CALENDAR WIDGET ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.45s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Calendar</h3>
+          <span id="calendarTodayLabel" class="text-[12px] text-amber-400 font-mono">—</span>
+        </div>
+        <p class="text-[11px] font-semibold tracking-wide text-[var(--text-mid)] uppercase mb-2">Upcoming</p>
+        <div id="calendarEventsList" class="space-y-2.5">
+          <div class="skel h-11 rounded-lg"></div>
+          <div class="skel h-11 rounded-lg"></div>
+        </div>
+      </section>
+
     </div>
 
-    <div class="glass p-4 rounded-xl glass-hover">
-      <p>Attendance</p>
-      <h2 id="attendanceStatus" class="text-2xl font-bold">--</h2>
-    </div>
+    <footer class="mt-8 pb-4 text-center text-[12px] text-[var(--text-low)]">
+      ABASHON Consultancy &amp; Construction — Employee Management System
+    </footer>
+  </main>
+</div>
 
-  </div>
+<!-- Toast container -->
+<div id="toastContainer" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2.5 w-[320px] max-w-[90vw]"></div>
 
-  <!-- Employee Info -->
-  <div class="glass p-6 rounded-xl">
-    <h2 class="text-xl font-semibold mb-4">Employee Information</h2>
+<!-- ============================================================
+     APPLICATION JAVASCRIPT
+     (This architecture — supabaseClient, guardSession, loaders,
+     toast, clock — is the shared backbone every future page reuses)
+============================================================ -->
+<script>
+/* ---------------------------------------------------------------
+   0. SUPABASE CONFIGURATION
+   Replace SUPABASE_URL / SUPABASE_ANON_KEY with your project keys.
+   Expected schema (create these tables in Supabase):
 
-    <div class="grid md:grid-cols-2 gap-4 text-sm">
-      <p><span class="text-gray-400">Full Name:</span> <span id="fullName"></span></p>
-      <p><span class="text-gray-400">Email:</span> <span id="email"></span></p>
-      <p><span class="text-gray-400">Designation:</span> <span id="designation"></span></p>
-      <p><span class="text-gray-400">Department:</span> <span id="department"></span></p>
-    </div>
-  </div>
+   employees(
+     id uuid pk, auth_user_id uuid references auth.users,
+     full_name text, employee_id text, department text, designation text,
+     photo_url text, email text, phone text, joining_date date,
+     employment_status text, shift text,
+     salary_base numeric, salary_bonus numeric, salary_allowance numeric,
+     salary_deduction numeric, salary_status text
+   )
+   attendance(
+     id uuid pk, employee_id uuid, date date, clock_in timestamptz,
+     clock_out timestamptz, status text, working_minutes int
+   )
+   tasks(
+     id uuid pk, employee_id uuid, title text, status text
+       check (status in ('pending','completed','urgent')),
+     due_date date
+   )
+   leave_balances(
+     employee_id uuid pk, casual_total int, casual_used int,
+     medical_total int, medical_used int, annual_total int, annual_used int
+   )
+   notifications(
+     id uuid pk, employee_id uuid, title text, message text,
+     is_read boolean default false, created_at timestamptz default now()
+   )
+   activity_log(
+     id uuid pk, employee_id uuid, type text, description text,
+     created_at timestamptz default now()
+   )
+   announcements(
+     id uuid pk, title text, message text, created_at timestamptz default now()
+   )
+   events(
+     id uuid pk, title text, event_date date, event_type text
+   )
+--------------------------------------------------------------- */
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-</main>
+/* ---------------------------------------------------------------
+   1. GLOBAL STATE
+--------------------------------------------------------------- */
+const AppState = {
+  session: null,
+  employee: null,
+  attendanceToday: null,
+  charts: {},
+};
+
+/* ---------------------------------------------------------------
+   2. UTILITIES
+--------------------------------------------------------------- */
+function $(id){ return document.getElementById(id); }
+
+function formatCurrency(n){
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return '৳' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+
+function formatTime(dateLike){
+  if (!dateLike) return '--:--';
+  const d = new Date(dateLike);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function minutesToHM(mins){
+  mins = Math.max(0, Math.round(mins || 0));
+  const h = Math.floor(mins / 60), m = mins % 60;
+  return h + 'h ' + m + 'm';
+}
+
+function timeAgo(dateLike){
+  const diffMs = Date.now() - new Date(dateLike).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h ago';
+  return Math.floor(hrs / 24) + 'd ago';
+}
+
+function unskel(el){ if (el) el.classList.remove('skel'); }
+
+function showToast(message, type){
+  type = type || 'info';
+  const colors = {
+    success: 'border-green-500/30 text-green-400',
+    error: 'border-red-500/30 text-red-400',
+    info: 'border-amber-500/30 text-amber-400',
+  };
+  const icons = { success: 'check-circle-2', error: 'alert-circle', info: 'info' };
+  const toast = document.createElement('div');
+  toast.className = 'glass-strong rounded-xl px-4 py-3 flex items-center gap-2.5 border anim-fade-up shadow-glass ' + (colors[type] || colors.info);
+  toast.innerHTML = '<i data-lucide="' + (icons[type] || icons.info) + '" class="w-4 h-4 shrink-0"></i>' +
+    '<span class="text-[13px] text-[var(--text-hi)] flex-1">' + message + '</span>';
+  $('toastContainer').appendChild(toast);
+  lucide.createIcons();
+  setTimeout(() => {
+    toast.style.transition = 'opacity .4s ease, transform .4s ease';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(20px)';
+    setTimeout(() => toast.remove(), 400);
+  }, 4200);
+}
+
+/* ---------------------------------------------------------------
+   3. SESSION GUARD
+   Every protected page starts by calling guardSession().
+--------------------------------------------------------------- */
+async function guardSession(){
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error || !data.session){
+    window.location.href = 'employee-login.html';
+    return null;
+  }
+  AppState.session = data.session;
+  return data.session;
+}
+
+/* ---------------------------------------------------------------
+   4. LIVE CLOCK + GREETING
+--------------------------------------------------------------- */
+function tickClock(){
+  const now = new Date();
+  $('liveClock').textContent = now.toLocaleTimeString([], { hour12: true });
+  $('liveDate').textContent = now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  $('calendarTodayLabel').textContent = now.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+}
+
+function setGreeting(){
+  const hour = new Date().getHours();
+  let text = 'Good evening', icon = 'sunset';
+  if (hour < 12){ text = 'Good morning'; icon = 'sunrise'; }
+  else if (hour < 17){ text = 'Good afternoon'; icon = 'sun'; }
+  $('greetingText').textContent = text;
+  const iconEl = document.querySelector('#greetingLine i');
+  if (iconEl){ iconEl.setAttribute('data-lucide', icon); }
+  lucide.createIcons();
+}
+
+/* ---------------------------------------------------------------
+   5. DATA LOADERS  (all dynamic — no hardcoded employee data)
+--------------------------------------------------------------- */
+async function loadEmployeeProfile(){
+  const userId = AppState.session.user.id;
+  const { data, error } = await supabaseClient
+    .from('employees')
+    .select('*')
+    .eq('auth_user_id', userId)
+    .single();
+
+  if (error || !data){
+    showToast('Could not load employee profile.', 'error');
+    return;
+  }
+  AppState.employee = data;
+
+  // Navbar
+  $('navProfilePhoto').src = data.photo_url || '';
+  unskel($('navProfilePhoto'));
+  $('navProfileName').textContent = data.full_name || '—'; unskel($('navProfileName'));
+  $('navProfileRole').textContent = data.designation || '—'; unskel($('navProfileRole'));
+
+  // Welcome card
+  $('welcomeName').textContent = data.full_name || '—'; unskel($('welcomeName'));
+  $('welcomeDesignation').textContent = data.designation || '—'; unskel($('welcomeDesignation'));
+  $('welcomeDepartment').textContent = data.department || '—'; unskel($('welcomeDepartment'));
+  $('welcomeJoinDate').textContent = data.joining_date ? new Date(data.joining_date).toLocaleDateString() : '—';
+  $('welcomeShift').textContent = data.shift || '—';
+  $('welcomePhoto').src = data.photo_url || '';
+  unskel($('welcomePhoto'));
+
+  // Employee info card
+  $('infoPhoto').src = data.photo_url || ''; unskel($('infoPhoto'));
+  $('infoName').textContent = data.full_name || '—'; unskel($('infoName'));
+  $('infoEmpId').textContent = data.employee_id || '—'; unskel($('infoEmpId'));
+  $('infoDept').textContent = data.department || '—'; unskel($('infoDept'));
+  $('infoDesignation').textContent = data.designation || '—'; unskel($('infoDesignation'));
+  $('infoEmail').textContent = data.email || '—'; unskel($('infoEmail'));
+  $('infoPhone').textContent = data.phone || '—'; unskel($('infoPhone'));
+  $('infoJoinDate').textContent = data.joining_date ? new Date(data.joining_date).toLocaleDateString() : '—';
+  const statusEl = $('infoStatus');
+  const isActive = (data.employment_status || '').toLowerCase() === 'active';
+  statusEl.innerHTML = '<span class="badge ' + (isActive ? 'badge-green' : 'badge-red') + '">' + (data.employment_status || 'Unknown') + '</span>';
+
+  // Salary summary
+  const net = (Number(data.salary_base||0) + Number(data.salary_bonus||0) + Number(data.salary_allowance||0)) - Number(data.salary_deduction||0);
+  $('salaryNet').textContent = formatCurrency(net); unskel($('salaryNet'));
+  $('salaryBase').textContent = formatCurrency(data.salary_base);
+  $('salaryBonus').textContent = '+' + formatCurrency(data.salary_bonus);
+  $('salaryAllowance').textContent = '+' + formatCurrency(data.salary_allowance);
+  $('salaryDeduction').textContent = '-' + formatCurrency(data.salary_deduction);
+  const salaryBadge = $('salaryStatusBadge');
+  const paid = (data.salary_status || '').toLowerCase() === 'paid';
+  salaryBadge.textContent = data.salary_status || 'Pending';
+  salaryBadge.className = 'badge ' + (paid ? 'badge-green' : 'badge-amber');
+
+  lucide.createIcons();
+}
+
+async function loadAttendanceToday(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+  const today = new Date().toISOString().slice(0, 10);
+
+  const { data, error } = await supabaseClient
+    .from('attendance')
+    .select('*')
+    .eq('employee_id', empId)
+    .eq('date', today)
+    .maybeSingle();
+
+  const shiftTargetMinutes = 8 * 60;
+
+  if (error || !data){
+    $('attendanceStatusBadge').textContent = 'Not clocked in';
+    $('attendanceStatusBadge').className = 'badge badge-red';
+    $('attendanceLateNote').innerHTML = '<i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> You have not clocked in today.';
+    lucide.createIcons();
+    return;
+  }
+
+  AppState.attendanceToday = data;
+  $('clockInTime').textContent = data.clock_in ? formatTime(data.clock_in) : '--:--';
+  $('clockOutTime').textContent = data.clock_out ? formatTime(data.clock_out) : '--:--';
+
+  const badge = $('attendanceStatusBadge');
+  if (data.clock_out){ badge.textContent = 'Completed'; badge.className = 'badge badge-blue'; }
+  else if (data.clock_in){ badge.textContent = 'Working'; badge.className = 'badge badge-green'; }
+  else { badge.textContent = 'Not clocked in'; badge.className = 'badge badge-red'; }
+
+  const workedMinutes = data.working_minutes || 0;
+  const pct = Math.min(100, (workedMinutes / shiftTargetMinutes) * 100);
+  $('attendanceHoursLabel').textContent = minutesToHM(workedMinutes) + ' / 8h';
+  $('attendanceProgressBar').style.width = pct + '%';
+
+  $('attendanceLateNote').innerHTML = data.status === 'late'
+    ? '<i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-400"></i> Marked late today.'
+    : '<i data-lucide="check" class="w-3.5 h-3.5 text-green-400"></i> On time today.';
+  lucide.createIcons();
+}
+
+async function loadWorkingHours(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+  const now = new Date();
+  const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - now.getDay());
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const { data, error } = await supabaseClient
+    .from('attendance')
+    .select('date, working_minutes')
+    .eq('employee_id', empId)
+    .gte('date', startOfMonth.toISOString().slice(0, 10));
+
+  if (error || !data) return;
+
+  const todayStr = now.toISOString().slice(0, 10);
+  let todayMin = 0, weekMin = 0, monthMin = 0;
+  data.forEach(row => {
+    monthMin += row.working_minutes || 0;
+    if (new Date(row.date) >= startOfWeek) weekMin += row.working_minutes || 0;
+    if (row.date === todayStr) todayMin += row.working_minutes || 0;
+  });
+
+  $('hoursToday').textContent = minutesToHM(todayMin);
+  $('hoursWeek').textContent = minutesToHM(weekMin);
+  $('hoursMonth').textContent = minutesToHM(monthMin);
+
+  const weeklyTarget = 40 * 60;
+  const pct = Math.min(100, Math.round((weekMin / weeklyTarget) * 100));
+  $('hoursRingPct').textContent = pct + '%';
+  const circumference = 251.2;
+  $('hoursRing').style.strokeDashoffset = circumference - (circumference * pct / 100);
+}
+
+async function loadTasks(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+  const { data, error } = await supabaseClient.from('tasks').select('*').eq('employee_id', empId);
+  if (error || !data) return;
+
+  const pending = data.filter(t => t.status === 'pending').length;
+  const completed = data.filter(t => t.status === 'completed').length;
+  const urgent = data.filter(t => t.status === 'urgent').length;
+  const total = data.length || 1;
+
+  $('taskPendingCount').textContent = pending; unskel($('taskPendingCount'));
+  $('taskCompletedCount').textContent = completed; unskel($('taskCompletedCount'));
+  $('taskUrgentCount').textContent = urgent; unskel($('taskUrgentCount'));
+
+  const pct = Math.round((completed / total) * 100);
+  $('taskProgressPct').textContent = pct + '%';
+  $('taskProgressBar').style.width = pct + '%';
+
+  renderTaskChart(pending, completed, urgent);
+}
+
+async function loadSalary(){
+  // Salary values are already populated from the employees row in loadEmployeeProfile().
+  // This function is kept separate so the Salary page can call it independently
+  // once it queries a dedicated payroll history table.
+}
+
+async function loadLeaveBalance(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+  const { data, error } = await supabaseClient.from('leave_balances').select('*').eq('employee_id', empId).maybeSingle();
+  if (error || !data) return;
+
+  const setBar = (usedKey, totalKey, labelId, barId) => {
+    const used = data[usedKey] || 0, total = data[totalKey] || 0;
+    const remaining = Math.max(0, total - used);
+    $(labelId).textContent = remaining + ' / ' + total + ' days';
+    $(barId).style.width = (total ? Math.min(100, (remaining / total) * 100) : 0) + '%';
+  };
+  setBar('casual_used', 'casual_total', 'leaveCasualLabel', 'leaveCasualBar');
+  setBar('medical_used', 'medical_total', 'leaveMedicalLabel', 'leaveMedicalBar');
+  setBar('annual_used', 'annual_total', 'leaveAnnualLabel', 'leaveAnnualBar');
+}
+
+async function loadNotifications(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+  const { data, error } = await supabaseClient
+    .from('notifications').select('*').eq('employee_id', empId)
+    .order('created_at', { ascending: false }).limit(6);
+
+  const list = $('notifList');
+  if (error || !data || data.length === 0){
+    list.innerHTML = '<p class="text-[12.5px] text-[var(--text-mid)] text-center py-4">No notifications yet.</p>';
+    return;
+  }
+
+  const unread = data.filter(n => !n.is_read).length;
+  const pill = $('notifUnreadPill');
+  if (unread > 0){ pill.textContent = unread; pill.classList.remove('hidden'); }
+  const bellBadge = $('notifBadge');
+  if (unread > 0){ bellBadge.textContent = unread; bellBadge.classList.remove('hidden'); }
+
+  list.innerHTML = data.map(n => (
+    '<div class="glass rounded-xl p-3 flex items-start gap-2.5' + (n.is_read ? '' : ' border-amber-500/25') + '">' +
+      '<div class="w-2 h-2 rounded-full mt-1.5 shrink-0 ' + (n.is_read ? 'bg-white/15' : 'bg-amber-400') + '"></div>' +
+      '<div class="min-w-0">' +
+        '<p class="text-[13px] text-white font-medium truncate">' + (n.title || 'Notification') + '</p>' +
+        '<p class="text-[11.5px] text-[var(--text-mid)] truncate">' + (n.message || '') + '</p>' +
+        '<p class="text-[10.5px] text-[var(--text-low)] mt-0.5">' + timeAgo(n.created_at) + '</p>' +
+      '</div>' +
+    '</div>'
+  )).join('');
+}
+
+async function loadActivityTimeline(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+  const { data, error } = await supabaseClient
+    .from('activity_log').select('*').eq('employee_id', empId)
+    .order('created_at', { ascending: false }).limit(6);
+
+  const wrap = $('activityTimeline');
+  if (error || !data || data.length === 0){
+    wrap.innerHTML = '<p class="text-[12.5px] text-[var(--text-mid)] text-center py-4">No recent activity.</p>';
+    return;
+  }
+
+  const iconFor = t => ({ clock_in: 'log-in', clock_out: 'log-out', task_completed: 'check-circle-2', leave_applied: 'plane', salary_updated: 'wallet' }[t] || 'circle');
+
+  wrap.innerHTML = data.map((a, i) => (
+    '<div class="flex gap-3 pb-4 relative">' +
+      (i < data.length - 1 ? '<div class="timeline-line absolute left-[13px] top-7 bottom-0"></div>' : '') +
+      '<div class="w-7 h-7 rounded-full glass flex items-center justify-center shrink-0 z-10 border-amber-500/25">' +
+        '<i data-lucide="' + iconFor(a.type) + '" class="w-3.5 h-3.5 text-amber-400"></i>' +
+      '</div>' +
+      '<div class="min-w-0 pt-0.5">' +
+        '<p class="text-[12.5px] text-white leading-snug">' + (a.description || a.type) + '</p>' +
+        '<p class="text-[10.5px] text-[var(--text-low)]">' + timeAgo(a.created_at) + '</p>' +
+      '</div>' +
+    '</div>'
+  )).join('');
+  lucide.createIcons();
+}
+
+async function loadAnnouncements(){
+  const { data, error } = await supabaseClient
+    .from('announcements').select('*').order('created_at', { ascending: false }).limit(5);
+
+  const wrap = $('announcementList');
+  if (error || !data || data.length === 0){
+    wrap.innerHTML = '<p class="text-[12.5px] text-[var(--text-mid)] text-center py-4">No announcements right now.</p>';
+    return;
+  }
+  wrap.innerHTML = data.map(a => (
+    '<div class="glass rounded-xl p-3">' +
+      '<p class="text-[13px] text-white font-medium">' + (a.title || 'Announcement') + '</p>' +
+      '<p class="text-[11.5px] text-[var(--text-mid)] mt-0.5 line-clamp-2">' + (a.message || '') + '</p>' +
+      '<p class="text-[10.5px] text-[var(--text-low)] mt-1">' + timeAgo(a.created_at) + '</p>' +
+    '</div>'
+  )).join('');
+}
+
+async function loadCalendarEvents(){
+  const today = new Date().toISOString().slice(0, 10);
+  const { data, error } = await supabaseClient
+    .from('events').select('*').gte('event_date', today)
+    .order('event_date', { ascending: true }).limit(5);
+
+  const wrap = $('calendarEventsList');
+  if (error || !data || data.length === 0){
+    wrap.innerHTML = '<p class="text-[12.5px] text-[var(--text-mid)] text-center py-4">No upcoming events.</p>';
+    return;
+  }
+  const iconFor = t => ({ birthday: 'cake', meeting: 'users' }[t] || 'calendar');
+  wrap.innerHTML = data.map(e => (
+    '<div class="flex items-center gap-3 glass rounded-xl p-2.5">' +
+      '<div class="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">' +
+        '<i data-lucide="' + iconFor(e.event_type) + '" class="w-4 h-4 text-amber-400"></i>' +
+      '</div>' +
+      '<div class="min-w-0"><p class="text-[12.5px] text-white font-medium truncate">' + e.title + '</p>' +
+      '<p class="text-[11px] text-[var(--text-mid)]">' + new Date(e.event_date).toLocaleDateString(undefined,{day:'numeric',month:'short'}) + '</p></div>' +
+    '</div>'
+  )).join('');
+  lucide.createIcons();
+}
+
+/* ---------------------------------------------------------------
+   6. CHARTS (Chart.js)
+--------------------------------------------------------------- */
+function chartDefaults(){
+  Chart.defaults.color = '#93A0B4';
+  Chart.defaults.font.family = 'Inter';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+}
+
+async function renderAttendanceChart(){
+  const empId = AppState.employee?.id;
+  const ctx = $('attendanceChart');
+  if (!ctx) return;
+
+  let labels = [], hoursData = [], perfData = [];
+  if (empId){
+    const since = new Date(); since.setDate(since.getDate() - 6);
+    const { data } = await supabaseClient
+      .from('attendance').select('date, working_minutes')
+      .eq('employee_id', empId).gte('date', since.toISOString().slice(0,10))
+      .order('date', { ascending: true });
+    (data || []).forEach(r => {
+      labels.push(new Date(r.date).toLocaleDateString(undefined,{weekday:'short'}));
+      hoursData.push(+( (r.working_minutes||0) / 60 ).toFixed(1));
+      perfData.push(Math.min(100, Math.round(((r.working_minutes||0)/480)*100)));
+    });
+  }
+  if (labels.length === 0){
+    labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    hoursData = [0,0,0,0,0,0,0];
+    perfData = [0,0,0,0,0,0,0];
+  }
+
+  AppState.charts.attendance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Hours', data: hoursData, borderColor: '#F5A524', backgroundColor: 'rgba(245,165,36,0.12)', fill: true, tension: .4, pointRadius: 3, pointBackgroundColor:'#F5A524', yAxisID:'y' },
+        { label: 'Performance %', data: perfData, borderColor: '#22D3EE', backgroundColor: 'rgba(34,211,238,0.08)', fill: true, tension: .4, pointRadius: 3, pointBackgroundColor:'#22D3EE', yAxisID:'y1' },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, title: { display:false } },
+        y1: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false } },
+        x: { grid: { display: false } },
+      },
+      animation: { duration: 900, easing: 'easeOutQuart' },
+    },
+  });
+}
+
+function renderTaskChart(pending, completed, urgent){
+  const ctx = $('taskChart');
+  if (!ctx) return;
+  if (AppState.charts.task) AppState.charts.task.destroy();
+  const total = pending + completed + urgent;
+  AppState.charts.task = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Pending', 'Completed', 'Urgent'],
+      datasets: [{
+        data: total ? [pending, completed, urgent] : [1,0,0],
+        backgroundColor: ['#F5A524', '#22C55E', '#EF4444'],
+        borderColor: '#0D1424', borderWidth: 3, hoverOffset: 6,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '68%',
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, padding: 14, font: { size: 11 } } } },
+      animation: { duration: 900, easing: 'easeOutQuart' },
+    },
+  });
+}
+
+/* ---------------------------------------------------------------
+   7. WEATHER (Open-Meteo — no API key required)
+--------------------------------------------------------------- */
+function loadWeather(){
+  if (!navigator.geolocation){
+    $('siteLocationLabel').textContent = 'Location unavailable';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const { latitude, longitude } = pos.coords;
+    try{
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code`);
+      const json = await res.json();
+      const temp = Math.round(json.current.temperature_2m);
+      const code = json.current.weather_code;
+      const desc = weatherCodeToText(code);
+
+      $('weatherTemp').textContent = temp + '°C'; unskel($('weatherTemp'));
+      $('weatherDesc').textContent = desc;
+
+      const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${latitude}&longitude=${longitude}`);
+      const geoJson = await geoRes.json();
+      const place = geoJson?.results?.[0]?.name || 'Your location';
+      $('weatherLocation').textContent = place; unskel($('weatherLocation'));
+      $('siteLocationLabel').textContent = place;
+    } catch(e){
+      $('weatherDesc').textContent = 'Unable to load weather';
+      $('siteLocationLabel').textContent = 'Location unavailable';
+    }
+  }, () => {
+    $('siteLocationLabel').textContent = 'Location permission denied';
+    $('weatherDesc').textContent = 'Enable location for weather';
+  });
+}
+
+function weatherCodeToText(code){
+  const map = {0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Fog',51:'Light drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',71:'Snow',80:'Rain showers',95:'Thunderstorm'};
+  return map[code] || 'Weather update';
+}
+
+/* ---------------------------------------------------------------
+   8. QUICK ACTIONS
+--------------------------------------------------------------- */
+async function handleClockIn(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const { error } = await supabaseClient.from('attendance').upsert({
+    employee_id: empId, date: today, clock_in: new Date().toISOString(), status: 'present',
+  }, { onConflict: 'employee_id,date' });
+
+  if (error){ showToast('Clock in failed. Try again.', 'error'); return; }
+  showToast('Clocked in successfully.', 'success');
+  loadAttendanceToday();
+}
+
+async function handleClockOut(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const clockOutTime = new Date();
+  let workingMinutes = 0;
+  if (AppState.attendanceToday?.clock_in){
+    workingMinutes = Math.round((clockOutTime - new Date(AppState.attendanceToday.clock_in)) / 60000);
+  }
+  const { error } = await supabaseClient.from('attendance')
+    .update({ clock_out: clockOutTime.toISOString(), working_minutes: workingMinutes })
+    .eq('employee_id', empId).eq('date', today);
+
+  if (error){ showToast('Clock out failed. Try again.', 'error'); return; }
+  showToast('Clocked out. Have a good rest!', 'success');
+  loadAttendanceToday();
+  loadWorkingHours();
+}
+
+/* ---------------------------------------------------------------
+   9. SIDEBAR / NAVBAR INTERACTIONS
+--------------------------------------------------------------- */
+function initUIControls(){
+  $('collapseBtn').addEventListener('click', () => document.body.classList.toggle('sidebar-collapsed'));
+  $('mobileMenuBtn').addEventListener('click', () => document.body.classList.add('sidebar-mobile-open'));
+  $('sidebarBackdrop').addEventListener('click', () => document.body.classList.remove('sidebar-mobile-open'));
+
+  $('themeToggleBtn').addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+    showToast('Theme preference saved.', 'info');
+  });
+
+  $('qaClockIn').addEventListener('click', handleClockIn);
+  $('qaClockOut').addEventListener('click', handleClockOut);
+  $('qaDownloadSlip').addEventListener('click', () => showToast('Preparing salary slip for download…', 'info'));
+
+  $('logoutBtn').addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'employee-login.html';
+  });
+}
+
+/* ---------------------------------------------------------------
+   10. BOOTSTRAP
+--------------------------------------------------------------- */
+async function bootstrap(){
+  lucide.createIcons();
+  chartDefaults();
+  initUIControls();
+
+  tickClock();
+  setInterval(tickClock, 1000);
+  setGreeting();
+
+  const session = await guardSession();
+  if (!session) return;
+
+  await loadEmployeeProfile();
+
+  await Promise.all([
+    loadAttendanceToday(),
+    loadWorkingHours(),
+    loadTasks(),
+    loadLeaveBalance(),
+    loadNotifications(),
+    loadActivityTimeline(),
+    loadAnnouncements(),
+    loadCalendarEvents(),
+    renderAttendanceChart(),
+  ]);
+
+  loadWeather();
+  lucide.createIcons();
+}
+
+document.addEventListener('DOMContentLoaded', bootstrap);
+</script>
+</body>
+</html>
