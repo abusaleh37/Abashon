@@ -783,7 +783,7 @@ function tickClock(){
 async function loadEmployeeProfile(){
   const userId = AppState.session.user.id;
   const { data, error } = await supabaseClient
-    .from('employees')
+    .from('Employees')
     .select('*')
     .eq('auth_user_id', userId)
     .single();
