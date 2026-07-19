@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>ABASHON | My Tasks</title>
+<meta name="description" content="ABASHON Consultancy & Construction — Employee Task Management" />
+
+<!-- ============================================================
+     FONTS
+============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<!-- ============================================================
+     TAILWIND CSS (CDN)
+============================================================ -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+        colors: {
+          ink: {
+            950: '#070B14',
+            900: '#0A0F1C',
+            850: '#0D1424',
+            800: '#131B2E',
+            700: '#1A2338',
+            600: '#243149',
+          },
+          amber: {
+            400: '#FBC56A',
+            500: '#F5A524',
+            600: '#D98A0F',
+          },
+        },
+        boxShadow: {
+          glass: '0 8px 32px rgba(0,0,0,0.35)',
+          'glow-amber': '0 0 0 1px rgba(245,165,36,0.25), 0 0 24px rgba(245,165,36,0.12)',
+        },
+      },
+    },
+  };
+</script>
+
+<!-- ============================================================
+     ICONS / CHARTS / SUPABASE
+============================================================ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- ============================================================
+     GLOBAL DESIGN SYSTEM (shared across every page — unchanged)
+============================================================ -->
+<style>
+  :root{
+    --bg-0:#070B14;
+    --bg-1:#0A0F1C;
+    --bg-2:#0D1424;
+    --bg-3:#131B2E;
+    --glass-bg: rgba(255,255,255,0.045);
+    --glass-bg-strong: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.09);
+    --glass-border-hover: rgba(245,165,36,0.35);
+    --line-blueprint: rgba(148,178,255,0.055);
+    --amber: #F5A524;
+    --amber-soft: #FBC56A;
+    --blue: #3B82F6;
+    --cyan: #22D3EE;
+    --green: #22C55E;
+    --red: #EF4444;
+    --violet:#8B7CF6;
+    --text-hi:#EDF1F7;
+    --text-mid:#93A0B4;
+    --text-low:#5C6B82;
+    --sidebar-w: 272px;
+    --sidebar-w-collapsed: 84px;
+    --navbar-h: 76px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    background:
+      radial-gradient(1100px 600px at 85% -10%, rgba(245,165,36,0.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 20%, rgba(59,130,246,0.08), transparent 55%),
+      var(--bg-0);
+    color:var(--text-hi);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---- Blueprint grid backdrop : the signature texture of this system ---- */
+  .blueprint{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line-blueprint) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-blueprint) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(1200px 800px at 30% 10%, #000 0%, transparent 75%);
+            mask-image: radial-gradient(1200px 800px at 30% 10%, #000 0%, transparent 75%);
+    opacity:.7;
+  }
+
+  h1,h2,h3,h4,.font-display{ font-family:'Space Grotesk', sans-serif; letter-spacing:-0.01em; }
+  .font-mono{ font-family:'JetBrains Mono', monospace; }
+
+  /* ---- Scrollbars ---- */
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:rgba(245,165,36,0.25); border-radius:99px; }
+  ::-webkit-scrollbar-thumb:hover{ background:rgba(245,165,36,0.45); }
+
+  /* ---- Glass primitives (reused by every card, every page) ---- */
+  .glass{
+    background: var(--glass-bg);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    border-radius: 20px;
+  }
+  .glass-strong{
+    background: var(--glass-bg-strong);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-radius: 20px;
+  }
+  .glass-card{
+    position:relative;
+    overflow:hidden;
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .35s ease, box-shadow .35s ease;
+  }
+  .glass-card::before{
+    content:"";
+    position:absolute; inset:0; border-radius:inherit; padding:1px;
+    background: linear-gradient(135deg, rgba(245,165,36,0.35), rgba(255,255,255,0) 35%, rgba(59,130,246,0.25) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity:0; transition:opacity .35s ease;
+    pointer-events:none;
+  }
+  .glass-card:hover{ transform:translateY(-3px); box-shadow:0 16px 40px rgba(0,0,0,0.45); }
+  .glass-card:hover::before{ opacity:1; }
+
+  .divider-blueprint{
+    height:1px;
+    background: repeating-linear-gradient(90deg, rgba(245,165,36,0.35) 0 6px, transparent 6px 12px);
+  }
+
+  /* ---- Sidebar ---- */
+  #sidebar{
+    width:var(--sidebar-w);
+    transition: width .3s cubic-bezier(.2,.8,.2,1), transform .3s ease;
+  }
+  body.sidebar-collapsed #sidebar{ width:var(--sidebar-w-collapsed); }
+  body.sidebar-collapsed .sidebar-label{ opacity:0; width:0; }
+  body.sidebar-collapsed #brandText{ opacity:0; width:0; }
+  #mainWrap{ margin-left:var(--sidebar-w); transition:margin-left .3s cubic-bezier(.2,.8,.2,1); }
+  body.sidebar-collapsed #mainWrap{ margin-left:var(--sidebar-w-collapsed); }
+
+  .nav-item{
+    position:relative;
+    display:flex; align-items:center; gap:14px;
+    padding:11px 16px; margin:2px 12px;
+    border-radius:12px;
+    color:var(--text-mid);
+    font-size:14px; font-weight:500;
+    transition:all .25s ease;
+    white-space:nowrap;
+  }
+  .nav-item:hover{ color:var(--text-hi); background:rgba(255,255,255,0.05); }
+  .nav-item.active{
+    color:#0A0F1C;
+    background: linear-gradient(135deg, var(--amber-soft), var(--amber));
+    box-shadow: 0 6px 18px rgba(245,165,36,0.28);
+    font-weight:600;
+  }
+  .nav-item.active svg{ stroke:#0A0F1C; }
+  .sidebar-label{ transition:opacity .2s ease, width .2s ease; overflow:hidden; }
+
+  /* ---- Badges ---- */
+  .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.02em; }
+  .badge-green{ color:var(--green); background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); }
+  .badge-amber{ color:var(--amber-soft); background:rgba(245,165,36,0.12); border:1px solid rgba(245,165,36,0.28); }
+  .badge-red{ color:var(--red); background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.28); }
+  .badge-blue{ color:#93C5FD; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.28); }
+  .badge-violet{ color:#C4B5FD; background:rgba(139,124,246,0.12); border:1px solid rgba(139,124,246,0.28); }
+
+  .btn-primary{
+    background:linear-gradient(135deg, var(--amber-soft), var(--amber));
+    color:#0A0F1C; font-weight:600; border-radius:12px;
+    transition:transform .2s ease, box-shadow .2s ease;
+    box-shadow:0 8px 20px rgba(245,165,36,0.22);
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(245,165,36,0.32); }
+  .btn-primary:active{ transform:translateY(0); }
+  .btn-primary:disabled{ opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  .btn-ghost{
+    background:rgba(255,255,255,0.04); border:1px solid var(--glass-border); color:var(--text-hi);
+    border-radius:12px; transition:all .2s ease;
+  }
+  .btn-ghost:hover{ background:rgba(255,255,255,0.08); border-color:var(--glass-border-hover); }
+  .btn-ghost:disabled{ opacity:.4; cursor:not-allowed; }
+
+  /* ---- Loading skeleton ---- */
+  .skel{ position:relative; overflow:hidden; background:rgba(255,255,255,0.06); border-radius:8px; color:transparent !important; }
+  .skel::after{
+    content:""; position:absolute; inset:0; transform:translateX(-100%);
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent);
+    animation:shimmer 1.4s infinite;
+  }
+  @keyframes shimmer{ 100%{ transform:translateX(100%); } }
+
+  /* ---- Progress ring ---- */
+  .ring-svg{ transform:rotate(-90deg); }
+  .ring-bg{ stroke:rgba(255,255,255,0.07); }
+  .ring-fg{ stroke-linecap:round; transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1); }
+
+  /* ---- Entrance animations ---- */
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes scaleIn{ from{ opacity:0; transform:scale(.96); } to{ opacity:1; transform:scale(1); } }
+  @keyframes slideInRight{ from{ opacity:0; transform:translateX(24px); } to{ opacity:1; transform:translateX(0); } }
+  .anim-fade-up{ animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both; }
+  .anim-scale-in{ animation:scaleIn .5s cubic-bezier(.2,.8,.2,1) both; }
+  .anim-fade-in{ animation:fadeIn .6s ease both; }
+  .anim-slide-in{ animation:slideInRight .4s cubic-bezier(.2,.8,.2,1) both; }
+
+  /* ---- Live pulse dot ---- */
+  .pulse-dot{ position:relative; }
+  .pulse-dot::after{
+    content:""; position:absolute; inset:-4px; border-radius:99px;
+    border:1.5px solid var(--green); animation:pulseRing 1.8s ease-out infinite;
+  }
+  @keyframes pulseRing{ 0%{ opacity:.9; transform:scale(.7);} 100%{ opacity:0; transform:scale(1.9);} }
+
+  /* ---- Timeline ---- */
+  .timeline-line{ background:linear-gradient(180deg, var(--amber), rgba(245,165,36,0)); width:2px; }
+
+  /* ---- Scroll marquee / fade masks ---- */
+  .scroll-y-fade{ mask-image:linear-gradient(180deg, transparent, #000 8%, #000 92%, transparent); }
+
+  input[type="text"]:focus, input[type="search"]:focus, select:focus, textarea:focus{ outline:none; }
+  ::placeholder{ color:var(--text-low); }
+
+  @media (max-width: 1024px){
+    #sidebar{ position:fixed; z-index:50; top:0; left:0; height:100vh; transform:translateX(-100%); }
+    body.sidebar-mobile-open #sidebar{ transform:translateX(0); }
+    #mainWrap, body.sidebar-collapsed #mainWrap{ margin-left:0; }
+    #sidebarBackdrop{ display:none; }
+    body.sidebar-mobile-open #sidebarBackdrop{ display:block; }
+  }
+
+  /* ============================================================
+     PAGE-SPECIFIC: TASKS TABLE, DETAILS PANEL, TIMELINE, NOTIFICATIONS
+     (built on top of the shared primitives above)
+  ============================================================ */
+
+  /* Tasks table */
+  .task-table{ width:100%; border-collapse:separate; border-spacing:0; }
+  .task-table thead th{
+    text-align:left; font-size:10.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--text-low); padding:0 14px 10px; white-space:nowrap;
+  }
+  .task-table thead th.sortable{ cursor:pointer; user-select:none; }
+  .task-table thead th.sortable:hover{ color:var(--text-mid); }
+  .task-table tbody tr{ transition: background .2s ease; cursor:pointer; }
+  .task-table tbody tr:hover{ background:rgba(255,255,255,0.035); }
+  .task-table tbody tr.selected{ background:rgba(245,165,36,0.06); }
+  .task-table tbody td{ padding:12px 14px; font-size:13px; border-top:1px solid rgba(255,255,255,0.06); }
+  .task-table tbody tr:first-child td{ border-top:none; }
+
+  .page-btn{
+    width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-size:12.5px; font-weight:600; color:var(--text-mid);
+    background:rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+    transition: all .2s ease;
+  }
+  .page-btn:hover:not(:disabled){ background:rgba(255,255,255,0.08); color:var(--text-hi); }
+  .page-btn.active{ background:linear-gradient(135deg, var(--amber-soft), var(--amber)); color:#0A0F1C; border-color:transparent; }
+  .page-btn:disabled{ opacity:.35; cursor:not-allowed; }
+
+  .filter-chip{
+    padding:7px 13px; border-radius:99px; font-size:12.5px; font-weight:600; color:var(--text-mid);
+    background:rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+    transition:all .2s ease; white-space:nowrap;
+  }
+  .filter-chip:hover{ color:var(--text-hi); background:rgba(255,255,255,0.07); }
+  .filter-chip.active{
+    color:#0A0F1C; background:linear-gradient(135deg, var(--amber-soft), var(--amber)); border-color:transparent;
+  }
+
+  /* Mini progress bar (table cell) */
+  .mini-progress{ width:70px; height:6px; border-radius:99px; background:rgba(255,255,255,0.07); overflow:hidden; }
+  .mini-progress > div{ height:100%; border-radius:99px; background:linear-gradient(90deg, var(--amber-soft), var(--amber)); transition:width .8s cubic-bezier(.2,.8,.2,1); }
+
+  /* Priority dot */
+  .priority-dot{ width:7px; height:7px; border-radius:99px; display:inline-block; }
+  .priority-high{ background:var(--red); box-shadow:0 0 8px rgba(239,68,68,.5); }
+  .priority-medium{ background:var(--amber); box-shadow:0 0 8px rgba(245,165,36,.5); }
+  .priority-low{ background:var(--green); box-shadow:0 0 8px rgba(34,197,94,.5); }
+
+  /* Quick action tile */
+  .qa-tile{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+    padding:16px 10px; border-radius:16px;
+    background:rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+    transition: all .2s ease; text-align:center;
+  }
+  .qa-tile:hover:not(:disabled){ background:rgba(255,255,255,0.07); border-color:var(--glass-border-hover); transform:translateY(-2px); }
+  .qa-tile:disabled{ opacity:.35; cursor:not-allowed; }
+  .qa-tile .qa-icon{
+    width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center;
+  }
+
+  /* Task Details slide-over panel */
+  #detailsOverlay{
+    position:fixed; inset:0; z-index:60; background:rgba(3,6,12,0.6); backdrop-filter:blur(3px);
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+  }
+  #detailsOverlay.open{ opacity:1; pointer-events:auto; }
+  #detailsPanel{
+    position:fixed; top:0; right:0; height:100vh; width:min(460px, 92vw); z-index:61;
+    transform:translateX(100%); transition: transform .35s cubic-bezier(.2,.8,.2,1);
+    overflow-y:auto;
+  }
+  #detailsOverlay.open #detailsPanel{ transform:translateX(0); }
+
+  .comment-bubble{ background:rgba(255,255,255,0.04); border:1px solid var(--glass-border); border-radius:14px; padding:10px 12px; }
+
+  input[type="range"]{ -webkit-appearance:none; height:6px; border-radius:99px; background:rgba(255,255,255,0.08); }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:16px; height:16px; border-radius:99px;
+    background:var(--amber); cursor:pointer; box-shadow:0 0 0 4px rgba(245,165,36,.18);
+  }
+</style>
+</head>
+
+<body class="font-body">
+<div class="blueprint"></div>
+
+<!-- Mobile backdrop -->
+<div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden"></div>
+
+<!-- ============================================================
+     SIDEBAR  (reused exactly — My Tasks marked active)
+============================================================ -->
+<aside id="sidebar" class="fixed top-0 left-0 h-screen z-50 flex flex-col glass-strong border-r border-white/5">
+  <!-- Brand -->
+  <div class="flex items-center gap-3 px-5 h-[76px] shrink-0 border-b border-white/5">
+    <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-glow-amber">
+      <i data-lucide="hard-hat" class="w-5 h-5 text-ink-900"></i>
+    </div>
+    <div id="brandText" class="sidebar-label leading-tight overflow-hidden">
+      <p class="font-display font-bold text-[15px] text-white tracking-tight">ABASHON</p>
+      <p class="text-[10.5px] text-[var(--text-mid)] tracking-wide">Consultancy &amp; Construction</p>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4">
+    <p class="sidebar-label px-6 mb-2 text-[10.5px] font-semibold tracking-[.14em] text-[var(--text-low)] uppercase">Workspace</p>
+    <a href="employee-dashboard.html" data-page="dashboard" class="nav-item">
+      <i data-lucide="layout-dashboard" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Dashboard</span>
+    </a>
+    <a href="employee-profile.html" data-page="profile" class="nav-item">
+      <i data-lucide="user-circle-2" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">My Profile</span>
+    </a>
+    <a href="attendance.html" data-page="attendance" class="nav-item">
+      <i data-lucide="calendar-check-2" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Attendance</span>
+    </a>
+    <a href="my-tasks.html" data-page="tasks" class="nav-item active">
+      <i data-lucide="list-checks" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">My Tasks</span>
+    </a>
+    <a href="employee-salary.html" data-page="salary" class="nav-item">
+      <i data-lucide="wallet" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Salary</span>
+    </a>
+    <a href="leave-request.html" data-page="leave" class="nav-item">
+      <i data-lucide="plane" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Leave Request</span>
+    </a>
+    <a href="notifications.html" data-page="notifications" class="nav-item">
+      <i data-lucide="bell" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Notifications</span>
+    </a>
+
+    <p class="sidebar-label px-6 mt-5 mb-2 text-[10.5px] font-semibold tracking-[.14em] text-[var(--text-low)] uppercase">System</p>
+    <a href="settings.html" data-page="settings" class="nav-item">
+      <i data-lucide="settings" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Settings</span>
+    </a>
+    <button id="logoutBtn" class="nav-item w-[calc(100%-24px)] text-left">
+      <i data-lucide="log-out" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Logout</span>
+    </button>
+  </nav>
+
+  <!-- Collapse toggle -->
+  <div class="p-3 border-t border-white/5 shrink-0">
+    <button id="collapseBtn" class="nav-item w-full justify-center lg:justify-start">
+      <i data-lucide="panel-left-close" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Collapse</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN WRAPPER
+============================================================ -->
+<div id="mainWrap" class="relative z-10 min-h-screen flex flex-col">
+
+  <!-- ============================================================
+       NAVBAR (reused exactly)
+  ============================================================ -->
+  <header id="navbar" class="sticky top-0 z-30 h-[76px] shrink-0 glass-strong border-b border-white/5 flex items-center justify-between gap-4 px-4 lg:px-8">
+    <div class="flex items-center gap-3 min-w-0">
+      <button id="mobileMenuBtn" class="lg:hidden btn-ghost w-10 h-10 flex items-center justify-center shrink-0">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+      <div class="hidden md:flex items-center gap-2.5 glass px-4 py-2.5 w-72 xl:w-96">
+        <i data-lucide="search" class="w-4 h-4 text-[var(--text-low)] shrink-0"></i>
+        <input type="text" placeholder="Search employees, tasks, documents…" class="bg-transparent text-sm w-full text-[var(--text-hi)]" />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 lg:gap-3 shrink-0">
+      <!-- Digital clock -->
+      <div class="hidden md:flex flex-col items-end leading-tight mr-1">
+        <span id="liveClock" class="font-mono text-[15px] font-semibold text-amber-400 tracking-wider">--:--:--</span>
+        <span id="liveDate" class="text-[11px] text-[var(--text-mid)]">Loading date…</span>
+      </div>
+
+      <div class="hidden md:block w-px h-8 bg-white/10 mx-1"></div>
+
+      <!-- Theme toggle (prepared) -->
+      <button id="themeToggleBtn" class="btn-ghost w-10 h-10 flex items-center justify-center" title="Toggle theme">
+        <i data-lucide="moon" class="w-[18px] h-[18px]"></i>
+      </button>
+
+      <!-- Notification bell -->
+      <button id="notifBellBtn" class="btn-ghost relative w-10 h-10 flex items-center justify-center" title="Notifications">
+        <i data-lucide="bell" class="w-[18px] h-[18px]"></i>
+        <span id="notifBadge" class="hidden absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[10px] font-bold flex items-center justify-center text-white">0</span>
+      </button>
+
+      <div class="hidden md:block w-px h-8 bg-white/10 mx-1"></div>
+
+      <!-- Profile -->
+      <button id="profileMenuBtn" class="flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full glass hover:border-amber-500/30 transition-colors">
+        <img id="navProfilePhoto" src="" alt="" class="w-9 h-9 rounded-full object-cover skel bg-ink-700" />
+        <div class="hidden sm:block text-left leading-tight">
+          <p id="navProfileName" class="text-[13px] font-semibold text-white skel rounded w-24">&nbsp;</p>
+          <p id="navProfileRole" class="text-[11px] text-[var(--text-mid)] skel rounded w-16 mt-0.5">&nbsp;</p>
+        </div>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--text-mid)] hidden sm:block"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       PAGE CONTENT
+  ============================================================ -->
+  <main class="flex-1 px-4 lg:px-8 py-6 lg:py-8 max-w-[1680px] w-full mx-auto">
+
+    <!-- Page heading -->
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-6 anim-fade-up">
+      <div>
+        <p class="text-[11px] font-semibold tracking-[.16em] text-amber-400 uppercase mb-1">Employee Workspace</p>
+        <h1 class="font-display text-2xl lg:text-[28px] font-bold text-white">My Tasks</h1>
+      </div>
+      <div class="flex items-center gap-2 text-[13px] text-[var(--text-mid)]">
+        <i data-lucide="list-checks" class="w-4 h-4 text-amber-400"></i>
+        <span id="taskCountLabel">Loading tasks…</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+      <!-- ============ 1. WELCOME HEADER ============ -->
+      <section class="lg:col-span-8 glass glass-card p-6 lg:p-7 anim-fade-up" style="animation-delay:.03s">
+        <div class="flex flex-col md:flex-row md:items-center gap-6 justify-between">
+          <div class="min-w-0">
+            <p class="text-[13px] font-semibold text-amber-400 flex items-center gap-2 mb-2">
+              <i data-lucide="list-checks" class="w-4 h-4"></i> <span>Task Workspace</span>
+            </p>
+            <h2 id="welcomeName" class="font-display text-2xl lg:text-3xl font-bold text-white skel rounded w-52">&nbsp;</h2>
+            <p class="text-sm text-[var(--text-mid)] mt-1.5">
+              <span id="welcomeDepartment" class="skel rounded inline-block w-28">&nbsp;</span> ·
+              <span id="welcomeDateLabel">—</span>
+            </p>
+            <div class="flex flex-wrap gap-2 mt-4">
+              <span class="badge badge-blue"><i data-lucide="clock-4" class="w-3 h-3"></i> <span id="welcomeLiveClock">--:--:--</span></span>
+              <span class="badge badge-amber"><i data-lucide="trending-up" class="w-3 h-3"></i> <span id="welcomeCompletionLabel">0%</span> completed</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 shrink-0">
+            <div class="relative w-24 h-24">
+              <svg class="ring-svg w-24 h-24" viewBox="0 0 96 96">
+                <circle class="ring-bg" cx="48" cy="48" r="41" stroke-width="8" fill="none"/>
+                <circle id="ringCompletion" class="ring-fg" cx="48" cy="48" r="41" stroke-width="8" fill="none" stroke="#F5A524" stroke-dasharray="257.6" stroke-dashoffset="257.6"/>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span id="ringCompletionLabel" class="font-display text-lg font-bold text-white">0%</span>
+              </div>
+            </div>
+            <img id="welcomePhoto" src="" alt="" class="w-20 h-20 rounded-2xl object-cover border-2 border-amber-500/30 shadow-glow-amber shrink-0 skel bg-ink-700" />
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 2. PRIORITY DISTRIBUTION ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up flex flex-col" style="animation-delay:.06s">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-display font-semibold text-white text-[15px]">Priority Distribution</h3>
+          <i data-lucide="flag" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="h-36"><canvas id="priorityChart"></canvas></div>
+        <div class="flex items-center justify-center gap-4 mt-3 text-[11.5px] text-[var(--text-mid)]">
+          <span class="flex items-center gap-1.5"><span class="priority-dot priority-high"></span>High</span>
+          <span class="flex items-center gap-1.5"><span class="priority-dot priority-medium"></span>Medium</span>
+          <span class="flex items-center gap-1.5"><span class="priority-dot priority-low"></span>Low</span>
+        </div>
+      </section>
+
+      <!-- ============ 3. TASK SUMMARY CARDS ============ -->
+      <section class="lg:col-span-12 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 anim-fade-up" style="animation-delay:.09s">
+        <div class="glass glass-card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center"><i data-lucide="list-checks" class="w-4 h-4 text-[var(--text-mid)]"></i></span>
+          </div>
+          <p id="sumTotal" class="font-display text-2xl font-bold text-white skel rounded w-10">&nbsp;</p>
+          <p class="text-[11.5px] text-[var(--text-mid)] mt-0.5">Total Tasks</p>
+        </div>
+        <div class="glass glass-card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/25 flex items-center justify-center"><i data-lucide="check" class="w-4 h-4 text-green-400"></i></span>
+          </div>
+          <p id="sumCompleted" class="font-display text-2xl font-bold text-white skel rounded w-10">&nbsp;</p>
+          <p class="text-[11.5px] text-[var(--text-mid)] mt-0.5">Completed</p>
+        </div>
+        <div class="glass glass-card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/25 flex items-center justify-center"><i data-lucide="loader-circle" class="w-4 h-4 text-blue-300"></i></span>
+          </div>
+          <p id="sumInProgress" class="font-display text-2xl font-bold text-white skel rounded w-10">&nbsp;</p>
+          <p class="text-[11.5px] text-[var(--text-mid)] mt-0.5">In Progress</p>
+        </div>
+        <div class="glass glass-card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/25 flex items-center justify-center"><i data-lucide="hourglass" class="w-4 h-4 text-amber-300"></i></span>
+          </div>
+          <p id="sumPending" class="font-display text-2xl font-bold text-white skel rounded w-10">&nbsp;</p>
+          <p class="text-[11.5px] text-[var(--text-mid)] mt-0.5">Pending</p>
+        </div>
+        <div class="glass glass-card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/25 flex items-center justify-center"><i data-lucide="alarm-clock" class="w-4 h-4 text-red-400"></i></span>
+          </div>
+          <p id="sumOverdue" class="font-display text-2xl font-bold text-white skel rounded w-10">&nbsp;</p>
+          <p class="text-[11.5px] text-[var(--text-mid)] mt-0.5">Overdue</p>
+        </div>
+        <div class="glass glass-card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="w-8 h-8 rounded-lg border flex items-center justify-center" style="background:rgba(139,124,246,.10); border-color:rgba(139,124,246,.25);"><i data-lucide="flame" class="w-4 h-4" style="color:#C4B5FD;"></i></span>
+          </div>
+          <p id="sumHighPriority" class="font-display text-2xl font-bold text-white skel rounded w-10">&nbsp;</p>
+          <p class="text-[11.5px] text-[var(--text-mid)] mt-0.5">High Priority</p>
+        </div>
+      </section>
+
+      <!-- ============ 4. MY TASKS TABLE ============ -->
+      <section class="lg:col-span-8 glass glass-card p-6 anim-fade-up" style="animation-delay:.12s">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <h3 class="font-display font-semibold text-white text-[15px]">My Tasks</h3>
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center gap-2 glass px-3 py-2 w-40">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--text-low)] shrink-0"></i>
+              <input id="taskSearch" type="search" placeholder="Search tasks…" class="bg-transparent text-[12.5px] w-full text-[var(--text-hi)]" />
+            </div>
+            <select id="taskStatusFilter" class="glass px-3 py-2 text-[12.5px] text-[var(--text-hi)] bg-transparent rounded-[12px] border border-[var(--glass-border)]">
+              <option value="all" class="bg-ink-800">All Status</option>
+              <option value="pending" class="bg-ink-800">Pending</option>
+              <option value="in_progress" class="bg-ink-800">In Progress</option>
+              <option value="completed" class="bg-ink-800">Completed</option>
+              <option value="overdue" class="bg-ink-800">Overdue</option>
+            </select>
+            <select id="taskPriorityFilter" class="glass px-3 py-2 text-[12.5px] text-[var(--text-hi)] bg-transparent rounded-[12px] border border-[var(--glass-border)]">
+              <option value="all" class="bg-ink-800">All Priority</option>
+              <option value="high" class="bg-ink-800">High</option>
+              <option value="medium" class="bg-ink-800">Medium</option>
+              <option value="low" class="bg-ink-800">Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="overflow-x-auto scroll-y-fade">
+          <table class="task-table">
+            <thead>
+              <tr>
+                <th class="sortable" data-sort="title">Task <i data-lucide="chevrons-up-down" class="w-3 h-3 inline"></i></th>
+                <th>Assigned By</th>
+                <th class="sortable" data-sort="priority">Priority <i data-lucide="chevrons-up-down" class="w-3 h-3 inline"></i></th>
+                <th>Status</th>
+                <th class="sortable" data-sort="due_date">Due Date <i data-lucide="chevrons-up-down" class="w-3 h-3 inline"></i></th>
+                <th>Progress</th>
+                <th>Category</th>
+                <th>Files</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="taskTableBody">
+              <tr><td colspan="9" class="text-center text-[var(--text-mid)] py-6">Loading tasks…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3 mt-5">
+          <p id="taskRangeLabel" class="text-[12px] text-[var(--text-mid)]">—</p>
+          <div id="taskPagination" class="flex items-center gap-1.5"></div>
+        </div>
+      </section>
+
+      <!-- ============ 5. NOTIFICATIONS ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.15s">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="font-display font-semibold text-white text-[15px]">Notifications</h3>
+          <i data-lucide="bell-ring" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div id="notificationsList" class="space-y-2.5 max-h-[380px] overflow-y-auto scroll-y-fade pr-1">
+          <p class="text-[13px] text-[var(--text-mid)] py-4 text-center">Loading notifications…</p>
+        </div>
+      </section>
+
+      <!-- ============ 6. PROGRESS ANALYTICS ============ -->
+      <section class="lg:col-span-8 glass glass-card p-6 anim-fade-up" style="animation-delay:.18s">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <h3 class="font-display font-semibold text-white text-[15px]">Progress Analytics</h3>
+          <div class="flex items-center gap-2">
+            <button class="filter-chip active" data-range="weekly">Weekly</button>
+            <button class="filter-chip" data-range="monthly">Monthly</button>
+          </div>
+        </div>
+        <div class="h-64"><canvas id="progressChart"></canvas></div>
+      </section>
+
+      <!-- ============ 7. PRODUCTIVITY CARDS ============ -->
+      <section class="lg:col-span-4 grid grid-cols-2 gap-4 anim-fade-up" style="animation-delay:.21s">
+        <div class="glass glass-card p-5 flex flex-col items-center justify-center text-center">
+          <div class="relative w-20 h-20 mb-2">
+            <svg class="ring-svg w-20 h-20" viewBox="0 0 80 80">
+              <circle class="ring-bg" cx="40" cy="40" r="34" stroke-width="7" fill="none"/>
+              <circle id="ringCompletionRate" class="ring-fg" cx="40" cy="40" r="34" stroke-width="7" fill="none" stroke="#22C55E" stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span id="prodCompletionRate" class="font-display text-lg font-bold text-white">0%</span>
+            </div>
+          </div>
+          <p class="text-[11.5px] text-[var(--text-mid)]">Completion Rate</p>
+        </div>
+        <div class="glass glass-card p-5 flex flex-col items-center justify-center text-center">
+          <span class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center mb-2"><i data-lucide="timer" class="w-5 h-5 text-blue-300"></i></span>
+          <p id="prodAvgTime" class="font-display text-xl font-bold text-white skel rounded w-14">&nbsp;</p>
+          <p class="text-[11.5px] text-[var(--text-mid)] mt-0.5">Avg Completion</p>
+        </div>
+        <div class="glass glass-card p-5 flex flex-col items-center justify-center text-center">
+          <span class="w-10 h-10 rounded-xl bg-green-500/10 border border-green-500/25 flex items-center justify-center mb-2"><i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i></span>
+          <p id="prodOnTime" class="font-display text-xl font-bold text-white skel rounded w-10">&nbsp;</p>
+          <p class="text-[11.5px] text-[var(--text-mid)] mt-0.5">On-Time</p>
+        </div>
+        <div class="glass glass-card p-5 flex flex-col items-center justify-center text-center">
+          <span class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/25 flex items-center justify-center mb-2"><i data-lucide="alarm-clock-off" class="w-5 h-5 text-red-400"></i></span>
+          <p id="prodLate" class="font-display text-xl font-bold text-white skel rounded w-10">&nbsp;</p>
+          <p class="text-[11.5px] text-[var(--text-mid)] mt-0.5">Late Completion</p>
+        </div>
+      </section>
+
+      <!-- ============ 8. TASK TIMELINE ============ -->
+      <section class="lg:col-span-12 glass glass-card p-6 anim-fade-up" style="animation-delay:.24s">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="font-display font-semibold text-white text-[15px]">Task Timeline</h3>
+          <i data-lucide="git-commit-horizontal" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div id="taskTimeline" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-8 gap-y-0">
+          <p class="text-[13px] text-[var(--text-mid)] py-4 text-center col-span-full">Loading timeline…</p>
+        </div>
+      </section>
+
+    </div>
+
+    <footer class="mt-8 pb-4 text-center text-[12px] text-[var(--text-low)]">
+      ABASHON Consultancy &amp; Construction — Employee Management System
+    </footer>
+  </main>
+</div>
+
+<!-- ============================================================
+     TASK DETAILS SLIDE-OVER PANEL
+============================================================ -->
+<div id="detailsOverlay">
+  <aside id="detailsPanel" class="glass-strong border-l border-white/5 p-6">
+    <div class="flex items-start justify-between gap-3 mb-5">
+      <div class="min-w-0">
+        <p class="text-[11px] font-semibold tracking-[.14em] text-amber-400 uppercase mb-1">Task Details</p>
+        <h3 id="detailTitle" class="font-display text-xl font-bold text-white leading-snug">—</h3>
+      </div>
+      <button id="detailsCloseBtn" class="btn-ghost w-9 h-9 flex items-center justify-center shrink-0">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <div class="flex flex-wrap gap-2 mb-5">
+      <span id="detailPriorityBadge" class="badge badge-amber">—</span>
+      <span id="detailStatusBadge" class="badge badge-blue">—</span>
+      <span id="detailCategoryBadge" class="badge badge-violet">—</span>
+    </div>
+
+    <div class="space-y-5">
+      <div>
+        <p class="text-[11px] font-semibold tracking-[.1em] text-[var(--text-mid)] uppercase mb-1.5">Description</p>
+        <p id="detailDescription" class="text-[13.5px] text-[var(--text-hi)] leading-relaxed">—</p>
+      </div>
+
+      <div>
+        <p class="text-[11px] font-semibold tracking-[.1em] text-[var(--text-mid)] uppercase mb-1.5">Instructions</p>
+        <p id="detailInstructions" class="text-[13.5px] text-[var(--text-mid)] leading-relaxed">—</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3 text-center">
+        <div class="glass rounded-xl p-3">
+          <p class="text-[10.5px] text-[var(--text-mid)] mb-1">Deadline</p>
+          <p id="detailDeadline" class="text-[12.5px] font-semibold text-white">—</p>
+        </div>
+        <div class="glass rounded-xl p-3">
+          <p class="text-[10.5px] text-[var(--text-mid)] mb-1">Estimated</p>
+          <p id="detailEstimated" class="text-[12.5px] font-semibold text-white">—</p>
+        </div>
+        <div class="glass rounded-xl p-3">
+          <p class="text-[10.5px] text-[var(--text-mid)] mb-1">Remaining</p>
+          <p id="detailRemaining" class="text-[12.5px] font-semibold text-amber-300">—</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-[11px] font-semibold tracking-[.1em] text-[var(--text-mid)] uppercase">Progress</p>
+          <span id="detailProgressLabel" class="text-[12.5px] font-semibold text-white">0%</span>
+        </div>
+        <input id="detailProgressSlider" type="range" min="0" max="100" step="5" value="0" class="w-full" />
+        <button id="detailSaveProgressBtn" class="btn-primary w-full mt-3 py-2.5 text-[13px]">Update Progress</button>
+      </div>
+
+      <div>
+        <p class="text-[11px] font-semibold tracking-[.1em] text-[var(--text-mid)] uppercase mb-2">Attachments</p>
+        <div id="detailAttachments" class="space-y-2 mb-2"></div>
+        <label class="btn-ghost w-full py-2.5 text-[12.5px] flex items-center justify-center gap-2 cursor-pointer">
+          <i data-lucide="paperclip" class="w-3.5 h-3.5"></i> Upload Attachment
+          <input id="detailFileInput" type="file" class="hidden" />
+        </label>
+      </div>
+
+      <div>
+        <p class="text-[11px] font-semibold tracking-[.1em] text-[var(--text-mid)] uppercase mb-2">Comments</p>
+        <div id="detailComments" class="space-y-2 mb-3 max-h-40 overflow-y-auto scroll-y-fade pr-1"></div>
+        <div class="flex items-center gap-2">
+          <input id="detailCommentInput" type="text" placeholder="Add a comment…" class="glass flex-1 px-3 py-2.5 text-[12.5px] text-[var(--text-hi)] bg-transparent" />
+          <button id="detailCommentSendBtn" class="btn-primary w-10 h-10 flex items-center justify-center shrink-0"><i data-lucide="send" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button id="detailMarkCompleteBtn" class="btn-primary flex-1 py-2.5 text-[13px] flex items-center justify-center gap-1.5">
+          <i data-lucide="check-circle-2" class="w-4 h-4"></i> Mark Complete
+        </button>
+        <button id="detailDownloadBtn" class="btn-ghost w-11 h-11 flex items-center justify-center shrink-0" title="Download task">
+          <i data-lucide="download" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Toast container -->
+<div id="toastContainer" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2.5 w-[320px] max-w-[90vw]"></div>
+
+<!-- ============================================================
+     APPLICATION JAVASCRIPT
+     (shared backbone — supabaseClient, guardSession, toast, clock —
+     identical architecture to Dashboard / Profile / Attendance, extended for Tasks)
+============================================================ -->
+<script>
+/* ---------------------------------------------------------------
+   0. SUPABASE CONFIGURATION
+   Same project keys as every other page — do not create a second client.
+
+   Expected `tasks` table (create in Supabase, RLS scoped to auth.uid()):
+     tasks(
+       id uuid pk, employee_id uuid references employees(id),
+       title text, description text, instructions text,
+       assigned_by text, priority text check (priority in ('high','medium','low')),
+       status text check (status in ('pending','in_progress','completed')),
+       start_date date, due_date date,
+       progress int default 0,
+       category text,
+       estimated_hours numeric, actual_hours numeric,
+       attachments jsonb default '[]',
+       completed_at timestamptz,
+       created_at timestamptz default now(),
+       updated_at timestamptz default now()
+     )
+   task_comments(
+     id uuid pk, task_id uuid references tasks(id),
+     author text, message text, created_at timestamptz default now()
+   )
+   notifications(  -- reused table, extended with a `type` column
+     id uuid pk, employee_id uuid, type text, title text, message text,
+     is_read boolean default false, created_at timestamptz default now()
+   )
+   RLS: employees may only select/update rows where employee_id = their own employees.id.
+--------------------------------------------------------------- */
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ---------------------------------------------------------------
+   1. GLOBAL STATE
+--------------------------------------------------------------- */
+const AppState = {
+  session: null,
+  employee: null,
+  tasks: [],            // all tasks for this employee
+  tasksFiltered: [],
+  taskPage: 1,
+  taskPageSize: 8,
+  taskSort: { key: 'due_date', dir: 'asc' },
+  activeTask: null,      // task currently open in the details panel
+  charts: {},
+};
+
+/* ---------------------------------------------------------------
+   2. UTILITIES
+--------------------------------------------------------------- */
+function $(id){ return document.getElementById(id); }
+
+function dateKey(d){ return d.toISOString().slice(0, 10); }
+
+function formatDate(dateLike){
+  if (!dateLike) return '—';
+  return new Date(dateLike).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function timeAgo(dateLike){
+  const diffMs = Date.now() - new Date(dateLike).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h ago';
+  return Math.floor(hrs / 24) + 'd ago';
+}
+
+function unskel(el){ if (el) el.classList.remove('skel'); }
+
+function isOverdue(task){
+  return task.status !== 'completed' && task.due_date && new Date(task.due_date) < new Date(dateKey(new Date()));
+}
+
+function effectiveStatus(task){
+  if (task.status === 'completed') return 'completed';
+  if (isOverdue(task)) return 'overdue';
+  return task.status || 'pending';
+}
+
+function showToast(message, type){
+  type = type || 'info';
+  const colors = {
+    success: 'border-green-500/30 text-green-400',
+    error: 'border-red-500/30 text-red-400',
+    info: 'border-amber-500/30 text-amber-400',
+  };
+  const icons = { success: 'check-circle-2', error: 'alert-circle', info: 'info' };
+  const toast = document.createElement('div');
+  toast.className = 'glass-strong rounded-xl px-4 py-3 flex items-center gap-2.5 border anim-fade-up shadow-glass ' + (colors[type] || colors.info);
+  toast.innerHTML = '<i data-lucide="' + (icons[type] || icons.info) + '" class="w-4 h-4 shrink-0"></i>' +
+    '<span class="text-[13px] text-[var(--text-hi)] flex-1">' + message + '</span>';
+  $('toastContainer').appendChild(toast);
+  lucide.createIcons();
+  setTimeout(() => {
+    toast.style.transition = 'opacity .4s ease, transform .4s ease';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(20px)';
+    setTimeout(() => toast.remove(), 400);
+  }, 4200);
+}
+
+/* ---------------------------------------------------------------
+   3. SESSION GUARD (identical to every protected page)
+--------------------------------------------------------------- */
+async function guardSession(){
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error || !data.session){
+    window.location.href = 'employee-login.html';
+    return null;
+  }
+  AppState.session = data.session;
+  return data.session;
+}
+
+/* ---------------------------------------------------------------
+   4. LIVE CLOCK
+--------------------------------------------------------------- */
+function tickClock(){
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], { hour12: true });
+  $('liveClock').textContent = timeStr;
+  $('liveDate').textContent = now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  $('welcomeLiveClock').textContent = timeStr;
+  $('welcomeDateLabel').textContent = now.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+/* ---------------------------------------------------------------
+   5. EMPLOYEE PROFILE (navbar + welcome header)
+--------------------------------------------------------------- */
+async function loadEmployeeProfile(){
+  const userId = AppState.session.user.id;
+  const { data, error } = await supabaseClient
+    .from('employees')
+    .select('*')
+    .eq('auth_user_id', userId)
+    .single();
+
+  if (error || !data){
+    showToast('Could not load employee profile.', 'error');
+    return;
+  }
+  AppState.employee = data;
+
+  $('navProfilePhoto').src = data.photo_url || ''; unskel($('navProfilePhoto'));
+  $('navProfileName').textContent = data.full_name || '—'; unskel($('navProfileName'));
+  $('navProfileRole').textContent = data.designation || '—'; unskel($('navProfileRole'));
+
+  $('welcomeName').textContent = data.full_name || '—'; unskel($('welcomeName'));
+  $('welcomeDepartment').textContent = data.department || '—'; unskel($('welcomeDepartment'));
+  $('welcomePhoto').src = data.photo_url || ''; unskel($('welcomePhoto'));
+
+  lucide.createIcons();
+}
+
+/* ---------------------------------------------------------------
+   6. LOAD TASKS  (RLS + explicit filter ensures own tasks only)
+--------------------------------------------------------------- */
+async function loadTasks(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+
+  const { data, error } = await supabaseClient
+    .from('tasks')
+    .select('*')
+    .eq('employee_id', empId)
+    .order('due_date', { ascending: true });
+
+  if (error){
+    showToast('Could not load tasks.', 'error');
+    AppState.tasks = [];
+  } else {
+    AppState.tasks = data || [];
+  }
+
+  renderSummary();
+  renderPriorityChart();
+  renderProductivity();
+  applyTaskFilters();
+  renderTimeline();
+  renderProgressChart('weekly');
+}
+
+/* ---------------------------------------------------------------
+   7. SUMMARY CARDS + COMPLETION RING
+--------------------------------------------------------------- */
+function renderSummary(){
+  const tasks = AppState.tasks;
+  const total = tasks.length;
+  const completed = tasks.filter(t => t.status === 'completed').length;
+  const inProgress = tasks.filter(t => t.status === 'in_progress').length;
+  const overdue = tasks.filter(isOverdue).length;
+  const pending = tasks.filter(t => t.status === 'pending' && !isOverdue(t)).length;
+  const highPriority = tasks.filter(t => t.priority === 'high' && t.status !== 'completed').length;
+
+  $('sumTotal').textContent = total; unskel($('sumTotal'));
+  $('sumCompleted').textContent = completed; unskel($('sumCompleted'));
+  $('sumInProgress').textContent = inProgress; unskel($('sumInProgress'));
+  $('sumPending').textContent = pending; unskel($('sumPending'));
+  $('sumOverdue').textContent = overdue; unskel($('sumOverdue'));
+  $('sumHighPriority').textContent = highPriority; unskel($('sumHighPriority'));
+
+  $('taskCountLabel').textContent = total + ' total task' + (total === 1 ? '' : 's') + ' assigned to you';
+
+  const completionPct = total ? Math.round((completed / total) * 100) : 0;
+  $('welcomeCompletionLabel').textContent = completionPct + '%';
+  $('ringCompletionLabel').textContent = completionPct + '%';
+  animateRing('ringCompletion', completionPct, 41);
+}
+
+function animateRing(id, pct, radius){
+  const el = $(id);
+  if (!el) return;
+  const r = radius || 34, c = 2 * Math.PI * r;
+  el.style.strokeDasharray = c;
+  el.style.strokeDashoffset = c - (Math.max(0, Math.min(100, pct)) / 100) * c;
+}
+
+/* ---------------------------------------------------------------
+   8. PRODUCTIVITY CARDS
+--------------------------------------------------------------- */
+function renderProductivity(){
+  const tasks = AppState.tasks;
+  const completedTasks = tasks.filter(t => t.status === 'completed');
+  const total = tasks.length;
+
+  const completionRate = total ? Math.round((completedTasks.length / total) * 100) : 0;
+  animateRing('ringCompletionRate', completionRate, 34);
+  $('prodCompletionRate').textContent = completionRate + '%';
+
+  const avgHours = completedTasks.length
+    ? (completedTasks.reduce((sum, t) => sum + Number(t.actual_hours || t.estimated_hours || 0), 0) / completedTasks.length)
+    : 0;
+  $('prodAvgTime').textContent = avgHours ? avgHours.toFixed(1) + 'h' : '—'; unskel($('prodAvgTime'));
+
+  const onTime = completedTasks.filter(t => t.completed_at && t.due_date && new Date(t.completed_at) <= new Date(t.due_date)).length;
+  const late = completedTasks.length - onTime;
+  $('prodOnTime').textContent = onTime; unskel($('prodOnTime'));
+  $('prodLate').textContent = late; unskel($('prodLate'));
+}
+
+/* ---------------------------------------------------------------
+   9. TASKS TABLE (search / filter / sort / pagination)
+--------------------------------------------------------------- */
+function applyTaskFilters(){
+  const q = ($('taskSearch').value || '').trim().toLowerCase();
+  const statusFilter = $('taskStatusFilter').value;
+  const priorityFilter = $('taskPriorityFilter').value;
+
+  let rows = AppState.tasks.filter(t => {
+    const status = effectiveStatus(t);
+    if (statusFilter !== 'all' && status !== statusFilter) return false;
+    if (priorityFilter !== 'all' && t.priority !== priorityFilter) return false;
+    if (!q) return true;
+    return (t.title || '').toLowerCase().includes(q) ||
+           (t.category || '').toLowerCase().includes(q) ||
+           (t.assigned_by || '').toLowerCase().includes(q);
+  });
+
+  const { key, dir } = AppState.taskSort;
+  const priorityRank = { high: 3, medium: 2, low: 1 };
+  rows.sort((a, b) => {
+    let va, vb;
+    if (key === 'title'){ va = (a.title||'').toLowerCase(); vb = (b.title||'').toLowerCase(); }
+    else if (key === 'priority'){ va = priorityRank[a.priority]||0; vb = priorityRank[b.priority]||0; }
+    else { va = a.due_date || ''; vb = b.due_date || ''; }
+    if (va < vb) return dir === 'asc' ? -1 : 1;
+    if (va > vb) return dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  AppState.tasksFiltered = rows;
+  AppState.taskPage = 1;
+  renderTaskTable();
+}
+
+function renderTaskTable(){
+  const rows = AppState.tasksFiltered;
+  const { taskPage, taskPageSize } = AppState;
+  const totalPages = Math.max(1, Math.ceil(rows.length / taskPageSize));
+  const page = Math.min(taskPage, totalPages);
+  const startIdx = (page - 1) * taskPageSize;
+  const pageRows = rows.slice(startIdx, startIdx + taskPageSize);
+
+  const tbody = $('taskTableBody');
+  if (pageRows.length === 0){
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-[var(--text-mid)] py-6">No tasks match your filters.</td></tr>';
+  } else {
+    tbody.innerHTML = pageRows.map(t => {
+      const status = effectiveStatus(t);
+      const attachCount = Array.isArray(t.attachments) ? t.attachments.length : 0;
+      return '<tr data-id="' + t.id + '">' +
+        '<td><p class="text-white font-medium max-w-[220px] truncate">' + escapeHtml(t.title || 'Untitled') + '</p>' +
+          '<p class="text-[11px] text-[var(--text-low)] mt-0.5">Due ' + formatDate(t.due_date) + '</p></td>' +
+        '<td class="text-[var(--text-mid)]">' + escapeHtml(t.assigned_by || '—') + '</td>' +
+        '<td>' + priorityBadgeHtml(t.priority) + '</td>' +
+        '<td>' + statusBadgeHtml(status) + '</td>' +
+        '<td class="text-[var(--text-mid)] font-mono">' + formatDate(t.due_date) + '</td>' +
+        '<td><div class="flex items-center gap-2"><div class="mini-progress"><div style="width:' + (t.progress||0) + '%"></div></div><span class="text-[11px] text-[var(--text-mid)]">' + (t.progress||0) + '%</span></div></td>' +
+        '<td class="text-[var(--text-mid)]">' + escapeHtml(t.category || '—') + '</td>' +
+        '<td class="text-[var(--text-mid)]"><span class="flex items-center gap-1"><i data-lucide="paperclip" class="w-3 h-3"></i>' + attachCount + '</span></td>' +
+        '<td>' +
+          '<div class="flex items-center gap-1.5">' +
+            '<button class="page-btn task-action-view" data-id="' + t.id + '" title="View details"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>' +
+            '<button class="page-btn task-action-complete" data-id="' + t.id + '" title="Mark complete" ' + (status === 'completed' ? 'disabled' : '') + '><i data-lucide="check" class="w-3.5 h-3.5"></i></button>' +
+            '<button class="page-btn task-action-download" data-id="' + t.id + '" title="Download task"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>' +
+          '</div>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  const from = rows.length ? startIdx + 1 : 0;
+  const to = Math.min(startIdx + taskPageSize, rows.length);
+  $('taskRangeLabel').textContent = 'Showing ' + from + '–' + to + ' of ' + rows.length + ' tasks';
+
+  renderTaskPagination(totalPages, page);
+  bindTaskRowEvents();
+  lucide.createIcons();
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+
+function priorityBadgeHtml(priority){
+  const cls = priority === 'high' ? 'priority-high' : priority === 'low' ? 'priority-low' : 'priority-medium';
+  const label = priority ? priority.charAt(0).toUpperCase() + priority.slice(1) : 'Medium';
+  return '<span class="inline-flex items-center gap-1.5 text-[12.5px] text-[var(--text-hi)]"><span class="priority-dot ' + cls + '"></span>' + label + '</span>';
+}
+
+function statusBadgeHtml(status){
+  if (status === 'completed') return '<span class="badge badge-green">Completed</span>';
+  if (status === 'in_progress') return '<span class="badge badge-blue">In Progress</span>';
+  if (status === 'overdue') return '<span class="badge badge-red">Overdue</span>';
+  return '<span class="badge badge-amber">Pending</span>';
+}
+
+function renderTaskPagination(totalPages, currentPage){
+  const wrap = $('taskPagination');
+  wrap.innerHTML = '';
+
+  const prev = document.createElement('button');
+  prev.className = 'page-btn'; prev.innerHTML = '<i data-lucide="chevron-left" class="w-4 h-4"></i>';
+  prev.disabled = currentPage <= 1;
+  prev.addEventListener('click', () => { AppState.taskPage = currentPage - 1; renderTaskTable(); });
+  wrap.appendChild(prev);
+
+  const maxButtons = 5;
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+  startPage = Math.max(1, endPage - maxButtons + 1);
+
+  for (let p = startPage; p <= endPage; p++){
+    const btn = document.createElement('button');
+    btn.className = 'page-btn' + (p === currentPage ? ' active' : '');
+    btn.textContent = p;
+    btn.addEventListener('click', () => { AppState.taskPage = p; renderTaskTable(); });
+    wrap.appendChild(btn);
+  }
+
+  const next = document.createElement('button');
+  next.className = 'page-btn'; next.innerHTML = '<i data-lucide="chevron-right" class="w-4 h-4"></i>';
+  next.disabled = currentPage >= totalPages;
+  next.addEventListener('click', () => { AppState.taskPage = currentPage + 1; renderTaskTable(); });
+  wrap.appendChild(next);
+}
+
+function bindTaskRowEvents(){
+  document.querySelectorAll('#taskTableBody tr[data-id]').forEach(row => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      openTaskDetails(row.dataset.id);
+    });
+  });
+  document.querySelectorAll('.task-action-view').forEach(btn => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); openTaskDetails(btn.dataset.id); });
+  });
+  document.querySelectorAll('.task-action-complete').forEach(btn => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); markTaskComplete(btn.dataset.id); });
+  });
+  document.querySelectorAll('.task-action-download').forEach(btn => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); downloadTask(btn.dataset.id); });
+  });
+}
+
+/* ---------------------------------------------------------------
+   10. TASK DETAILS PANEL
+--------------------------------------------------------------- */
+async function openTaskDetails(taskId){
+  const task = AppState.tasks.find(t => String(t.id) === String(taskId));
+  if (!task) return;
+  AppState.activeTask = task;
+
+  const status = effectiveStatus(task);
+  $('detailTitle').textContent = task.title || 'Untitled task';
+  const priorityBadge = $('detailPriorityBadge');
+  priorityBadge.className = 'badge ' + (task.priority === 'high' ? 'badge-red' : task.priority === 'low' ? 'badge-green' : 'badge-amber');
+  priorityBadge.textContent = (task.priority ? task.priority.charAt(0).toUpperCase()+task.priority.slice(1) : 'Medium') + ' Priority';
+
+  const statusBadge = $('detailStatusBadge');
+  const statusClassMap = { completed: 'badge-green', in_progress: 'badge-blue', overdue: 'badge-red', pending: 'badge-amber' };
+  const statusLabelMap = { completed: 'Completed', in_progress: 'In Progress', overdue: 'Overdue', pending: 'Pending' };
+  statusBadge.className = 'badge ' + (statusClassMap[status] || 'badge-amber');
+  statusBadge.textContent = statusLabelMap[status] || 'Pending';
+
+  $('detailCategoryBadge').textContent = task.category || 'General';
+
+  $('detailDescription').textContent = task.description || 'No description provided.';
+  $('detailInstructions').textContent = task.instructions || 'No additional instructions.';
+  $('detailDeadline').textContent = formatDate(task.due_date);
+  $('detailEstimated').textContent = task.estimated_hours ? task.estimated_hours + 'h' : '—';
+
+  const remainingMs = task.due_date ? new Date(task.due_date).getTime() - Date.now() : null;
+  $('detailRemaining').textContent = task.status === 'completed'
+    ? 'Done'
+    : (remainingMs === null ? '—' : remainingMs > 0 ? Math.ceil(remainingMs / 86400000) + ' days left' : 'Overdue');
+
+  $('detailProgressSlider').value = task.progress || 0;
+  $('detailProgressLabel').textContent = (task.progress || 0) + '%';
+  $('detailMarkCompleteBtn').disabled = task.status === 'completed';
+  $('detailMarkCompleteBtn').innerHTML = task.status === 'completed'
+    ? '<i data-lucide="check-circle-2" class="w-4 h-4"></i> Already Completed'
+    : '<i data-lucide="check-circle-2" class="w-4 h-4"></i> Mark Complete';
+
+  const attachments = Array.isArray(task.attachments) ? task.attachments : [];
+  $('detailAttachments').innerHTML = attachments.length
+    ? attachments.map(a => '<div class="flex items-center gap-2 glass rounded-lg px-3 py-2 text-[12px] text-[var(--text-hi)]"><i data-lucide="file" class="w-3.5 h-3.5 text-amber-400"></i><span class="truncate">' + escapeHtml(a.name || a) + '</span></div>').join('')
+    : '<p class="text-[12px] text-[var(--text-low)]">No attachments yet.</p>';
+
+  await loadTaskComments(task.id);
+
+  $('detailsOverlay').classList.add('open');
+  lucide.createIcons();
+}
+
+function closeTaskDetails(){
+  $('detailsOverlay').classList.remove('open');
+  AppState.activeTask = null;
+}
+
+async function loadTaskComments(taskId){
+  const { data, error } = await supabaseClient
+    .from('task_comments')
+    .select('*')
+    .eq('task_id', taskId)
+    .order('created_at', { ascending: true });
+
+  const rows = error ? [] : (data || []);
+  $('detailComments').innerHTML = rows.length
+    ? rows.map(c => '<div class="comment-bubble"><p class="text-[12px] text-white font-medium">' + escapeHtml(c.author || 'You') + '</p><p class="text-[12.5px] text-[var(--text-mid)] mt-0.5">' + escapeHtml(c.message) + '</p><p class="text-[10.5px] text-[var(--text-low)] mt-1">' + timeAgo(c.created_at) + '</p></div>').join('')
+    : '<p class="text-[12px] text-[var(--text-low)]">No comments yet.</p>';
+}
+
+async function handleSaveProgress(){
+  const task = AppState.activeTask;
+  if (!task) return;
+  const progress = Number($('detailProgressSlider').value);
+  const newStatus = progress >= 100 ? 'completed' : progress > 0 ? 'in_progress' : 'pending';
+  const payload = { progress, status: newStatus, updated_at: new Date().toISOString() };
+  if (newStatus === 'completed') payload.completed_at = new Date().toISOString();
+
+  const { error } = await supabaseClient.from('tasks').update(payload).eq('id', task.id);
+  if (error){ showToast('Could not update progress.', 'error'); return; }
+  showToast('Progress updated to ' + progress + '%.', 'success');
+  await logNotification('task_updated', 'Task Updated', '"' + (task.title||'Task') + '" progress set to ' + progress + '%.');
+  await loadTasks();
+  openTaskDetails(task.id);
+}
+
+async function markTaskComplete(taskId){
+  const { error } = await supabaseClient.from('tasks')
+    .update({ status: 'completed', progress: 100, completed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .eq('id', taskId);
+  if (error){ showToast('Could not mark task complete.', 'error'); return; }
+  const task = AppState.tasks.find(t => String(t.id) === String(taskId));
+  showToast('Task marked as complete!', 'success');
+  await logNotification('completed_confirmation', 'Task Completed', '"' + (task?.title||'Task') + '" has been marked complete.');
+  await loadTasks();
+  if (AppState.activeTask && String(AppState.activeTask.id) === String(taskId)) closeTaskDetails();
+}
+
+async function handleUploadAttachment(file){
+  const task = AppState.activeTask;
+  if (!task || !file) return;
+  const path = 'tasks/' + task.id + '/' + Date.now() + '_' + file.name;
+
+  const { error: uploadError } = await supabaseClient.storage.from('attachments').upload(path, file);
+  if (uploadError){ showToast('Upload failed. Try again.', 'error'); return; }
+
+  const attachments = Array.isArray(task.attachments) ? task.attachments.slice() : [];
+  attachments.push({ name: file.name, path });
+
+  const { error } = await supabaseClient.from('tasks').update({ attachments, updated_at: new Date().toISOString() }).eq('id', task.id);
+  if (error){ showToast('Could not save attachment reference.', 'error'); return; }
+
+  showToast('Attachment uploaded.', 'success');
+  await loadTasks();
+  openTaskDetails(task.id);
+}
+
+async function handlePostComment(){
+  const task = AppState.activeTask;
+  const message = $('detailCommentInput').value.trim();
+  if (!task || !message) return;
+  const authorName = AppState.employee?.full_name || 'You';
+
+  const { error } = await supabaseClient.from('task_comments').insert({ task_id: task.id, author: authorName, message });
+  if (error){ showToast('Could not post comment.', 'error'); return; }
+  $('detailCommentInput').value = '';
+  await loadTaskComments(task.id);
+}
+
+function downloadTask(taskId){
+  const task = AppState.tasks.find(t => String(t.id) === String(taskId));
+  if (!task) return;
+  const lines = [
+    'Task: ' + (task.title || ''),
+    'Assigned By: ' + (task.assigned_by || ''),
+    'Priority: ' + (task.priority || ''),
+    'Status: ' + effectiveStatus(task),
+    'Start Date: ' + (task.start_date || ''),
+    'Due Date: ' + (task.due_date || ''),
+    'Progress: ' + (task.progress || 0) + '%',
+    'Category: ' + (task.category || ''),
+    '',
+    'Description:',
+    task.description || '',
+    '',
+    'Instructions:',
+    task.instructions || '',
+  ];
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'task-' + taskId + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Task file downloaded.', 'success');
+}
+
+/* ---------------------------------------------------------------
+   11. TASK TIMELINE
+--------------------------------------------------------------- */
+function renderTimeline(){
+  const tasks = AppState.tasks.slice();
+
+  const recentlyAssigned = tasks.slice().sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0)).slice(0, 4);
+  const started = tasks.filter(t => t.status === 'in_progress').sort((a,b) => new Date(b.updated_at||0) - new Date(a.updated_at||0)).slice(0, 4);
+  const completed = tasks.filter(t => t.status === 'completed').sort((a,b) => new Date(b.completed_at||0) - new Date(a.completed_at||0)).slice(0, 4);
+  const updated = tasks.slice().sort((a,b) => new Date(b.updated_at||0) - new Date(a.updated_at||0)).slice(0, 4);
+
+  const columns = [
+    { title: 'Recently Assigned', icon: 'plus-circle', color: 'text-amber-300', bg: 'bg-amber-500/10 border-amber-500/25', rows: recentlyAssigned, dateField: 'created_at' },
+    { title: 'Started', icon: 'play-circle', color: 'text-blue-300', bg: 'bg-blue-500/10 border-blue-500/25', rows: started, dateField: 'updated_at' },
+    { title: 'Completed', icon: 'check-circle-2', color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/25', rows: completed, dateField: 'completed_at' },
+    { title: 'Updated', icon: 'refresh-cw', color: 'text-violet-300', bg: 'bg-violet-500/10 border-violet-500/25', rows: updated, dateField: 'updated_at' },
+  ];
+
+  $('taskTimeline').innerHTML = columns.map(col => {
+    const items = col.rows.length
+      ? col.rows.map((t, i) => {
+          const isLast = i === col.rows.length - 1;
+          return '<div class="flex gap-3 pb-4 relative">' +
+            (!isLast ? '<span class="timeline-line absolute left-[15px] top-8 bottom-0"></span>' : '') +
+            '<span class="w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ' + col.bg + '"><i data-lucide="' + col.icon + '" class="w-4 h-4 ' + col.color + '"></i></span>' +
+            '<div class="min-w-0 pt-0.5">' +
+              '<p class="text-[12.5px] text-white font-medium truncate max-w-[180px]">' + escapeHtml(t.title || 'Untitled') + '</p>' +
+              '<p class="text-[11px] text-[var(--text-low)] mt-0.5">' + (t[col.dateField] ? timeAgo(t[col.dateField]) : '—') + '</p>' +
+            '</div>' +
+          '</div>';
+        }).join('')
+      : '<p class="text-[12px] text-[var(--text-low)] py-2">Nothing here yet.</p>';
+    return '<div class="pr-4 md:border-r md:border-white/5 last:border-none pb-2 md:pb-0">' +
+      '<p class="text-[10.5px] font-semibold tracking-[.1em] text-[var(--text-mid)] uppercase mb-3">' + col.title + '</p>' +
+      items +
+    '</div>';
+  }).join('');
+  lucide.createIcons();
+}
+
+/* ---------------------------------------------------------------
+   12. NOTIFICATIONS
+--------------------------------------------------------------- */
+async function loadNotifications(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+
+  const { data, error } = await supabaseClient
+    .from('notifications')
+    .select('*')
+    .eq('employee_id', empId)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  const rows = error ? [] : (data || []);
+  const wrap = $('notificationsList');
+
+  if (rows.length === 0){
+    wrap.innerHTML = '<p class="text-[13px] text-[var(--text-mid)] py-4 text-center">No notifications yet.</p>';
+    $('notifBadge').classList.add('hidden');
+    return;
+  }
+
+  const iconMap = {
+    new_task: { icon: 'plus-circle', color: 'text-amber-300', bg: 'bg-amber-500/10 border-amber-500/25' },
+    deadline_reminder: { icon: 'alarm-clock', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/25' },
+    task_updated: { icon: 'refresh-cw', color: 'text-blue-300', bg: 'bg-blue-500/10 border-blue-500/25' },
+    completed_confirmation: { icon: 'check-circle-2', color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/25' },
+  };
+
+  wrap.innerHTML = rows.map(n => {
+    const meta = iconMap[n.type] || iconMap.task_updated;
+    return '<div class="flex gap-3 p-3 rounded-xl ' + (n.is_read ? '' : 'bg-white/[0.03]') + '">' +
+      '<span class="w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ' + meta.bg + '"><i data-lucide="' + meta.icon + '" class="w-4 h-4 ' + meta.color + '"></i></span>' +
+      '<div class="min-w-0">' +
+        '<p class="text-[12.5px] text-white font-medium">' + escapeHtml(n.title || 'Notification') + '</p>' +
+        '<p class="text-[12px] text-[var(--text-mid)] mt-0.5 leading-snug">' + escapeHtml(n.message || '') + '</p>' +
+        '<p class="text-[10.5px] text-[var(--text-low)] mt-1">' + timeAgo(n.created_at) + '</p>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  const unread = rows.filter(n => !n.is_read).length;
+  const badge = $('notifBadge');
+  if (unread > 0){ badge.textContent = unread; badge.classList.remove('hidden'); }
+  else { badge.classList.add('hidden'); }
+
+  lucide.createIcons();
+}
+
+async function logNotification(type, title, message){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+  await supabaseClient.from('notifications').insert({ employee_id: empId, type, title, message });
+  await loadNotifications();
+}
+
+/* ---------------------------------------------------------------
+   13. CHARTS
+--------------------------------------------------------------- */
+function chartDefaults(){
+  Chart.defaults.color = '#93A0B4';
+  Chart.defaults.font.family = 'Inter';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+}
+
+function renderPriorityChart(){
+  const ctx = $('priorityChart');
+  if (!ctx) return;
+  const tasks = AppState.tasks.filter(t => t.status !== 'completed');
+  const high = tasks.filter(t => t.priority === 'high').length;
+  const medium = tasks.filter(t => t.priority === 'medium').length;
+  const low = tasks.filter(t => t.priority === 'low').length;
+  const total = high + medium + low;
+
+  if (AppState.charts.priority) AppState.charts.priority.destroy();
+  AppState.charts.priority = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['High', 'Medium', 'Low'],
+      datasets: [{
+        data: total ? [high, medium, low] : [1, 0, 0],
+        backgroundColor: ['#EF4444', '#F5A524', '#22C55E'],
+        borderColor: '#0D1424', borderWidth: 3,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      animation: { duration: 900, easing: 'easeOutQuart' },
+    },
+  });
+}
+
+async function renderProgressChart(range){
+  range = range || 'weekly';
+  const ctx = $('progressChart');
+  if (!ctx) return;
+  const days = range === 'weekly' ? 7 : 30;
+
+  const buckets = {};
+  const labels = [];
+  for (let i = days - 1; i >= 0; i--){
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = dateKey(d);
+    buckets[key] = { completed: 0, pending: 0 };
+    labels.push(d.toLocaleDateString(undefined, range === 'weekly' ? { weekday: 'short' } : { day: 'numeric', month: 'short' }));
+  }
+
+  AppState.tasks.forEach(t => {
+    if (t.status === 'completed' && t.completed_at){
+      const key = dateKey(new Date(t.completed_at));
+      if (buckets[key]) buckets[key].completed++;
+    }
+    if (t.status !== 'completed' && t.due_date){
+      const key = dateKey(new Date(t.due_date));
+      if (buckets[key]) buckets[key].pending++;
+    }
+  });
+
+  const completedData = Object.values(buckets).map(b => b.completed);
+  const pendingData = Object.values(buckets).map(b => b.pending);
+
+  if (AppState.charts.progress) AppState.charts.progress.destroy();
+  AppState.charts.progress = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Completed', data: completedData, borderColor: '#22C55E', backgroundColor: 'rgba(34,197,94,0.12)', fill: true, tension: .4, pointRadius: 3 },
+        { label: 'Pending / Due', data: pendingData, borderColor: '#F5A524', backgroundColor: 'rgba(245,165,36,0.1)', fill: true, tension: .4, pointRadius: 3 },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, padding: 14, font: { size: 11 } } } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { precision: 0 } },
+        x: { grid: { display: false } },
+      },
+      animation: { duration: 900, easing: 'easeOutQuart' },
+    },
+  });
+}
+
+/* ---------------------------------------------------------------
+   14. SIDEBAR / NAVBAR / FILTER INTERACTIONS
+--------------------------------------------------------------- */
+function initUIControls(){
+  $('collapseBtn').addEventListener('click', () => document.body.classList.toggle('sidebar-collapsed'));
+  $('mobileMenuBtn').addEventListener('click', () => document.body.classList.add('sidebar-mobile-open'));
+  $('sidebarBackdrop').addEventListener('click', () => document.body.classList.remove('sidebar-mobile-open'));
+
+  $('themeToggleBtn').addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+    showToast('Theme preference saved.', 'info');
+  });
+
+  $('taskSearch').addEventListener('input', applyTaskFilters);
+  $('taskStatusFilter').addEventListener('change', applyTaskFilters);
+  $('taskPriorityFilter').addEventListener('change', applyTaskFilters);
+
+  document.querySelectorAll('.task-table th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const key = th.dataset.sort;
+      if (AppState.taskSort.key === key){
+        AppState.taskSort.dir = AppState.taskSort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        AppState.taskSort = { key, dir: 'asc' };
+      }
+      applyTaskFilters();
+    });
+  });
+
+  document.querySelectorAll('.filter-chip[data-range]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip[data-range]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderProgressChart(btn.dataset.range);
+    });
+  });
+
+  $('detailsCloseBtn').addEventListener('click', closeTaskDetails);
+  $('detailsOverlay').addEventListener('click', (e) => { if (e.target === $('detailsOverlay')) closeTaskDetails(); });
+
+  $('detailProgressSlider').addEventListener('input', (e) => {
+    $('detailProgressLabel').textContent = e.target.value + '%';
+  });
+  $('detailSaveProgressBtn').addEventListener('click', handleSaveProgress);
+  $('detailMarkCompleteBtn').addEventListener('click', () => {
+    if (AppState.activeTask) markTaskComplete(AppState.activeTask.id);
+  });
+  $('detailDownloadBtn').addEventListener('click', () => {
+    if (AppState.activeTask) downloadTask(AppState.activeTask.id);
+  });
+  $('detailFileInput').addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (file) handleUploadAttachment(file);
+  });
+  $('detailCommentSendBtn').addEventListener('click', handlePostComment);
+  $('detailCommentInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handlePostComment();
+  });
+
+  $('logoutBtn').addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'employee-login.html';
+  });
+}
+
+/* ---------------------------------------------------------------
+   15. BOOTSTRAP
+--------------------------------------------------------------- */
+async function bootstrap(){
+  lucide.createIcons();
+  chartDefaults();
+  initUIControls();
+
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  const session = await guardSession();
+  if (!session) return;
+
+  await loadEmployeeProfile();
+
+  await Promise.all([
+    loadTasks(),
+    loadNotifications(),
+  ]);
+
+  lucide.createIcons();
+}
+
+document.addEventListener('DOMContentLoaded', bootstrap);
+</script>
+</body>
+</html>

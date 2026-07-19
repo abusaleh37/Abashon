@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>ABASHON | Salary</title>
+<meta name="description" content="ABASHON Consultancy & Construction — Employee Salary Management" />
+
+<!-- ============================================================
+     FONTS
+============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<!-- ============================================================
+     TAILWIND CSS (CDN)
+============================================================ -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+        colors: {
+          ink: {
+            950: '#070B14',
+            900: '#0A0F1C',
+            850: '#0D1424',
+            800: '#131B2E',
+            700: '#1A2338',
+            600: '#243149',
+          },
+          amber: {
+            400: '#FBC56A',
+            500: '#F5A524',
+            600: '#D98A0F',
+          },
+        },
+        boxShadow: {
+          glass: '0 8px 32px rgba(0,0,0,0.35)',
+          'glow-amber': '0 0 0 1px rgba(245,165,36,0.25), 0 0 24px rgba(245,165,36,0.12)',
+        },
+      },
+    },
+  };
+</script>
+
+<!-- ============================================================
+     ICONS / CHARTS / SUPABASE
+============================================================ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- ============================================================
+     GLOBAL DESIGN SYSTEM (shared across every page — unchanged)
+============================================================ -->
+<style>
+  :root{
+    --bg-0:#070B14;
+    --bg-1:#0A0F1C;
+    --bg-2:#0D1424;
+    --bg-3:#131B2E;
+    --glass-bg: rgba(255,255,255,0.045);
+    --glass-bg-strong: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.09);
+    --glass-border-hover: rgba(245,165,36,0.35);
+    --line-blueprint: rgba(148,178,255,0.055);
+    --amber: #F5A524;
+    --amber-soft: #FBC56A;
+    --blue: #3B82F6;
+    --cyan: #22D3EE;
+    --green: #22C55E;
+    --red: #EF4444;
+    --violet:#8B7CF6;
+    --text-hi:#EDF1F7;
+    --text-mid:#93A0B4;
+    --text-low:#5C6B82;
+    --sidebar-w: 272px;
+    --sidebar-w-collapsed: 84px;
+    --navbar-h: 76px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    background:
+      radial-gradient(1100px 600px at 85% -10%, rgba(245,165,36,0.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 20%, rgba(59,130,246,0.08), transparent 55%),
+      var(--bg-0);
+    color:var(--text-hi);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---- Blueprint grid backdrop : the signature texture of this system ---- */
+  .blueprint{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line-blueprint) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-blueprint) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(1200px 800px at 30% 10%, #000 0%, transparent 75%);
+            mask-image: radial-gradient(1200px 800px at 30% 10%, #000 0%, transparent 75%);
+    opacity:.7;
+  }
+
+  h1,h2,h3,h4,.font-display{ font-family:'Space Grotesk', sans-serif; letter-spacing:-0.01em; }
+  .font-mono{ font-family:'JetBrains Mono', monospace; }
+
+  /* ---- Scrollbars ---- */
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:rgba(245,165,36,0.25); border-radius:99px; }
+  ::-webkit-scrollbar-thumb:hover{ background:rgba(245,165,36,0.45); }
+
+  /* ---- Glass primitives (reused by every card, every page) ---- */
+  .glass{
+    background: var(--glass-bg);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    border-radius: 20px;
+  }
+  .glass-strong{
+    background: var(--glass-bg-strong);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-radius: 20px;
+  }
+  .glass-card{
+    position:relative;
+    overflow:hidden;
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .35s ease, box-shadow .35s ease;
+  }
+  .glass-card::before{
+    content:"";
+    position:absolute; inset:0; border-radius:inherit; padding:1px;
+    background: linear-gradient(135deg, rgba(245,165,36,0.35), rgba(255,255,255,0) 35%, rgba(59,130,246,0.25) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity:0; transition:opacity .35s ease;
+    pointer-events:none;
+  }
+  .glass-card:hover{ transform:translateY(-3px); box-shadow:0 16px 40px rgba(0,0,0,0.45); }
+  .glass-card:hover::before{ opacity:1; }
+
+  .divider-blueprint{
+    height:1px;
+    background: repeating-linear-gradient(90deg, rgba(245,165,36,0.35) 0 6px, transparent 6px 12px);
+  }
+
+  /* ---- Sidebar ---- */
+  #sidebar{
+    width:var(--sidebar-w);
+    transition: width .3s cubic-bezier(.2,.8,.2,1), transform .3s ease;
+  }
+  body.sidebar-collapsed #sidebar{ width:var(--sidebar-w-collapsed); }
+  body.sidebar-collapsed .sidebar-label{ opacity:0; width:0; }
+  body.sidebar-collapsed #brandText{ opacity:0; width:0; }
+  #mainWrap{ margin-left:var(--sidebar-w); transition:margin-left .3s cubic-bezier(.2,.8,.2,1); }
+  body.sidebar-collapsed #mainWrap{ margin-left:var(--sidebar-w-collapsed); }
+
+  .nav-item{
+    position:relative;
+    display:flex; align-items:center; gap:14px;
+    padding:11px 16px; margin:2px 12px;
+    border-radius:12px;
+    color:var(--text-mid);
+    font-size:14px; font-weight:500;
+    transition:all .25s ease;
+    white-space:nowrap;
+  }
+  .nav-item:hover{ color:var(--text-hi); background:rgba(255,255,255,0.05); }
+  .nav-item.active{
+    color:#0A0F1C;
+    background: linear-gradient(135deg, var(--amber-soft), var(--amber));
+    box-shadow: 0 6px 18px rgba(245,165,36,0.28);
+    font-weight:600;
+  }
+  .nav-item.active svg{ stroke:#0A0F1C; }
+  .sidebar-label{ transition:opacity .2s ease, width .2s ease; overflow:hidden; }
+
+  /* ---- Badges ---- */
+  .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.02em; }
+  .badge-green{ color:var(--green); background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); }
+  .badge-amber{ color:var(--amber-soft); background:rgba(245,165,36,0.12); border:1px solid rgba(245,165,36,0.28); }
+  .badge-red{ color:var(--red); background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.28); }
+  .badge-blue{ color:#93C5FD; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.28); }
+  .badge-violet{ color:#C4B5FD; background:rgba(139,124,246,0.12); border:1px solid rgba(139,124,246,0.28); }
+
+  .btn-primary{
+    background:linear-gradient(135deg, var(--amber-soft), var(--amber));
+    color:#0A0F1C; font-weight:600; border-radius:12px;
+    transition:transform .2s ease, box-shadow .2s ease;
+    box-shadow:0 8px 20px rgba(245,165,36,0.22);
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(245,165,36,0.32); }
+  .btn-primary:active{ transform:translateY(0); }
+  .btn-primary:disabled{ opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  .btn-ghost{
+    background:rgba(255,255,255,0.04); border:1px solid var(--glass-border); color:var(--text-hi);
+    border-radius:12px; transition:all .2s ease;
+  }
+  .btn-ghost:hover{ background:rgba(255,255,255,0.08); border-color:var(--glass-border-hover); }
+  .btn-ghost:disabled{ opacity:.4; cursor:not-allowed; }
+
+  /* ---- Loading skeleton ---- */
+  .skel{ position:relative; overflow:hidden; background:rgba(255,255,255,0.06); border-radius:8px; color:transparent !important; }
+  .skel::after{
+    content:""; position:absolute; inset:0; transform:translateX(-100%);
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent);
+    animation:shimmer 1.4s infinite;
+  }
+  @keyframes shimmer{ 100%{ transform:translateX(100%); } }
+
+  /* ---- Entrance animations ---- */
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  .anim-fade-up{ animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both; }
+
+  /* ---- Table ---- */
+  .sal-table{ width:100%; border-collapse:separate; border-spacing:0; }
+  .sal-table thead th{
+    text-align:left; font-size:10.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--text-low); padding:0 14px 10px; white-space:nowrap;
+  }
+  .sal-table tbody tr{ transition: background .2s ease; }
+  .sal-table tbody tr:hover{ background:rgba(255,255,255,0.035); }
+  .sal-table tbody td{ padding:12px 14px; font-size:13px; border-top:1px solid rgba(255,255,255,0.06); white-space:nowrap; }
+  .sal-table tbody tr:first-child td{ border-top:none; }
+
+  .page-btn{
+    width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-size:12.5px; font-weight:600; color:var(--text-mid);
+    background:rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+    transition: all .2s ease;
+  }
+  .page-btn:hover:not(:disabled){ background:rgba(255,255,255,0.08); color:var(--text-hi); }
+  .page-btn.active{ background:linear-gradient(135deg, var(--amber-soft), var(--amber)); color:#0A0F1C; border-color:transparent; }
+  .page-btn:disabled{ opacity:.35; cursor:not-allowed; }
+
+  .ring-svg{ transform:rotate(-90deg); }
+  .ring-bg{ stroke:rgba(255,255,255,0.07); }
+  .ring-fg{ stroke-linecap:round; transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1); }
+
+  .scroll-y-fade{ mask-image:linear-gradient(180deg, transparent, #000 8%, #000 92%, transparent); }
+
+  /* fixed clock width (no resizing) */
+  #liveClock{
+    display:inline-block;
+    min-width:106px;
+    text-align:right;
+    font-size:15px;
+    line-height:1;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  input[type="text"]:focus, input[type="search"]:focus, select:focus{ outline:none; }
+  ::placeholder{ color:var(--text-low); }
+
+  @media (max-width: 1024px){
+    #sidebar{ position:fixed; z-index:50; top:0; left:0; height:100vh; transform:translateX(-100%); }
+    body.sidebar-mobile-open #sidebar{ transform:translateX(0); }
+    #mainWrap, body.sidebar-collapsed #mainWrap{ margin-left:0; }
+    #sidebarBackdrop{ display:none; }
+    body.sidebar-mobile-open #sidebarBackdrop{ display:block; }
+  }
+</style>
+</head>
+
+<body class="font-body">
+<div class="blueprint"></div>
+
+<!-- Mobile backdrop -->
+<div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden"></div>
+
+<!-- ============================================================
+     SIDEBAR (EXACT structure from my-tasks.html, salary active)
+============================================================ -->
+<aside id="sidebar" class="fixed top-0 left-0 h-screen z-50 flex flex-col glass-strong border-r border-white/5">
+  <!-- Brand -->
+  <div class="flex items-center gap-3 px-5 h-[76px] shrink-0 border-b border-white/5">
+    <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-glow-amber">
+      <i data-lucide="hard-hat" class="w-5 h-5 text-ink-900"></i>
+    </div>
+    <div id="brandText" class="sidebar-label leading-tight overflow-hidden">
+      <p class="font-display font-bold text-[15px] text-white tracking-tight">ABASHON</p>
+      <p class="text-[10.5px] text-[var(--text-mid)] tracking-wide">Consultancy &amp; Construction</p>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4">
+    <p class="sidebar-label px-6 mb-2 text-[10.5px] font-semibold tracking-[.14em] text-[var(--text-low)] uppercase">Workspace</p>
+    <a href="employee-dashboard.html" data-page="dashboard" class="nav-item">
+      <i data-lucide="layout-dashboard" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Dashboard</span>
+    </a>
+    <a href="employee-profile.html" data-page="profile" class="nav-item">
+      <i data-lucide="user-circle-2" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">My Profile</span>
+    </a>
+    <a href="attendance.html" data-page="attendance" class="nav-item">
+      <i data-lucide="calendar-check-2" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Attendance</span>
+    </a>
+    <a href="my-tasks.html" data-page="tasks" class="nav-item">
+      <i data-lucide="list-checks" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">My Tasks</span>
+    </a>
+    <a href="employee-salary.html" data-page="salary" class="nav-item active">
+      <i data-lucide="wallet" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Salary</span>
+    </a>
+    <a href="leave-request.html" data-page="leave" class="nav-item">
+      <i data-lucide="plane" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Leave Request</span>
+    </a>
+    <a href="notifications.html" data-page="notifications" class="nav-item">
+      <i data-lucide="bell" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Notifications</span>
+    </a>
+
+    <p class="sidebar-label px-6 mt-5 mb-2 text-[10.5px] font-semibold tracking-[.14em] text-[var(--text-low)] uppercase">System</p>
+    <a href="settings.html" data-page="settings" class="nav-item">
+      <i data-lucide="settings" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Settings</span>
+    </a>
+    <button id="logoutBtn" class="nav-item w-[calc(100%-24px)] text-left">
+      <i data-lucide="log-out" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Logout</span>
+    </button>
+  </nav>
+
+  <!-- Collapse toggle -->
+  <div class="p-3 border-t border-white/5 shrink-0">
+    <button id="collapseBtn" class="nav-item w-full justify-center lg:justify-start">
+      <i data-lucide="panel-left-close" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Collapse</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN WRAPPER
+============================================================ -->
+<div id="mainWrap" class="relative z-10 min-h-screen flex flex-col">
+
+  <!-- ============================================================
+       NAVBAR (EXACT structure from my-tasks.html)
+  ============================================================ -->
+  <header id="navbar" class="sticky top-0 z-30 h-[76px] shrink-0 glass-strong border-b border-white/5 flex items-center justify-between gap-4 px-4 lg:px-8">
+    <div class="flex items-center gap-3 min-w-0">
+      <button id="mobileMenuBtn" class="lg:hidden btn-ghost w-10 h-10 flex items-center justify-center shrink-0">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+      <div class="hidden md:flex items-center gap-2.5 glass px-4 py-2.5 w-72 xl:w-96">
+        <i data-lucide="search" class="w-4 h-4 text-[var(--text-low)] shrink-0"></i>
+        <input type="text" placeholder="Search employees, tasks, documents…" class="bg-transparent text-sm w-full text-[var(--text-hi)]" />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 lg:gap-3 shrink-0">
+      <!-- Digital clock -->
+      <div class="hidden md:flex flex-col items-end leading-tight mr-1">
+        <span id="liveClock" class="font-mono text-[15px] font-semibold text-amber-400 tracking-wider">--:--:--</span>
+        <span id="liveDate" class="text-[11px] text-[var(--text-mid)]">Loading date…</span>
+      </div>
+
+      <div class="hidden md:block w-px h-8 bg-white/10 mx-1"></div>
+
+      <!-- Theme toggle -->
+      <button id="themeToggleBtn" class="btn-ghost w-10 h-10 flex items-center justify-center" title="Toggle theme">
+        <i data-lucide="moon" class="w-[18px] h-[18px]"></i>
+      </button>
+
+      <!-- Notification bell -->
+      <button id="notifBellBtn" class="btn-ghost relative w-10 h-10 flex items-center justify-center" title="Notifications">
+        <i data-lucide="bell" class="w-[18px] h-[18px]"></i>
+        <span id="notifBadge" class="hidden absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[10px] font-bold flex items-center justify-center text-white">0</span>
+      </button>
+
+      <div class="hidden md:block w-px h-8 bg-white/10 mx-1"></div>
+
+      <!-- Profile -->
+      <button id="profileMenuBtn" class="flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full glass hover:border-amber-500/30 transition-colors">
+        <img id="navProfilePhoto" src="" alt="" class="w-9 h-9 rounded-full object-cover skel bg-ink-700" />
+        <div class="hidden sm:block text-left leading-tight">
+          <p id="navProfileName" class="text-[13px] font-semibold text-white skel rounded w-24">&nbsp;</p>
+          <p id="navProfileRole" class="text-[11px] text-[var(--text-mid)] skel rounded w-16 mt-0.5">&nbsp;</p>
+        </div>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--text-mid)] hidden sm:block"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       PAGE CONTENT (Salary module only)
+  ============================================================ -->
+  <main class="flex-1 px-4 lg:px-8 py-6 lg:py-8 max-w-[1680px] w-full mx-auto">
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-6 anim-fade-up">
+      <div>
+        <p class="text-[11px] font-semibold tracking-[.16em] text-amber-400 uppercase mb-1">Employee Workspace</p>
+        <h1 class="font-display text-2xl lg:text-[28px] font-bold text-white">Salary Dashboard</h1>
+      </div>
+      <div class="flex items-center gap-2 text-[13px] text-[var(--text-mid)]">
+        <i data-lucide="calendar-days" class="w-4 h-4 text-amber-400"></i>
+        <span id="periodLabel">Current payroll period</span>
+      </div>
+    </div>
+
+    <!-- Summary cards -->
+    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-5 anim-fade-up">
+      <div class="glass glass-card p-4">
+        <p class="text-[11px] text-[var(--text-mid)] mb-1">Current Month</p>
+        <p id="cardMonth" class="text-sm text-white font-semibold skel rounded w-20">&nbsp;</p>
+      </div>
+      <div class="glass glass-card p-4">
+        <p class="text-[11px] text-[var(--text-mid)] mb-1">Net Salary</p>
+        <p id="cardNet" class="font-display text-xl text-amber-300 font-bold skel rounded w-24">&nbsp;</p>
+      </div>
+      <div class="glass glass-card p-4">
+        <p class="text-[11px] text-[var(--text-mid)] mb-1">Basic Salary</p>
+        <p id="cardBasic" class="font-mono text-lg text-white skel rounded w-20">&nbsp;</p>
+      </div>
+      <div class="glass glass-card p-4">
+        <p class="text-[11px] text-[var(--text-mid)] mb-1">Allowances</p>
+        <p id="cardAllowances" class="font-mono text-lg text-cyan-300 skel rounded w-20">&nbsp;</p>
+      </div>
+      <div class="glass glass-card p-4">
+        <p class="text-[11px] text-[var(--text-mid)] mb-1">Deductions</p>
+        <p id="cardDeductions" class="font-mono text-lg text-red-400 skel rounded w-20">&nbsp;</p>
+      </div>
+      <div class="glass glass-card p-4">
+        <p class="text-[11px] text-[var(--text-mid)] mb-1">Payment Status</p>
+        <p id="cardStatus" class="text-sm text-white">—</p>
+      </div>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <!-- Salary breakdown -->
+      <section class="lg:col-span-8 glass glass-card p-6 anim-fade-up">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Salary Breakdown</h3>
+          <button id="downloadPayslipBtnTop" class="btn-primary px-3 py-2 text-[12.5px] flex items-center gap-1.5">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i> Download Payslip
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="sal-table">
+            <thead>
+              <tr><th>Component</th><th>Amount</th><th>Status</th><th>Description</th></tr>
+            </thead>
+            <tbody id="breakdownBody">
+              <tr><td colspan="4" class="text-center text-[var(--text-mid)] py-6">Loading salary breakdown…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Salary info card -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up">
+        <h3 class="font-display font-semibold text-white text-[15px] mb-4">Current Salary Details</h3>
+        <div id="salaryDetailCard" class="space-y-2.5 text-[13px]">
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Employee Name</span><span id="sdName" class="text-white skel rounded w-20">&nbsp;</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Employee ID</span><span id="sdEmpId" class="text-white skel rounded w-16">&nbsp;</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Department</span><span id="sdDept" class="text-white skel rounded w-20">&nbsp;</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Salary Month</span><span id="sdMonth" class="text-white">—</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Salary Year</span><span id="sdYear" class="text-white">—</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Payment Method</span><span id="sdMethod" class="text-white">—</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Bank Name</span><span id="sdBank" class="text-white">—</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Account</span><span id="sdAccount" class="text-white">—</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Payment Date</span><span id="sdPayDate" class="text-white">—</span></div>
+        </div>
+      </section>
+
+      <!-- History table -->
+      <section class="lg:col-span-12 glass glass-card p-6 anim-fade-up">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Salary History</h3>
+          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 glass px-3 py-2 w-52">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--text-low)] shrink-0"></i>
+              <input id="historySearch" type="search" placeholder="Search month/status…" class="bg-transparent text-[12.5px] w-full text-[var(--text-hi)]" />
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="sal-table">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Year</th>
+                <th>Net Salary</th>
+                <th>Payment Date</th>
+                <th>Status</th>
+                <th>Download Payslip</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody">
+              <tr><td colspan="6" class="text-center text-[var(--text-mid)] py-6">Loading salary history…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
+          <p id="historyRangeLabel" class="text-[12px] text-[var(--text-mid)]">—</p>
+          <div id="historyPagination" class="flex items-center gap-1.5"></div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="mt-8 pb-4 text-center text-[12px] text-[var(--text-low)]">
+      ABASHON Consultancy &amp; Construction — Employee Management System
+    </footer>
+  </main>
+</div>
+
+<!-- Toast container -->
+<div id="toastContainer" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2.5 w-[320px] max-w-[90vw]"></div>
+
+<script>
+/* ---------------------------------------------------------------
+   0. SUPABASE CONFIGURATION (same pattern as existing pages)
+--------------------------------------------------------------- */
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ---------------------------------------------------------------
+   1. GLOBAL STATE
+--------------------------------------------------------------- */
+const AppState = {
+  session: null,
+  employee: null,
+  rows: [],
+  filtered: [],
+  page: 1,
+  pageSize: 8,
+};
+
+/* ---------------------------------------------------------------
+   2. UTILITIES
+--------------------------------------------------------------- */
+function $(id){ return document.getElementById(id); }
+
+function money(v){
+  return '৳' + Number(v || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+function fmtDate(d){
+  return d ? new Date(d).toLocaleDateString() : '—';
+}
+function unskel(el){ if (el) el.classList.remove('skel'); }
+
+function showToast(message, type){
+  type = type || 'info';
+  const colors = {
+    success: 'border-green-500/30 text-green-400',
+    error: 'border-red-500/30 text-red-400',
+    info: 'border-amber-500/30 text-amber-400',
+  };
+  const icons = { success: 'check-circle-2', error: 'alert-circle', info: 'info' };
+  const toast = document.createElement('div');
+  toast.className = 'glass-strong rounded-xl px-4 py-3 flex items-center gap-2.5 border anim-fade-up shadow-glass ' + (colors[type] || colors.info);
+  toast.innerHTML = '<i data-lucide="' + (icons[type] || icons.info) + '" class="w-4 h-4 shrink-0"></i>' +
+    '<span class="text-[13px] text-[var(--text-hi)] flex-1">' + message + '</span>';
+  $('toastContainer').appendChild(toast);
+  lucide.createIcons();
+  setTimeout(() => toast.remove(), 3800);
+}
+
+/* ---------------------------------------------------------------
+   3. SESSION GUARD (same architecture)
+--------------------------------------------------------------- */
+async function guardSession(){
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error || !data.session){
+    window.location.href = 'employee-login.html';
+    return null;
+  }
+  AppState.session = data.session;
+  return data.session;
+}
+
+/* ---------------------------------------------------------------
+   4. CLOCK (same structure, fixed no-shift rendering)
+--------------------------------------------------------------- */
+function tickClock(){
+  const now = new Date();
+  $('liveClock').textContent = now.toLocaleTimeString([], {
+    hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true
+  });
+  $('liveDate').textContent = now.toLocaleDateString(undefined, {
+    weekday:'long', day:'numeric', month:'long', year:'numeric'
+  });
+}
+
+/* ---------------------------------------------------------------
+   5. LOAD EMPLOYEE PROFILE (navbar data)
+--------------------------------------------------------------- */
+async function loadEmployeeProfile(){
+  const uid = AppState.session.user.id;
+  const { data, error } = await supabaseClient
+    .from('employees')
+    .select('*')
+    .eq('auth_user_id', uid)
+    .single();
+
+  if (error || !data){
+    showToast('Could not load employee profile.', 'error');
+    return;
+  }
+
+  AppState.employee = data;
+  $('navProfilePhoto').src = data.photo_url || '';
+  $('navProfileName').textContent = data.full_name || '—';
+  $('navProfileRole').textContent = data.designation || '—';
+  unskel($('navProfilePhoto')); unskel($('navProfileName')); unskel($('navProfileRole'));
+}
+
+/* ---------------------------------------------------------------
+   6. LOAD SALARY DATA
+--------------------------------------------------------------- */
+async function loadSalaryData(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+
+  const { data, error } = await supabaseClient
+    .from('salary')
+    .select('*')
+    .eq('employee_id', empId)
+    .order('salary_year', { ascending: false });
+
+  if (error){
+    showToast('Database error while loading salary.', 'error');
+    $('historyBody').innerHTML = '<tr><td colspan="6" class="text-center text-[var(--text-mid)] py-6">Could not load salary records.</td></tr>';
+    return;
+  }
+
+  AppState.rows = data || [];
+  AppState.filtered = [...AppState.rows];
+
+  if (!AppState.rows.length){
+    $('periodLabel').textContent = 'No records';
+    $('historyBody').innerHTML = '<tr><td colspan="6" class="text-center text-[var(--text-mid)] py-6">No salary records found.</td></tr>';
+    return;
+  }
+
+  renderCurrentSalary();
+  renderHistory();
+}
+
+/* ---------------------------------------------------------------
+   7. RENDER CURRENT SALARY + BREAKDOWN
+--------------------------------------------------------------- */
+function renderCurrentSalary(){
+  const r = AppState.rows[0];
+
+  const allowances = Number(r.house_rent||0)+Number(r.medical_allowance||0)+Number(r.transport_allowance||0)+Number(r.food_allowance||0)+Number(r.mobile_allowance||0);
+  const deductions = Number(r.tax||0)+Number(r.provident_fund||0)+Number(r.insurance||0)+Number(r.loan_deduction||0)+Number(r.other_deduction||0);
+
+  $('periodLabel').textContent = (r.salary_month || '—') + ' ' + (r.salary_year || '');
+  $('cardMonth').textContent = (r.salary_month || '—') + ' ' + (r.salary_year || ''); unskel($('cardMonth'));
+  $('cardNet').textContent = money(r.net_salary); unskel($('cardNet'));
+  $('cardBasic').textContent = money(r.basic_salary); unskel($('cardBasic'));
+  $('cardAllowances').textContent = money(allowances); unskel($('cardAllowances'));
+  $('cardDeductions').textContent = money(deductions); unskel($('cardDeductions'));
+  $('cardStatus').innerHTML = '<span class="badge ' + ((String(r.payment_status||'').toLowerCase()==='paid') ? 'badge-green' : 'badge-amber') + '">' + (r.payment_status||'Pending') + '</span>';
+
+  $('sdName').textContent = AppState.employee?.full_name || '—'; unskel($('sdName'));
+  $('sdEmpId').textContent = AppState.employee?.employee_id || '—'; unskel($('sdEmpId'));
+  $('sdDept').textContent = AppState.employee?.department || '—'; unskel($('sdDept'));
+  $('sdMonth').textContent = r.salary_month || '—';
+  $('sdYear').textContent = r.salary_year || '—';
+  $('sdMethod').textContent = r.payment_method || '—';
+  $('sdBank').textContent = r.bank_name || '—';
+  $('sdAccount').textContent = (r.bank_account_number||'').toString().replace(/.(?=.{4})/g, '*') || '—';
+  $('sdPayDate').textContent = fmtDate(r.payment_date);
+
+  const rows = [
+    ['Basic Salary', r.basic_salary, 'Included', 'Base salary'],
+    ['House Rent', r.house_rent, 'Included', 'Allowance'],
+    ['Medical', r.medical_allowance, 'Included', 'Allowance'],
+    ['Transport', r.transport_allowance, 'Included', 'Allowance'],
+    ['Food Allowance', r.food_allowance, 'Included', 'Allowance'],
+    ['Mobile Allowance', r.mobile_allowance, 'Included', 'Allowance'],
+    ['Overtime', r.overtime, 'Included', 'Additional earnings'],
+    ['Festival Bonus', r.festival_bonus, 'Included', 'Bonus'],
+    ['Performance Bonus', r.performance_bonus, 'Included', 'Bonus'],
+    ['Tax', r.tax, 'Deducted', 'Statutory deduction'],
+    ['Provident Fund', r.provident_fund, 'Deducted', 'Deduction'],
+    ['Insurance', r.insurance, 'Deducted', 'Deduction'],
+    ['Loan Deduction', r.loan_deduction, 'Deducted', 'Deduction'],
+    ['Other Deduction', r.other_deduction, 'Deducted', 'Deduction'],
+    ['Net Salary', r.net_salary, 'Final', 'Final payable'],
+  ];
+
+  $('breakdownBody').innerHTML = rows.map(x => (
+    '<tr>' +
+      '<td class="text-white">'+x[0]+'</td>' +
+      '<td class="font-mono">'+money(x[1])+'</td>' +
+      '<td>'+(x[2]==='Deducted' ? '<span class="badge badge-red">'+x[2]+'</span>' : x[2]==='Final' ? '<span class="badge badge-blue">'+x[2]+'</span>' : '<span class="badge badge-green">'+x[2]+'</span>')+'</td>' +
+      '<td class="text-[var(--text-mid)]">'+x[3]+'</td>' +
+    '</tr>'
+  )).join('');
+}
+
+/* ---------------------------------------------------------------
+   8. HISTORY TABLE + SEARCH + PAGINATION
+--------------------------------------------------------------- */
+function applySearch(){
+  const q = ($('historySearch').value || '').trim().toLowerCase();
+  AppState.filtered = AppState.rows.filter(r => (
+    ((r.salary_month||'') + ' ' + (r.salary_year||'') + ' ' + (r.payment_status||'')).toLowerCase().includes(q)
+  ));
+  AppState.page = 1;
+  renderHistory();
+}
+
+function renderHistory(){
+  const rows = AppState.filtered;
+  const total = rows.length;
+  const pages = Math.max(1, Math.ceil(total / AppState.pageSize));
+  const page = Math.min(AppState.page, pages);
+  const start = (page - 1) * AppState.pageSize;
+  const pageRows = rows.slice(start, start + AppState.pageSize);
+
+  if (!pageRows.length){
+    $('historyBody').innerHTML = '<tr><td colspan="6" class="text-center text-[var(--text-mid)] py-6">No salary records found.</td></tr>';
+  } else {
+    $('historyBody').innerHTML = pageRows.map(r => (
+      '<tr>' +
+        '<td>'+ (r.salary_month||'—') +'</td>' +
+        '<td>'+ (r.salary_year||'—') +'</td>' +
+        '<td class="font-mono">'+ money(r.net_salary) +'</td>' +
+        '<td>'+ fmtDate(r.payment_date) +'</td>' +
+        '<td>'+ ((String(r.payment_status||'').toLowerCase()==='paid') ? '<span class="badge badge-green">Paid</span>' : '<span class="badge badge-amber">'+(r.payment_status||'Pending')+'</span>') +'</td>' +
+        '<td><button class="btn-ghost px-2.5 py-1 text-[12px]" onclick="downloadPayslip(\''+ r.id +'\')">Download</button></td>' +
+      '</tr>'
+    )).join('');
+  }
+
+  $('historyRangeLabel').textContent = 'Showing ' + (total ? (start + 1) : 0) + '–' + Math.min(start + AppState.pageSize, total) + ' of ' + total + ' records';
+
+  const pWrap = $('historyPagination');
+  pWrap.innerHTML = '';
+  const prev = document.createElement('button');
+  prev.className = 'page-btn'; prev.innerHTML = '<i data-lucide="chevron-left" class="w-4 h-4"></i>'; prev.disabled = page <= 1;
+  prev.onclick = () => { AppState.page = page - 1; renderHistory(); };
+  pWrap.appendChild(prev);
+
+  for (let i = 1; i <= pages; i++){
+    const b = document.createElement('button');
+    b.className = 'page-btn' + (i===page ? ' active' : '');
+    b.textContent = i;
+    b.onclick = () => { AppState.page = i; renderHistory(); };
+    pWrap.appendChild(b);
+  }
+
+  const next = document.createElement('button');
+  next.className = 'page-btn'; next.innerHTML = '<i data-lucide="chevron-right" class="w-4 h-4"></i>'; next.disabled = page >= pages;
+  next.onclick = () => { AppState.page = page + 1; renderHistory(); };
+  pWrap.appendChild(next);
+
+  lucide.createIcons();
+}
+
+function downloadPayslip(id){
+  const r = AppState.rows.find(x => String(x.id) === String(id));
+  if (!r) return;
+  const lines = [
+    'ABASHON Consultancy & Construction',
+    'Employee Payslip',
+    'Employee: ' + (AppState.employee?.full_name || ''),
+    'Employee ID: ' + (AppState.employee?.employee_id || ''),
+    'Month: ' + (r.salary_month || '') + ' ' + (r.salary_year || ''),
+    'Net Salary: ' + money(r.net_salary),
+    'Status: ' + (r.payment_status || ''),
+    'Payment Date: ' + fmtDate(r.payment_date),
+  ];
+  const blob = new Blob([lines.join('\n')], { type:'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'payslip-' + (r.salary_month || 'month') + '-' + (r.salary_year || 'year') + '.txt';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* ---------------------------------------------------------------
+   9. UI CONTROLS (copied behavior pattern from my-tasks.html)
+--------------------------------------------------------------- */
+function initUIControls(){
+  $('collapseBtn').addEventListener('click', () => document.body.classList.toggle('sidebar-collapsed'));
+  $('mobileMenuBtn').addEventListener('click', () => document.body.classList.add('sidebar-mobile-open'));
+  $('sidebarBackdrop').addEventListener('click', () => document.body.classList.remove('sidebar-mobile-open'));
+
+  $('themeToggleBtn').addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+    showToast('Theme preference saved.', 'info');
+  });
+
+  $('historySearch').addEventListener('input', applySearch);
+
+  $('downloadPayslipBtnTop').addEventListener('click', () => {
+    if (!AppState.rows.length) return showToast('No payslip available yet.', 'info');
+    downloadPayslip(AppState.rows[0].id);
+  });
+
+  $('logoutBtn').addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'employee-login.html';
+  });
+}
+
+/* ---------------------------------------------------------------
+   10. BOOTSTRAP
+--------------------------------------------------------------- */
+async function bootstrap(){
+  lucide.createIcons();
+  initUIControls();
+
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  const session = await guardSession();
+  if (!session) return;
+
+  await loadEmployeeProfile();
+  await loadSalaryData();
+
+  lucide.createIcons();
+}
+
+document.addEventListener('DOMContentLoaded', bootstrap);
+</script>
+</body>
+</html>

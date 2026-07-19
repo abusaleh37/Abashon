@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>ABASHON | Settings</title>
+<meta name="description" content="ABASHON Consultancy & Construction — Employee Settings" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+        colors: {
+          ink: {
+            950: '#070B14',
+            900: '#0A0F1C',
+            850: '#0D1424',
+            800: '#131B2E',
+            700: '#1A2338',
+            600: '#243149',
+          },
+          amber: {
+            400: '#FBC56A',
+            500: '#F5A524',
+            600: '#D98A0F',
+          },
+        },
+        boxShadow: {
+          glass: '0 8px 32px rgba(0,0,0,0.35)',
+          'glow-amber': '0 0 0 1px rgba(245,165,36,0.25), 0 0 24px rgba(245,165,36,0.12)',
+        },
+      },
+    },
+  };
+</script>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  :root{
+    --bg-0:#070B14;
+    --bg-1:#0A0F1C;
+    --bg-2:#0D1424;
+    --bg-3:#131B2E;
+    --glass-bg: rgba(255,255,255,0.045);
+    --glass-bg-strong: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.09);
+    --glass-border-hover: rgba(245,165,36,0.35);
+    --line-blueprint: rgba(148,178,255,0.055);
+    --amber: #F5A524;
+    --amber-soft: #FBC56A;
+    --blue: #3B82F6;
+    --cyan: #22D3EE;
+    --green: #22C55E;
+    --red: #EF4444;
+    --violet:#8B7CF6;
+    --text-hi:#EDF1F7;
+    --text-mid:#93A0B4;
+    --text-low:#5C6B82;
+    --sidebar-w: 272px;
+    --sidebar-w-collapsed: 84px;
+    --navbar-h: 76px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    background:
+      radial-gradient(1100px 600px at 85% -10%, rgba(245,165,36,0.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 20%, rgba(59,130,246,0.08), transparent 55%),
+      var(--bg-0);
+    color:var(--text-hi);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .blueprint{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line-blueprint) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-blueprint) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(1200px 800px at 30% 10%, #000 0%, transparent 75%);
+            mask-image: radial-gradient(1200px 800px at 30% 10%, #000 0%, transparent 75%);
+    opacity:.7;
+  }
+
+  h1,h2,h3,h4,.font-display{ font-family:'Space Grotesk', sans-serif; letter-spacing:-0.01em; }
+  .font-mono{ font-family:'JetBrains Mono', monospace; }
+
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:rgba(245,165,36,0.25); border-radius:99px; }
+  ::-webkit-scrollbar-thumb:hover{ background:rgba(245,165,36,0.45); }
+
+  .glass{
+    background: var(--glass-bg);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    border-radius: 20px;
+  }
+  .glass-strong{
+    background: var(--glass-bg-strong);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-radius: 20px;
+  }
+  .glass-card{
+    position:relative;
+    overflow:hidden;
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .35s ease, box-shadow .35s ease;
+  }
+  .glass-card::before{
+    content:"";
+    position:absolute; inset:0; border-radius:inherit; padding:1px;
+    background: linear-gradient(135deg, rgba(245,165,36,0.35), rgba(255,255,255,0) 35%, rgba(59,130,246,0.25) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity:0; transition:opacity .35s ease;
+    pointer-events:none;
+  }
+  .glass-card:hover{ transform:translateY(-3px); box-shadow:0 16px 40px rgba(0,0,0,0.45); }
+  .glass-card:hover::before{ opacity:1; }
+
+  #sidebar{
+    width:var(--sidebar-w);
+    transition: width .3s cubic-bezier(.2,.8,.2,1), transform .3s ease;
+  }
+  body.sidebar-collapsed #sidebar{ width:var(--sidebar-w-collapsed); }
+  body.sidebar-collapsed .sidebar-label{ opacity:0; width:0; }
+  body.sidebar-collapsed #brandText{ opacity:0; width:0; }
+  #mainWrap{ margin-left:var(--sidebar-w); transition:margin-left .3s cubic-bezier(.2,.8,.2,1); }
+  body.sidebar-collapsed #mainWrap{ margin-left:var(--sidebar-w-collapsed); }
+
+  .nav-item{
+    position:relative;
+    display:flex; align-items:center; gap:14px;
+    padding:11px 16px; margin:2px 12px;
+    border-radius:12px;
+    color:var(--text-mid);
+    font-size:14px; font-weight:500;
+    transition:all .25s ease;
+    white-space:nowrap;
+  }
+  .nav-item:hover{ color:var(--text-hi); background:rgba(255,255,255,0.05); }
+  .nav-item.active{
+    color:#0A0F1C;
+    background: linear-gradient(135deg, var(--amber-soft), var(--amber));
+    box-shadow: 0 6px 18px rgba(245,165,36,0.28);
+    font-weight:600;
+  }
+  .nav-item.active svg{ stroke:#0A0F1C; }
+  .sidebar-label{ transition:opacity .2s ease, width .2s ease; overflow:hidden; }
+
+  .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.02em; }
+  .badge-green{ color:var(--green); background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); }
+  .badge-amber{ color:var(--amber-soft); background:rgba(245,165,36,0.12); border:1px solid rgba(245,165,36,0.28); }
+  .badge-red{ color:var(--red); background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.28); }
+  .badge-blue{ color:#93C5FD; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.28); }
+
+  .btn-primary{
+    background:linear-gradient(135deg, var(--amber-soft), var(--amber));
+    color:#0A0F1C; font-weight:600; border-radius:12px;
+    transition:transform .2s ease, box-shadow .2s ease;
+    box-shadow:0 8px 20px rgba(245,165,36,0.22);
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(245,165,36,0.32); }
+  .btn-primary:active{ transform:translateY(0); }
+
+  .btn-ghost{
+    background:rgba(255,255,255,0.04); border:1px solid var(--glass-border); color:var(--text-hi);
+    border-radius:12px; transition:all .2s ease;
+  }
+  .btn-ghost:hover{ background:rgba(255,255,255,0.08); border-color:var(--glass-border-hover); }
+
+  .skel{ position:relative; overflow:hidden; background:rgba(255,255,255,0.06); border-radius:8px; color:transparent !important; }
+  .skel::after{
+    content:""; position:absolute; inset:0; transform:translateX(-100%);
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent);
+    animation:shimmer 1.4s infinite;
+  }
+  @keyframes shimmer{ 100%{ transform:translateX(100%); } }
+
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  .anim-fade-up{ animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both; }
+
+  .field-label{ font-size:11.5px; font-weight:600; color:var(--text-mid); margin-bottom:6px; display:block; }
+  .field-input{
+    width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--glass-border);
+    border-radius:12px; padding:10px 14px; font-size:13px; color:var(--text-hi);
+  }
+  .field-input:focus{ outline:none; border-color:var(--glass-border-hover); background:rgba(255,255,255,0.06); }
+
+  .switch{
+    position:relative; width:44px; height:24px; border-radius:99px; background:rgba(255,255,255,.16); transition:.2s;
+  }
+  .switch::after{
+    content:""; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%;
+    background:#fff; transition:.2s;
+  }
+  .switch.active{ background:linear-gradient(135deg,var(--amber-soft),var(--amber)); }
+  .switch.active::after{ left:23px; background:#0A0F1C; }
+
+  .strength-wrap{ height:6px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden; }
+  .strength-bar{ height:100%; width:0%; border-radius:99px; transition:width .25s ease, background .25s ease; }
+
+  #liveClock{
+    display:inline-block;
+    min-width:106px;
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+    font-feature-settings:"tnum";
+  }
+
+  @media (max-width: 1024px){
+    #sidebar{ position:fixed; z-index:50; top:0; left:0; height:100vh; transform:translateX(-100%); }
+    body.sidebar-mobile-open #sidebar{ transform:translateX(0); }
+    #mainWrap, body.sidebar-collapsed #mainWrap{ margin-left:0; }
+    #sidebarBackdrop{ display:none; }
+    body.sidebar-mobile-open #sidebarBackdrop{ display:block; }
+  }
+</style>
+</head>
+
+<body class="font-body">
+<div class="blueprint"></div>
+
+<div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden"></div>
+
+<aside id="sidebar" class="fixed top-0 left-0 h-screen z-50 flex flex-col glass-strong border-r border-white/5">
+  <div class="flex items-center gap-3 px-5 h-[76px] shrink-0 border-b border-white/5">
+    <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-glow-amber">
+      <i data-lucide="hard-hat" class="w-5 h-5 text-ink-900"></i>
+    </div>
+    <div id="brandText" class="sidebar-label leading-tight overflow-hidden">
+      <p class="font-display font-bold text-[15px] text-white tracking-tight">ABASHON</p>
+      <p class="text-[10.5px] text-[var(--text-mid)] tracking-wide">Consultancy &amp; Construction</p>
+    </div>
+  </div>
+
+  <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4">
+    <p class="sidebar-label px-6 mb-2 text-[10.5px] font-semibold tracking-[.14em] text-[var(--text-low)] uppercase">Workspace</p>
+    <a href="employee-dashboard.html" data-page="dashboard" class="nav-item">
+      <i data-lucide="layout-dashboard" class="w-[18px] h-[18px] shrink-0"></i><span class="sidebar-label">Dashboard</span>
+    </a>
+    <a href="employee-profile.html" data-page="profile" class="nav-item">
+      <i data-lucide="user-circle-2" class="w-[18px] h-[18px] shrink-0"></i><span class="sidebar-label">My Profile</span>
+    </a>
+    <a href="attendance.html" data-page="attendance" class="nav-item">
+      <i data-lucide="calendar-check-2" class="w-[18px] h-[18px] shrink-0"></i><span class="sidebar-label">Attendance</span>
+    </a>
+    <a href="my-tasks.html" data-page="tasks" class="nav-item">
+      <i data-lucide="list-checks" class="w-[18px] h-[18px] shrink-0"></i><span class="sidebar-label">My Tasks</span>
+    </a>
+    <a href="employee-salary.html" data-page="salary" class="nav-item">
+      <i data-lucide="wallet" class="w-[18px] h-[18px] shrink-0"></i><span class="sidebar-label">Salary</span>
+    </a>
+    <a href="leave-request.html" data-page="leave" class="nav-item">
+      <i data-lucide="plane" class="w-[18px] h-[18px] shrink-0"></i><span class="sidebar-label">Leave Request</span>
+    </a>
+    <a href="notifications.html" data-page="notifications" class="nav-item">
+      <i data-lucide="bell" class="w-[18px] h-[18px] shrink-0"></i><span class="sidebar-label">Notifications</span>
+    </a>
+
+    <p class="sidebar-label px-6 mt-5 mb-2 text-[10.5px] font-semibold tracking-[.14em] text-[var(--text-low)] uppercase">System</p>
+    <a href="settings.html" data-page="settings" class="nav-item active">
+      <i data-lucide="settings" class="w-[18px] h-[18px] shrink-0"></i><span class="sidebar-label">Settings</span>
+    </a>
+    <button id="logoutBtn" class="nav-item w-[calc(100%-24px)] text-left">
+      <i data-lucide="log-out" class="w-[18px] h-[18px] shrink-0"></i><span class="sidebar-label">Logout</span>
+    </button>
+  </nav>
+
+  <div class="p-3 border-t border-white/5 shrink-0">
+    <button id="collapseBtn" class="nav-item w-full justify-center lg:justify-start">
+      <i data-lucide="panel-left-close" class="w-[18px] h-[18px] shrink-0"></i><span class="sidebar-label">Collapse</span>
+    </button>
+  </div>
+</aside>
+
+<div id="mainWrap" class="relative z-10 min-h-screen flex flex-col">
+  <header id="navbar" class="sticky top-0 z-30 h-[76px] shrink-0 glass-strong border-b border-white/5 flex items-center justify-between gap-4 px-4 lg:px-8">
+    <div class="flex items-center gap-3 min-w-0">
+      <button id="mobileMenuBtn" class="lg:hidden btn-ghost w-10 h-10 flex items-center justify-center shrink-0">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+      <div class="hidden md:flex items-center gap-2.5 glass px-4 py-2.5 w-72 xl:w-96">
+        <i data-lucide="search" class="w-4 h-4 text-[var(--text-low)] shrink-0"></i>
+        <input type="text" placeholder="Search employees, tasks, documents…" class="bg-transparent text-sm w-full text-[var(--text-hi)]" />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 lg:gap-3 shrink-0">
+      <div class="hidden md:flex flex-col items-end leading-tight mr-1">
+        <span id="liveClock" class="font-mono text-[15px] font-semibold text-amber-400 tracking-wider">--:--:--</span>
+        <span id="liveDate" class="text-[11px] text-[var(--text-mid)]">Loading date…</span>
+      </div>
+
+      <div class="hidden md:block w-px h-8 bg-white/10 mx-1"></div>
+
+      <button id="themeToggleBtn" class="btn-ghost w-10 h-10 flex items-center justify-center" title="Toggle theme">
+        <i data-lucide="moon" class="w-[18px] h-[18px]"></i>
+      </button>
+
+      <button id="notifBellBtn" class="btn-ghost relative w-10 h-10 flex items-center justify-center" title="Notifications">
+        <i data-lucide="bell" class="w-[18px] h-[18px]"></i>
+        <span id="notifBadge" class="hidden absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[10px] font-bold flex items-center justify-center text-white">0</span>
+      </button>
+
+      <div class="hidden md:block w-px h-8 bg-white/10 mx-1"></div>
+
+      <button id="profileMenuBtn" class="flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full glass hover:border-amber-500/30 transition-colors">
+        <img id="navProfilePhoto" src="" alt="" class="w-9 h-9 rounded-full object-cover skel bg-ink-700" />
+        <div class="hidden sm:block text-left leading-tight">
+          <p id="navProfileName" class="text-[13px] font-semibold text-white skel rounded w-24">&nbsp;</p>
+          <p id="navProfileRole" class="text-[11px] text-[var(--text-mid)] skel rounded w-16 mt-0.5">&nbsp;</p>
+        </div>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--text-mid)] hidden sm:block"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 px-4 lg:px-8 py-6 lg:py-8 max-w-[1680px] w-full mx-auto">
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-6 anim-fade-up">
+      <div>
+        <p class="text-[11px] font-semibold tracking-[.16em] text-amber-400 uppercase mb-1">Employee Workspace</p>
+        <h1 class="font-display text-2xl lg:text-[28px] font-bold text-white">Settings</h1>
+      </div>
+      <div class="flex items-center gap-2 text-[13px] text-[var(--text-mid)]">
+        <i data-lucide="sliders-horizontal" class="w-4 h-4 text-amber-400"></i>
+        <span id="settingsStatus">Loading settings…</span>
+      </div>
+    </div>
+
+    <section class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5 anim-fade-up">
+      <div class="glass glass-card p-4 text-center"><p class="text-[11px] text-[var(--text-mid)]">Profile Completion</p><p id="stProfile" class="font-display text-xl text-white skel rounded w-10 mx-auto">&nbsp;</p></div>
+      <div class="glass glass-card p-4 text-center"><p class="text-[11px] text-[var(--text-mid)]">Security Score</p><p id="stSecurity" class="font-display text-xl text-cyan-300 skel rounded w-10 mx-auto">&nbsp;</p></div>
+      <div class="glass glass-card p-4 text-center"><p class="text-[11px] text-[var(--text-mid)]">Notification Status</p><p id="stNotify" class="font-display text-xl text-amber-300 skel rounded w-10 mx-auto">&nbsp;</p></div>
+      <div class="glass glass-card p-4 text-center"><p class="text-[11px] text-[var(--text-mid)]">Account Status</p><p id="stAccount" class="font-display text-xl text-green-400 skel rounded w-10 mx-auto">&nbsp;</p></div>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <!-- Profile Settings -->
+      <section class="lg:col-span-6 glass glass-card p-6 anim-fade-up">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Profile Settings</h3>
+          <i data-lucide="user-cog" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="flex items-center gap-4 mb-4">
+          <img id="profilePhoto" src="" class="w-16 h-16 rounded-xl object-cover skel bg-ink-700" alt="" />
+          <div>
+            <p id="pfName" class="text-sm font-semibold text-white skel rounded w-28">&nbsp;</p>
+            <p id="pfDesignation" class="text-[12px] text-[var(--text-mid)] skel rounded w-20 mt-1">&nbsp;</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 text-[13px]">
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Full Name</p><input id="inFullName" class="field-input" /></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Email</p><input id="inEmail" class="field-input" /></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Phone</p><input id="inPhone" class="field-input" /></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Department</p><input id="inDept" class="field-input" readonly /></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Designation</p><input id="inDesig" class="field-input" readonly /></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Employee ID</p><input id="inEmpId" class="field-input font-mono" readonly /></div>
+        </div>
+        <div class="mt-4 flex justify-end"><button id="editProfileBtn" class="btn-primary px-4 py-2 text-[13px]">Edit Profile</button></div>
+      </section>
+
+      <!-- Account Settings -->
+      <section class="lg:col-span-6 glass glass-card p-6 anim-fade-up">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Account Settings</h3>
+          <i data-lucide="key-round" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="grid grid-cols-1 gap-3">
+          <div>
+            <label class="field-label">Current Password</label>
+            <div class="relative"><input id="curPwd" type="password" class="field-input pr-10" /><button type="button" class="absolute right-3 top-2.5 text-[var(--text-mid)]" onclick="togglePwd('curPwd', this)"><i data-lucide="eye" class="w-4 h-4"></i></button></div>
+          </div>
+          <div>
+            <label class="field-label">New Password</label>
+            <div class="relative"><input id="newPwd" type="password" class="field-input pr-10" /><button type="button" class="absolute right-3 top-2.5 text-[var(--text-mid)]" onclick="togglePwd('newPwd', this)"><i data-lucide="eye" class="w-4 h-4"></i></button></div>
+          </div>
+          <div>
+            <label class="field-label">Confirm Password</label>
+            <div class="relative"><input id="confirmPwd" type="password" class="field-input pr-10" /><button type="button" class="absolute right-3 top-2.5 text-[var(--text-mid)]" onclick="togglePwd('confirmPwd', this)"><i data-lucide="eye" class="w-4 h-4"></i></button></div>
+          </div>
+          <div>
+            <p class="text-[11px] text-[var(--text-mid)] mb-1">Password Strength</p>
+            <div class="strength-wrap"><div id="pwdStrengthBar" class="strength-bar"></div></div>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end"><button id="updatePwdBtn" class="btn-primary px-4 py-2 text-[13px]">Update Password</button></div>
+      </section>
+
+      <!-- Preferences -->
+      <section class="lg:col-span-6 glass glass-card p-6 anim-fade-up">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Preferences</h3>
+          <i data-lucide="sliders" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="field-label">Theme</label><select id="prefTheme" class="field-input"><option value="dark">Dark</option><option value="light">Light</option></select></div>
+          <div><label class="field-label">Language</label><select id="prefLang" class="field-input"><option value="en">English</option><option value="bn">Bangla</option></select></div>
+          <div><label class="field-label">Timezone</label><select id="prefTZ" class="field-input"><option value="Asia/Dhaka">Asia/Dhaka</option><option value="UTC">UTC</option></select></div>
+          <div><label class="field-label">Date Format</label><select id="prefDateFmt" class="field-input"><option value="dd-mm-yyyy">DD-MM-YYYY</option><option value="mm-dd-yyyy">MM-DD-YYYY</option></select></div>
+          <div><label class="field-label">Time Format</label><select id="prefTimeFmt" class="field-input"><option value="12h">12 Hour</option><option value="24h">24 Hour</option></select></div>
+        </div>
+      </section>
+
+      <!-- Notification Preferences -->
+      <section class="lg:col-span-6 glass glass-card p-6 anim-fade-up">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Notification Preferences</h3>
+          <i data-lucide="bell-ring" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="space-y-3" id="notifPrefList">
+          <div class="flex items-center justify-between"><span class="text-[13px] text-[var(--text-mid)]">Email Notifications</span><button class="switch" data-pref="email_notifications"></button></div>
+          <div class="flex items-center justify-between"><span class="text-[13px] text-[var(--text-mid)]">Task Notifications</span><button class="switch" data-pref="task_notifications"></button></div>
+          <div class="flex items-center justify-between"><span class="text-[13px] text-[var(--text-mid)]">Attendance Alerts</span><button class="switch" data-pref="attendance_alerts"></button></div>
+          <div class="flex items-center justify-between"><span class="text-[13px] text-[var(--text-mid)]">Salary Notifications</span><button class="switch" data-pref="salary_notifications"></button></div>
+          <div class="flex items-center justify-between"><span class="text-[13px] text-[var(--text-mid)]">Leave Notifications</span><button class="switch" data-pref="leave_notifications"></button></div>
+          <div class="flex items-center justify-between"><span class="text-[13px] text-[var(--text-mid)]">System Notifications</span><button class="switch" data-pref="system_notifications"></button></div>
+        </div>
+      </section>
+
+      <!-- Security -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up">
+        <h3 class="font-display font-semibold text-white text-[15px] mb-4">Security</h3>
+        <div class="space-y-2.5 text-[13px]">
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Last Login</span><span id="secLastLogin">—</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Current Session</span><span class="badge badge-green">Active</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Two-factor Auth</span><span class="badge badge-amber">UI Ready</span></div>
+        </div>
+        <div class="mt-4 space-y-2">
+          <button id="logoutOtherBtn" class="btn-ghost w-full py-2 text-[12.5px]">Logout From Other Devices</button>
+        </div>
+      </section>
+
+      <!-- Privacy -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up">
+        <h3 class="font-display font-semibold text-white text-[15px] mb-4">Privacy</h3>
+        <div class="space-y-3">
+          <div><label class="field-label">Profile Visibility</label><select id="privacyProfile" class="field-input"><option value="company">Company</option><option value="private">Private</option></select></div>
+          <div><label class="field-label">Activity Visibility</label><select id="privacyActivity" class="field-input"><option value="manager">Manager</option><option value="private">Private</option></select></div>
+          <div><label class="field-label">Contact Visibility</label><select id="privacyContact" class="field-input"><option value="team">Team</option><option value="private">Private</option></select></div>
+        </div>
+      </section>
+
+      <!-- Quick Actions -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up">
+        <h3 class="font-display font-semibold text-white text-[15px] mb-4">Quick Actions</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="saveSettingsBtn" class="btn-primary py-2 text-[12.5px]">Save Settings</button>
+          <button id="resetSettingsBtn" class="btn-ghost py-2 text-[12.5px]">Reset Changes</button>
+          <button id="refreshSettingsBtn" class="btn-ghost py-2 text-[12.5px]">Refresh</button>
+          <button id="logoutNowBtn" class="btn-ghost py-2 text-[12.5px]">Logout</button>
+        </div>
+      </section>
+
+      <!-- Charts -->
+      <section class="lg:col-span-6 glass glass-card p-6 anim-fade-up">
+        <h3 class="font-display font-semibold text-white text-[15px] mb-3">Profile Completion Progress</h3>
+        <div class="h-52"><canvas id="completionChart"></canvas></div>
+      </section>
+
+      <section class="lg:col-span-6 glass glass-card p-6 anim-fade-up">
+        <h3 class="font-display font-semibold text-white text-[15px] mb-3">Account Activity Overview</h3>
+        <div class="h-52"><canvas id="activityChart"></canvas></div>
+      </section>
+    </div>
+
+    <footer class="mt-8 pb-4 text-center text-[12px] text-[var(--text-low)]">
+      ABASHON Consultancy &amp; Construction — Employee Management System
+    </footer>
+  </main>
+</div>
+
+<div id="toastContainer" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2.5 w-[320px] max-w-[90vw]"></div>
+
+<script>
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const AppState = {
+  session: null,
+  employee: null,
+  settingsRow: null,
+  charts: {},
+  defaults: {
+    theme:'dark', language:'en', timezone:'Asia/Dhaka', date_format:'dd-mm-yyyy', time_format:'12h',
+    email_notifications:true, task_notifications:true, attendance_alerts:true, salary_notifications:true, leave_notifications:true, system_notifications:true,
+    profile_visibility:'company', activity_visibility:'manager', contact_visibility:'team'
+  }
+};
+
+function $(id){ return document.getElementById(id); }
+function unskel(el){ if (el) el.classList.remove('skel'); }
+
+function showToast(message, type){
+  type = type || 'info';
+  const colors = {
+    success: 'border-green-500/30 text-green-400',
+    error: 'border-red-500/30 text-red-400',
+    info: 'border-amber-500/30 text-amber-400',
+  };
+  const icons = { success: 'check-circle-2', error: 'alert-circle', info: 'info' };
+  const toast = document.createElement('div');
+  toast.className = 'glass-strong rounded-xl px-4 py-3 flex items-center gap-2.5 border anim-fade-up shadow-glass ' + (colors[type] || colors.info);
+  toast.innerHTML = '<i data-lucide="' + (icons[type] || icons.info) + '" class="w-4 h-4 shrink-0"></i>' +
+    '<span class="text-[13px] text-[var(--text-hi)] flex-1">' + message + '</span>';
+  $('toastContainer').appendChild(toast);
+  lucide.createIcons();
+  setTimeout(() => toast.remove(), 3500);
+}
+
+async function guardSession(){
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error || !data.session){
+    window.location.href = 'employee-login.html';
+    return null;
+  }
+  AppState.session = data.session;
+  return data.session;
+}
+
+function tickClock(){
+  const now = new Date();
+  $('liveClock').textContent = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
+  $('liveDate').textContent = now.toLocaleDateString(undefined, { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+
+async function loadEmployeeProfile(){
+  const userId = AppState.session.user.id;
+  const { data, error } = await supabaseClient
+    .from('employees')
+    .select('*')
+    .eq('auth_user_id', userId)
+    .single();
+
+  if (error || !data){
+    showToast('Could not load employee profile.', 'error');
+    return;
+  }
+  AppState.employee = data;
+
+  $('navProfilePhoto').src = data.photo_url || ''; unskel($('navProfilePhoto'));
+  $('navProfileName').textContent = data.full_name || '—'; unskel($('navProfileName'));
+  $('navProfileRole').textContent = data.designation || '—'; unskel($('navProfileRole'));
+
+  $('profilePhoto').src = data.photo_url || ''; unskel($('profilePhoto'));
+  $('pfName').textContent = data.full_name || '—'; unskel($('pfName'));
+  $('pfDesignation').textContent = data.designation || '—'; unskel($('pfDesignation'));
+
+  $('inFullName').value = data.full_name || '';
+  $('inEmail').value = data.email || '';
+  $('inPhone').value = data.phone || '';
+  $('inDept').value = data.department || '';
+  $('inDesig').value = data.designation || '';
+  $('inEmpId').value = data.employee_id || '';
+
+  $('secLastLogin').textContent = AppState.session.user.last_sign_in_at
+    ? new Date(AppState.session.user.last_sign_in_at).toLocaleString()
+    : '—';
+
+  $('stAccount').textContent = ((data.employment_status || 'active').toLowerCase() === 'active') ? 'Active' : (data.employment_status || 'Unknown');
+  unskel($('stAccount'));
+
+  renderProfileStats(data);
+}
+
+function renderProfileStats(data){
+  const required = ['full_name','email','phone','department','designation','photo_url'];
+  const filled = required.filter(k => !!data[k]).length;
+  const completion = Math.round((filled / required.length) * 100);
+  $('stProfile').textContent = completion + '%'; unskel($('stProfile'));
+
+  const security = Math.min(100, (completion >= 80 ? 75 : 55) + (AppState.session?.user?.last_sign_in_at ? 15 : 0));
+  $('stSecurity').textContent = security + '%'; unskel($('stSecurity'));
+
+  $('settingsStatus').textContent = 'Settings loaded';
+}
+
+async function loadSettingsRow(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+
+  let { data, error } = await supabaseClient
+    .from('employee_settings')
+    .select('*')
+    .eq('employee_id', empId)
+    .maybeSingle();
+
+  if (error){
+    // if table unavailable or row not found, fallback defaults without hard fail
+    AppState.settingsRow = { ...AppState.defaults, employee_id: empId };
+    hydrateSettingsUI();
+    return;
+  }
+
+  if (!data){
+    const payload = { employee_id: empId, ...AppState.defaults };
+    const ins = await supabaseClient.from('employee_settings').insert(payload).select('*').maybeSingle();
+    data = ins.data || payload;
+  }
+
+  AppState.settingsRow = { ...AppState.defaults, ...(data || {}) };
+  hydrateSettingsUI();
+}
+
+function hydrateSettingsUI(){
+  const s = AppState.settingsRow || AppState.defaults;
+
+  $('prefTheme').value = s.theme || 'dark';
+  $('prefLang').value = s.language || 'en';
+  $('prefTZ').value = s.timezone || 'Asia/Dhaka';
+  $('prefDateFmt').value = s.date_format || 'dd-mm-yyyy';
+  $('prefTimeFmt').value = s.time_format || '12h';
+
+  $('privacyProfile').value = s.profile_visibility || 'company';
+  $('privacyActivity').value = s.activity_visibility || 'manager';
+  $('privacyContact').value = s.contact_visibility || 'team';
+
+  const keys = ['email_notifications','task_notifications','attendance_alerts','salary_notifications','leave_notifications','system_notifications'];
+  keys.forEach(k => {
+    const btn = document.querySelector('.switch[data-pref="'+k+'"]');
+    if (!btn) return;
+    btn.classList.toggle('active', !!s[k]);
+  });
+
+  const enabled = keys.filter(k => !!s[k]).length;
+  $('stNotify').textContent = enabled + '/6'; unskel($('stNotify'));
+
+  renderCharts();
+}
+
+function chartDefaults(){
+  Chart.defaults.color = '#93A0B4';
+  Chart.defaults.font.family = 'Inter';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+}
+
+function renderCharts(){
+  const completion = parseInt(($('stProfile').textContent || '0').replace('%','')) || 0;
+  const remain = Math.max(0, 100 - completion);
+
+  if (AppState.charts.completion) AppState.charts.completion.destroy();
+  AppState.charts.completion = new Chart($('completionChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Completed','Remaining'],
+      datasets: [{
+        data: [completion, remain],
+        backgroundColor: ['#F5A524', 'rgba(255,255,255,0.08)'],
+        borderColor: '#0D1424',
+        borderWidth: 3,
+      }],
+    },
+    options: { responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{ legend:{ position:'bottom' } } }
+  });
+
+  if (AppState.charts.activity) AppState.charts.activity.destroy();
+  AppState.charts.activity = new Chart($('activityChart'), {
+    type: 'line',
+    data: {
+      labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets: [{
+        label: 'Security Activity',
+        data: [2,4,3,5,4,2,3],
+        borderColor: '#22D3EE',
+        backgroundColor: 'rgba(34,211,238,.12)',
+        fill: true,
+        tension: .35,
+        pointRadius: 3,
+      }],
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } }
+  });
+}
+
+function computePasswordStrength(v){
+  let s = 0;
+  if (v.length >= 8) s += 25;
+  if (/[A-Z]/.test(v)) s += 20;
+  if (/[0-9]/.test(v)) s += 20;
+  if (/[^A-Za-z0-9]/.test(v)) s += 20;
+  if (v.length >= 12) s += 15;
+  return Math.min(100, s);
+}
+
+function renderPasswordStrength(){
+  const v = $('newPwd').value || '';
+  const score = computePasswordStrength(v);
+  const bar = $('pwdStrengthBar');
+  bar.style.width = score + '%';
+  bar.style.background = score >= 80 ? '#22C55E' : score >= 55 ? '#F5A524' : '#EF4444';
+}
+
+function togglePwd(id, btn){
+  const el = $(id);
+  if (!el) return;
+  el.type = el.type === 'password' ? 'text' : 'password';
+  const icon = btn.querySelector('i');
+  if (icon) icon.setAttribute('data-lucide', el.type === 'password' ? 'eye' : 'eye-off');
+  lucide.createIcons();
+}
+
+async function updateProfileInfo(){
+  if (!AppState.employee?.id) return;
+
+  const payload = {
+    full_name: $('inFullName').value.trim(),
+    email: $('inEmail').value.trim(),
+    phone: $('inPhone').value.trim(),
+  };
+
+  const { error } = await supabaseClient.from('employees').update(payload).eq('id', AppState.employee.id);
+  if (error){ showToast('Failed to update profile settings.', 'error'); return false; }
+  showToast('Profile settings updated.', 'success');
+  return true;
+}
+
+async function updateSettingsRow(){
+  if (!AppState.employee?.id) return false;
+
+  const prefs = {
+    theme: $('prefTheme').value,
+    language: $('prefLang').value,
+    timezone: $('prefTZ').value,
+    date_format: $('prefDateFmt').value,
+    time_format: $('prefTimeFmt').value,
+    profile_visibility: $('privacyProfile').value,
+    activity_visibility: $('privacyActivity').value,
+    contact_visibility: $('privacyContact').value,
+  };
+
+  document.querySelectorAll('.switch[data-pref]').forEach(btn => {
+    prefs[btn.dataset.pref] = btn.classList.contains('active');
+  });
+
+  const { error } = await supabaseClient
+    .from('employee_settings')
+    .upsert({ employee_id: AppState.employee.id, ...prefs }, { onConflict: 'employee_id' });
+
+  if (error){ showToast('Failed to save preferences.', 'error'); return false; }
+
+  AppState.settingsRow = { ...(AppState.settingsRow || {}), ...prefs };
+  $('stNotify').textContent =
+    ['email_notifications','task_notifications','attendance_alerts','salary_notifications','leave_notifications','system_notifications']
+      .filter(k => !!AppState.settingsRow[k]).length + '/6';
+  showToast('Preferences saved.', 'success');
+  return true;
+}
+
+async function updatePassword(){
+  const cur = $('curPwd').value;
+  const np = $('newPwd').value;
+  const cp = $('confirmPwd').value;
+
+  if (!cur || !np || !cp){ showToast('Please complete all password fields.', 'error'); return; }
+  if (np !== cp){ showToast('New password and confirm password do not match.', 'error'); return; }
+  if (computePasswordStrength(np) < 55){ showToast('Please choose a stronger password.', 'error'); return; }
+
+  const { error } = await supabaseClient.auth.updateUser({ password: np });
+  if (error){ showToast('Password update failed.', 'error'); return; }
+
+  $('curPwd').value = ''; $('newPwd').value = ''; $('confirmPwd').value = '';
+  renderPasswordStrength();
+  showToast('Password updated successfully.', 'success');
+}
+
+function resetChanges(){
+  if (!AppState.employee) return;
+  loadEmployeeProfile();
+  hydrateSettingsUI();
+  $('curPwd').value = ''; $('newPwd').value = ''; $('confirmPwd').value = '';
+  renderPasswordStrength();
+  showToast('Changes reset.', 'info');
+}
+
+async function logoutOtherDevices(){
+  const { error } = await supabaseClient.auth.signOut({ scope: 'global' });
+  if (error){ showToast('Failed to logout other devices.', 'error'); return; }
+  showToast('Logged out from other devices.', 'success');
+}
+
+function initUIControls(){
+  $('collapseBtn').addEventListener('click', () => document.body.classList.toggle('sidebar-collapsed'));
+  $('mobileMenuBtn').addEventListener('click', () => document.body.classList.add('sidebar-mobile-open'));
+  $('sidebarBackdrop').addEventListener('click', () => document.body.classList.remove('sidebar-mobile-open'));
+
+  $('themeToggleBtn').addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+    showToast('Theme preference saved.', 'info');
+  });
+
+  document.querySelectorAll('.switch[data-pref]').forEach(btn => {
+    btn.addEventListener('click', () => btn.classList.toggle('active'));
+  });
+
+  $('newPwd').addEventListener('input', renderPasswordStrength);
+  $('confirmPwd').addEventListener('input', renderPasswordStrength);
+
+  $('editProfileBtn').addEventListener('click', updateProfileInfo);
+  $('updatePwdBtn').addEventListener('click', updatePassword);
+  $('saveSettingsBtn').addEventListener('click', async () => {
+    const ok1 = await updateProfileInfo();
+    const ok2 = await updateSettingsRow();
+    if (ok1 || ok2) showToast('Settings saved successfully.', 'success');
+  });
+  $('resetSettingsBtn').addEventListener('click', resetChanges);
+  $('refreshSettingsBtn').addEventListener('click', async () => {
+    await loadEmployeeProfile();
+    await loadSettingsRow();
+    showToast('Settings refreshed.', 'success');
+  });
+
+  $('logoutOtherBtn').addEventListener('click', logoutOtherDevices);
+
+  $('logoutNowBtn').addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'employee-login.html';
+  });
+
+  $('logoutBtn').addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'employee-login.html';
+  });
+}
+
+async function bootstrap(){
+  lucide.createIcons();
+  chartDefaults();
+  initUIControls();
+
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  const session = await guardSession();
+  if (!session) return;
+
+  await loadEmployeeProfile();
+  await loadSettingsRow();
+
+  lucide.createIcons();
+}
+
+document.addEventListener('DOMContentLoaded', bootstrap);
+</script>
+</body>
+</html>
