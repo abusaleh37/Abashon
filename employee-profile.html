@@ -1,240 +1,1135 @@
-<!-- employee-profile.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Employee Profile - ABASHON Consultancy & Construction</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>ABASHON | My Profile</title>
+<meta name="description" content="ABASHON Consultancy & Construction — Employee Profile" />
 
-  <script src="https://cdn.tailwindcss.com"></script>
+<!-- ============================================================
+     FONTS
+============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    body {
-      background: radial-gradient(circle at top, #0f172a, #020617);
-    }
-    .glass {
-      background: rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-  </style>
-</head>
-
-<body class="text-white min-h-screen flex">
-
-<!-- Sidebar -->
-<aside class="w-64 min-h-screen glass p-5 hidden md:block">
-  <h1 class="text-xl font-bold mb-8">ABASHON</h1>
-
-  <nav class="space-y-4 text-sm">
-    <a href="employee-dashboard.html" class="block hover:text-blue-400">Dashboard</a>
-    <a href="employee-profile.html" class="block text-blue-400 font-semibold">My Profile</a>
-    <a href="#" class="block hover:text-blue-400">Attendance</a>
-    <a href="#" class="block hover:text-blue-400">My Tasks</a>
-    <a href="#" class="block hover:text-blue-400">Salary</a>
-    <a href="#" class="block hover:text-blue-400">Leave Request</a>
-    <a href="#" class="block hover:text-blue-400">Notifications</a>
-    <a href="employee-login.html" class="block hover:text-red-400">Logout</a>
-  </nav>
-</aside>
-
-<!-- Main -->
-<main class="flex-1 p-6">
-
-  <!-- Top Bar -->
-  <div class="flex justify-between items-center mb-6 glass p-4 rounded-xl">
-    <h2 class="text-lg font-semibold">Employee Profile</h2>
-    <button id="logoutBtn" class="text-red-400 hover:text-red-300">Logout</button>
-  </div>
-
-  <!-- Message -->
-  <div id="msgBox" class="mb-4 hidden p-3 rounded-lg text-sm"></div>
-
-  <!-- Profile Card -->
-  <div class="glass rounded-2xl p-6 max-w-3xl mx-auto">
-
-    <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
-
-      <div class="text-center">
-        <img id="profilePhoto" class="w-32 h-32 rounded-full border-2 border-blue-500 object-cover"
-             src="https://via.placeholder.com/150" />
-        <input id="photoInput" type="text" placeholder="Profile Photo URL"
-               class="mt-3 w-full p-2 rounded bg-white/10 text-xs hidden"/>
-      </div>
-
-      <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-
-        <div>
-          <label class="text-gray-400">Full Name</label>
-          <p id="fullName" class="font-semibold"></p>
-        </div>
-
-        <div>
-          <label class="text-gray-400">Email</label>
-          <p id="email"></p>
-        </div>
-
-        <div>
-          <label class="text-gray-400">Phone</label>
-          <p id="phoneText"></p>
-          <input id="phoneInput" class="w-full mt-1 p-2 rounded bg-white/10 hidden"/>
-        </div>
-
-        <div>
-          <label class="text-gray-400">Department</label>
-          <p id="department"></p>
-        </div>
-
-        <div>
-          <label class="text-gray-400">Designation</label>
-          <p id="designation"></p>
-        </div>
-
-        <div>
-          <label class="text-gray-400">Joining Date</label>
-          <p id="joiningDate"></p>
-        </div>
-
-        <div class="md:col-span-2">
-          <label class="text-gray-400">Address</label>
-          <p id="addressText"></p>
-          <textarea id="addressInput" class="w-full mt-1 p-2 rounded bg-white/10 hidden"></textarea>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Buttons -->
-    <div class="mt-6 flex gap-3">
-      <button id="editBtn" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500">Edit Profile</button>
-      <button id="saveBtn" class="px-4 py-2 bg-green-600 rounded hover:bg-green-500 hidden">Save Changes</button>
-      <button id="cancelBtn" class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-500 hidden">Cancel</button>
-    </div>
-
-  </div>
-</main>
-
+<!-- ============================================================
+     TAILWIND CSS (CDN)
+============================================================ -->
+<script src="https://cdn.tailwindcss.com"></script>
 <script>
-  // =======================
-  // Supabase Config (ONLY ONE CLIENT)
-  // =======================
-  const SUPABASE_URL = "YOUR_SUPABASE_URL";
-  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
-
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  let currentUser = null;
-  let employeeData = null;
-
-  const msgBox = document.getElementById("msgBox");
-
-  function showMsg(text, type="success") {
-    msgBox.classList.remove("hidden");
-    msgBox.textContent = text;
-
-    if(type === "success") {
-      msgBox.className = "mb-4 p-3 rounded-lg text-sm bg-green-600/30 text-green-300";
-    } else {
-      msgBox.className = "mb-4 p-3 rounded-lg text-sm bg-red-600/30 text-red-300";
-    }
-
-    setTimeout(() => msgBox.classList.add("hidden"), 3000);
-  }
-
-  function toggleEdit(mode) {
-    document.getElementById("phoneText").classList.toggle("hidden", mode);
-    document.getElementById("addressText").classList.toggle("hidden", mode);
-
-    document.getElementById("phoneInput").classList.toggle("hidden", !mode);
-    document.getElementById("addressInput").classList.toggle("hidden", !mode);
-    document.getElementById("photoInput").classList.toggle("hidden", !mode);
-
-    document.getElementById("editBtn").classList.toggle("hidden", mode);
-    document.getElementById("saveBtn").classList.toggle("hidden", !mode);
-    document.getElementById("cancelBtn").classList.toggle("hidden", !mode);
-  }
-
-  async function checkSession() {
-    const { data } = await supabase.auth.getUser();
-
-    if(!data.user) {
-      window.location.href = "employee-login.html";
-      return;
-    }
-
-    currentUser = data.user;
-    loadProfile();
-  }
-
-  async function loadProfile() {
-    const { data, error } = await supabase
-      .from("Employees")
-      .select("*")
-      .eq("auth_user_id", currentUser.id)
-      .single();
-
-    if(error) {
-      showMsg("Failed to load profile", "error");
-      return;
-    }
-
-    employeeData = data;
-
-    document.getElementById("fullName").textContent = data.full_name || "";
-    document.getElementById("email").textContent = data.email || "";
-    document.getElementById("phoneText").textContent = data.phone || "";
-    document.getElementById("department").textContent = data.department || "";
-    document.getElementById("designation").textContent = data.designation || "";
-    document.getElementById("joiningDate").textContent = data.joining_date || "";
-    document.getElementById("addressText").textContent = data.address || "";
-    document.getElementById("profilePhoto").src = data.profile_photo || "https://via.placeholder.com/150";
-
-    document.getElementById("phoneInput").value = data.phone || "";
-    document.getElementById("addressInput").value = data.address || "";
-    document.getElementById("photoInput").value = data.profile_photo || "";
-  }
-
-  document.getElementById("editBtn").addEventListener("click", () => {
-    toggleEdit(true);
-  });
-
-  document.getElementById("cancelBtn").addEventListener("click", () => {
-    toggleEdit(false);
-    loadProfile();
-  });
-
-  document.getElementById("saveBtn").addEventListener("click", async () => {
-    const updates = {
-      phone: document.getElementById("phoneInput").value,
-      address: document.getElementById("addressInput").value,
-      profile_photo: document.getElementById("photoInput").value
-    };
-
-    const { error } = await supabase
-      .from("Employees")
-      .update(updates)
-      .eq("auth_user_id", currentUser.id);
-
-    if(error) {
-      showMsg("Update failed!", "error");
-      return;
-    }
-
-    showMsg("Profile updated successfully!");
-    toggleEdit(false);
-    loadProfile();
-  });
-
-  document.getElementById("logoutBtn").addEventListener("click", async () => {
-    await supabase.auth.signOut();
-    window.location.href = "employee-login.html";
-  });
-
-  checkSession();
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+        colors: {
+          ink: {
+            950: '#070B14',
+            900: '#0A0F1C',
+            850: '#0D1424',
+            800: '#131B2E',
+            700: '#1A2338',
+            600: '#243149',
+          },
+          amber: {
+            400: '#FBC56A',
+            500: '#F5A524',
+            600: '#D98A0F',
+          },
+        },
+        boxShadow: {
+          glass: '0 8px 32px rgba(0,0,0,0.35)',
+          'glow-amber': '0 0 0 1px rgba(245,165,36,0.25), 0 0 24px rgba(245,165,36,0.12)',
+        },
+      },
+    },
+  };
 </script>
 
+<!-- ============================================================
+     ICONS / CHARTS / SUPABASE
+============================================================ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- ============================================================
+     GLOBAL DESIGN SYSTEM — identical to employee-dashboard.html
+     (this block must stay byte-for-byte the same across every page)
+============================================================ -->
+<style>
+  :root{
+    --bg-0:#070B14;
+    --bg-1:#0A0F1C;
+    --bg-2:#0D1424;
+    --bg-3:#131B2E;
+    --glass-bg: rgba(255,255,255,0.045);
+    --glass-bg-strong: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.09);
+    --glass-border-hover: rgba(245,165,36,0.35);
+    --line-blueprint: rgba(148,178,255,0.055);
+    --amber: #F5A524;
+    --amber-soft: #FBC56A;
+    --blue: #3B82F6;
+    --cyan: #22D3EE;
+    --green: #22C55E;
+    --red: #EF4444;
+    --violet:#8B7CF6;
+    --text-hi:#EDF1F7;
+    --text-mid:#93A0B4;
+    --text-low:#5C6B82;
+    --sidebar-w: 272px;
+    --sidebar-w-collapsed: 84px;
+    --navbar-h: 76px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    background:
+      radial-gradient(1100px 600px at 85% -10%, rgba(245,165,36,0.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 20%, rgba(59,130,246,0.08), transparent 55%),
+      var(--bg-0);
+    color:var(--text-hi);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .blueprint{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line-blueprint) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-blueprint) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(1200px 800px at 30% 10%, #000 0%, transparent 75%);
+            mask-image: radial-gradient(1200px 800px at 30% 10%, #000 0%, transparent 75%);
+    opacity:.7;
+  }
+
+  h1,h2,h3,h4,.font-display{ font-family:'Space Grotesk', sans-serif; letter-spacing:-0.01em; }
+  .font-mono{ font-family:'JetBrains Mono', monospace; }
+
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:rgba(245,165,36,0.25); border-radius:99px; }
+  ::-webkit-scrollbar-thumb:hover{ background:rgba(245,165,36,0.45); }
+
+  .glass{
+    background: var(--glass-bg);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    border-radius: 20px;
+  }
+  .glass-strong{
+    background: var(--glass-bg-strong);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-radius: 20px;
+  }
+  .glass-card{
+    position:relative;
+    overflow:hidden;
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .35s ease, box-shadow .35s ease;
+  }
+  .glass-card::before{
+    content:"";
+    position:absolute; inset:0; border-radius:inherit; padding:1px;
+    background: linear-gradient(135deg, rgba(245,165,36,0.35), rgba(255,255,255,0) 35%, rgba(59,130,246,0.25) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity:0; transition:opacity .35s ease;
+    pointer-events:none;
+  }
+  .glass-card:hover{ transform:translateY(-3px); box-shadow:0 16px 40px rgba(0,0,0,0.45); }
+  .glass-card:hover::before{ opacity:1; }
+
+  .divider-blueprint{
+    height:1px;
+    background: repeating-linear-gradient(90deg, rgba(245,165,36,0.35) 0 6px, transparent 6px 12px);
+  }
+
+  #sidebar{
+    width:var(--sidebar-w);
+    transition: width .3s cubic-bezier(.2,.8,.2,1), transform .3s ease;
+  }
+  body.sidebar-collapsed #sidebar{ width:var(--sidebar-w-collapsed); }
+  body.sidebar-collapsed .sidebar-label{ opacity:0; width:0; }
+  body.sidebar-collapsed #brandText{ opacity:0; width:0; }
+  #mainWrap{ margin-left:var(--sidebar-w); transition:margin-left .3s cubic-bezier(.2,.8,.2,1); }
+  body.sidebar-collapsed #mainWrap{ margin-left:var(--sidebar-w-collapsed); }
+
+  .nav-item{
+    position:relative;
+    display:flex; align-items:center; gap:14px;
+    padding:11px 16px; margin:2px 12px;
+    border-radius:12px;
+    color:var(--text-mid);
+    font-size:14px; font-weight:500;
+    transition:all .25s ease;
+    white-space:nowrap;
+  }
+  .nav-item:hover{ color:var(--text-hi); background:rgba(255,255,255,0.05); }
+  .nav-item.active{
+    color:#0A0F1C;
+    background: linear-gradient(135deg, var(--amber-soft), var(--amber));
+    box-shadow: 0 6px 18px rgba(245,165,36,0.28);
+    font-weight:600;
+  }
+  .nav-item.active svg{ stroke:#0A0F1C; }
+  .sidebar-label{ transition:opacity .2s ease, width .2s ease; overflow:hidden; }
+
+  .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.02em; }
+  .badge-green{ color:var(--green); background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); }
+  .badge-amber{ color:var(--amber-soft); background:rgba(245,165,36,0.12); border:1px solid rgba(245,165,36,0.28); }
+  .badge-red{ color:var(--red); background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.28); }
+  .badge-blue{ color:#93C5FD; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.28); }
+
+  .btn-primary{
+    background:linear-gradient(135deg, var(--amber-soft), var(--amber));
+    color:#0A0F1C; font-weight:600; border-radius:12px;
+    transition:transform .2s ease, box-shadow .2s ease;
+    box-shadow:0 8px 20px rgba(245,165,36,0.22);
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(245,165,36,0.32); }
+  .btn-primary:active{ transform:translateY(0); }
+
+  .btn-ghost{
+    background:rgba(255,255,255,0.04); border:1px solid var(--glass-border); color:var(--text-hi);
+    border-radius:12px; transition:all .2s ease;
+  }
+  .btn-ghost:hover{ background:rgba(255,255,255,0.08); border-color:var(--glass-border-hover); }
+
+  .btn-danger-ghost{
+    background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.25); color:#FCA5A5;
+    border-radius:12px; transition:all .2s ease;
+  }
+  .btn-danger-ghost:hover{ background:rgba(239,68,68,0.12); border-color:rgba(239,68,68,0.45); }
+
+  .skel{ position:relative; overflow:hidden; background:rgba(255,255,255,0.06); border-radius:8px; color:transparent !important; }
+  .skel::after{
+    content:""; position:absolute; inset:0; transform:translateX(-100%);
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent);
+    animation:shimmer 1.4s infinite;
+  }
+  @keyframes shimmer{ 100%{ transform:translateX(100%); } }
+
+  .ring-svg{ transform:rotate(-90deg); }
+  .ring-bg{ stroke:rgba(255,255,255,0.07); }
+  .ring-fg{ stroke-linecap:round; transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1); }
+
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes scaleIn{ from{ opacity:0; transform:scale(.96); } to{ opacity:1; transform:scale(1); } }
+  @keyframes slideInRight{ from{ opacity:0; transform:translateX(18px); } to{ opacity:1; transform:translateX(0); } }
+  .anim-fade-up{ animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both; }
+  .anim-scale-in{ animation:scaleIn .5s cubic-bezier(.2,.8,.2,1) both; }
+  .anim-fade-in{ animation:fadeIn .6s ease both; }
+  .anim-slide-in{ animation:slideInRight .4s cubic-bezier(.2,.8,.2,1) both; }
+
+  .pulse-dot{ position:relative; }
+  .pulse-dot::after{
+    content:""; position:absolute; inset:-4px; border-radius:99px;
+    border:1.5px solid var(--green); animation:pulseRing 1.8s ease-out infinite;
+  }
+  @keyframes pulseRing{ 0%{ opacity:.9; transform:scale(.7);} 100%{ opacity:0; transform:scale(1.9);} }
+
+  .timeline-line{ background:linear-gradient(180deg, var(--amber), rgba(245,165,36,0)); width:2px; }
+  .scroll-y-fade{ mask-image:linear-gradient(180deg, transparent, #000 8%, #000 92%, transparent); }
+
+  input[type="text"]:focus, input[type="search"]:focus, input[type="email"]:focus, input[type="tel"]:focus, input[type="date"]:focus, textarea:focus, select:focus{ outline:none; border-color: var(--glass-border-hover) !important; }
+  ::placeholder{ color:var(--text-low); }
+
+  .field-input{
+    width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--glass-border);
+    border-radius:12px; padding:10px 14px; font-size:13.5px; color:var(--text-hi);
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .field-input:focus{ background:rgba(255,255,255,0.06); }
+  .field-label{ font-size:11.5px; font-weight:600; color:var(--text-mid); margin-bottom:6px; display:block; }
+
+  /* ---- Cover banner texture (signature: architectural elevation lines) ---- */
+  .cover-banner{
+    background:
+      repeating-linear-gradient(135deg, rgba(245,165,36,0.10) 0 2px, transparent 2px 26px),
+      linear-gradient(120deg, #16233F 0%, #0D1424 55%, #1C1408 130%);
+  }
+
+  /* ---- Modal ---- */
+  #editModalBackdrop{
+    position:fixed; inset:0; z-index:90; background:rgba(4,7,14,0.7); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+
+  @media (max-width: 1024px){
+    #sidebar{ position:fixed; z-index:50; top:0; left:0; height:100vh; transform:translateX(-100%); }
+    body.sidebar-mobile-open #sidebar{ transform:translateX(0); }
+    #mainWrap, body.sidebar-collapsed #mainWrap{ margin-left:0; }
+    #sidebarBackdrop{ display:none; }
+    body.sidebar-mobile-open #sidebarBackdrop{ display:block; }
+  }
+</style>
+</head>
+
+<body class="font-body">
+<div class="blueprint"></div>
+
+<!-- Mobile backdrop -->
+<div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden"></div>
+
+<!-- ============================================================
+     SIDEBAR  (identical to employee-dashboard.html — "My Profile" active)
+============================================================ -->
+<aside id="sidebar" class="fixed top-0 left-0 h-screen z-50 flex flex-col glass-strong border-r border-white/5">
+  <div class="flex items-center gap-3 px-5 h-[76px] shrink-0 border-b border-white/5">
+    <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-glow-amber">
+      <i data-lucide="hard-hat" class="w-5 h-5 text-ink-900"></i>
+    </div>
+    <div id="brandText" class="sidebar-label leading-tight overflow-hidden">
+      <p class="font-display font-bold text-[15px] text-white tracking-tight">ABASHON</p>
+      <p class="text-[10.5px] text-[var(--text-mid)] tracking-wide">Consultancy &amp; Construction</p>
+    </div>
+  </div>
+
+  <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4">
+    <p class="sidebar-label px-6 mb-2 text-[10.5px] font-semibold tracking-[.14em] text-[var(--text-low)] uppercase">Workspace</p>
+    <a href="employee-dashboard.html" data-page="dashboard" class="nav-item">
+      <i data-lucide="layout-dashboard" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Dashboard</span>
+    </a>
+    <a href="employee-profile.html" data-page="profile" class="nav-item active">
+      <i data-lucide="user-circle-2" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">My Profile</span>
+    </a>
+    <a href="attendance.html" data-page="attendance" class="nav-item">
+      <i data-lucide="calendar-check-2" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Attendance</span>
+    </a>
+    <a href="my-tasks.html" data-page="tasks" class="nav-item">
+      <i data-lucide="list-checks" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">My Tasks</span>
+    </a>
+    <a href="employee-salary.html" data-page="salary" class="nav-item">
+      <i data-lucide="wallet" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Salary</span>
+    </a>
+    <a href="leave-request.html" data-page="leave" class="nav-item">
+      <i data-lucide="plane" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Leave Request</span>
+    </a>
+    <a href="notifications.html" data-page="notifications" class="nav-item">
+      <i data-lucide="bell" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Notifications</span>
+    </a>
+
+    <p class="sidebar-label px-6 mt-5 mb-2 text-[10.5px] font-semibold tracking-[.14em] text-[var(--text-low)] uppercase">System</p>
+    <a href="settings.html" data-page="settings" class="nav-item">
+      <i data-lucide="settings" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Settings</span>
+    </a>
+    <button id="logoutBtn" class="nav-item w-[calc(100%-24px)] text-left">
+      <i data-lucide="log-out" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Logout</span>
+    </button>
+  </nav>
+
+  <div class="p-3 border-t border-white/5 shrink-0">
+    <button id="collapseBtn" class="nav-item w-full justify-center lg:justify-start">
+      <i data-lucide="panel-left-close" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Collapse</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN WRAPPER
+============================================================ -->
+<div id="mainWrap" class="relative z-10 min-h-screen flex flex-col">
+
+  <!-- ============================================================
+       NAVBAR (identical to employee-dashboard.html)
+  ============================================================ -->
+  <header id="navbar" class="sticky top-0 z-30 h-[76px] shrink-0 glass-strong border-b border-white/5 flex items-center justify-between gap-4 px-4 lg:px-8">
+    <div class="flex items-center gap-3 min-w-0">
+      <button id="mobileMenuBtn" class="lg:hidden btn-ghost w-10 h-10 flex items-center justify-center shrink-0">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+      <div class="hidden md:flex items-center gap-2.5 glass px-4 py-2.5 w-72 xl:w-96">
+        <i data-lucide="search" class="w-4 h-4 text-[var(--text-low)] shrink-0"></i>
+        <input type="text" placeholder="Search employees, tasks, documents…" class="bg-transparent text-sm w-full text-[var(--text-hi)]" />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 lg:gap-3 shrink-0">
+      <div class="hidden md:flex flex-col items-end leading-tight mr-1">
+        <span id="liveClock" class="font-mono text-[15px] font-semibold text-amber-400 tracking-wider">--:--:--</span>
+        <span id="liveDate" class="text-[11px] text-[var(--text-mid)]">Loading date…</span>
+      </div>
+
+      <div class="hidden md:block w-px h-8 bg-white/10 mx-1"></div>
+
+      <button id="themeToggleBtn" class="btn-ghost w-10 h-10 flex items-center justify-center" title="Toggle theme">
+        <i data-lucide="moon" class="w-[18px] h-[18px]"></i>
+      </button>
+
+      <button id="notifBellBtn" class="btn-ghost relative w-10 h-10 flex items-center justify-center" title="Notifications">
+        <i data-lucide="bell" class="w-[18px] h-[18px]"></i>
+        <span id="notifBadge" class="hidden absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[10px] font-bold flex items-center justify-center text-white">0</span>
+      </button>
+
+      <div class="hidden md:block w-px h-8 bg-white/10 mx-1"></div>
+
+      <button id="profileMenuBtn" class="flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full glass hover:border-amber-500/30 transition-colors">
+        <img id="navProfilePhoto" src="" alt="" class="w-9 h-9 rounded-full object-cover skel bg-ink-700" />
+        <div class="hidden sm:block text-left leading-tight">
+          <p id="navProfileName" class="text-[13px] font-semibold text-white skel rounded w-24">&nbsp;</p>
+          <p id="navProfileRole" class="text-[11px] text-[var(--text-mid)] skel rounded w-16 mt-0.5">&nbsp;</p>
+        </div>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--text-mid)] hidden sm:block"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       PAGE CONTENT — EMPLOYEE PROFILE
+  ============================================================ -->
+  <main class="flex-1 px-4 lg:px-8 py-6 lg:py-8 max-w-[1680px] w-full mx-auto">
+
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-6 anim-fade-up">
+      <div>
+        <p class="text-[11px] font-semibold tracking-[.16em] text-amber-400 uppercase mb-1">Employee Workspace</p>
+        <h1 class="font-display text-2xl lg:text-[28px] font-bold text-white">My Profile</h1>
+      </div>
+      <div id="sessionStatusPill" class="flex items-center gap-2 text-[13px] text-[var(--text-mid)]">
+        <span class="w-2 h-2 rounded-full bg-green-400 pulse-dot"></span> Session active
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+      <!-- ============ 1. LARGE PROFILE HEADER ============ -->
+      <section class="lg:col-span-12 glass glass-card overflow-hidden anim-fade-up">
+        <div class="cover-banner h-32 lg:h-40 relative">
+          <button id="editCoverHint" class="absolute top-4 right-4 btn-ghost text-[12px] px-3 py-2 flex items-center gap-1.5">
+            <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Edit Profile
+          </button>
+        </div>
+        <div class="px-6 lg:px-8 pb-6 -mt-14 lg:-mt-16 flex flex-col md:flex-row md:items-end gap-5">
+          <div class="relative shrink-0 w-28 h-28 lg:w-32 lg:h-32">
+            <img id="headerPhoto" src="" alt="" class="w-full h-full rounded-2xl object-cover border-4 border-[var(--bg-1)] shadow-glow-amber skel bg-ink-700" />
+            <button id="photoUploadBtn" class="absolute -bottom-2 -right-2 w-9 h-9 rounded-full btn-primary flex items-center justify-center" title="Change photo">
+              <i data-lucide="camera" class="w-4 h-4"></i>
+            </button>
+            <input type="file" id="photoFileInput" accept="image/*" class="hidden" />
+          </div>
+          <div class="flex-1 min-w-0 pt-2 md:pt-0">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <h2 id="headerName" class="font-display text-xl lg:text-2xl font-bold text-white skel rounded w-48">&nbsp;</h2>
+              <span id="headerStatusBadge" class="badge badge-green">Active</span>
+            </div>
+            <p class="text-sm text-[var(--text-mid)] mt-1.5">
+              <span id="headerDesignation" class="skel rounded inline-block w-24">&nbsp;</span> ·
+              <span id="headerDepartment" class="skel rounded inline-block w-28">&nbsp;</span>
+            </p>
+            <p class="text-[12.5px] text-amber-400 font-mono mt-2 skel rounded inline-block w-20" id="headerEmpId">&nbsp;</p>
+          </div>
+          <div class="flex gap-2.5 pt-2 md:pt-0">
+            <button id="openEditModalBtn" class="btn-primary px-4 py-2.5 text-[13px] flex items-center gap-2">
+              <i data-lucide="square-pen" class="w-4 h-4"></i> Edit Profile
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 8. PROFILE COMPLETION ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.05s">
+        <h3 class="font-display font-semibold text-white text-[15px] mb-4">Profile Completion</h3>
+        <div class="flex items-center gap-5">
+          <div class="relative w-24 h-24 shrink-0">
+            <svg class="ring-svg w-24 h-24">
+              <circle cx="48" cy="48" r="40" fill="none" stroke-width="8" class="ring-bg"></circle>
+              <circle id="completionRing" cx="48" cy="48" r="40" fill="none" stroke-width="8" class="ring-fg" stroke="url(#ringGrad2)" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+              <defs>
+                <linearGradient id="ringGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#FBC56A"/><stop offset="100%" stop-color="#F5A524"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="completionPct" class="text-sm font-bold text-white">0%</span>
+              <span class="text-[9px] text-[var(--text-mid)]">complete</span>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[11.5px] font-semibold tracking-wide text-[var(--text-mid)] uppercase mb-2">Missing info</p>
+            <div id="missingFieldsList" class="flex flex-wrap gap-1.5">
+              <span class="badge badge-amber skel w-16 h-5">&nbsp;</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 7. STATISTICS CARDS ============ -->
+      <section class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-5 gap-3 anim-fade-up" style="animation-delay:.08s">
+        <div class="glass glass-card p-4 flex flex-col items-center text-center justify-center">
+          <i data-lucide="calendar-check-2" class="w-4 h-4 text-amber-400 mb-2"></i>
+          <p id="statAttendance" class="text-xl font-bold text-white font-mono skel rounded">0%</p>
+          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">Attendance</p>
+        </div>
+        <div class="glass glass-card p-4 flex flex-col items-center text-center justify-center">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-green-400 mb-2"></i>
+          <p id="statCompleted" class="text-xl font-bold text-white font-mono skel rounded">0</p>
+          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">Completed</p>
+        </div>
+        <div class="glass glass-card p-4 flex flex-col items-center text-center justify-center">
+          <i data-lucide="list-todo" class="w-4 h-4 text-cyan-400 mb-2"></i>
+          <p id="statPending" class="text-xl font-bold text-white font-mono skel rounded">0</p>
+          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">Pending</p>
+        </div>
+        <div class="glass glass-card p-4 flex flex-col items-center text-center justify-center">
+          <i data-lucide="plane" class="w-4 h-4 text-violet-400 mb-2"></i>
+          <p id="statLeaves" class="text-xl font-bold text-white font-mono skel rounded">0</p>
+          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">Leaves taken</p>
+        </div>
+        <div class="glass glass-card p-4 flex flex-col items-center text-center justify-center">
+          <i data-lucide="timer" class="w-4 h-4 text-amber-400 mb-2"></i>
+          <p id="statHours" class="text-xl font-bold text-white font-mono skel rounded">0h</p>
+          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">This month</p>
+        </div>
+      </section>
+
+      <!-- ============ 2. PERSONAL INFORMATION ============ -->
+      <section class="lg:col-span-6 glass glass-card p-6 anim-fade-up" style="animation-delay:.11s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Personal Information</h3>
+          <i data-lucide="user-round" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="grid grid-cols-2 gap-4 text-[13px]">
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1 flex items-center gap-1.5"><i data-lucide="cake" class="w-3.5 h-3.5"></i>Date of birth</p><p id="pDob" class="text-white skel rounded w-20">&nbsp;</p></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1 flex items-center gap-1.5"><i data-lucide="venus-and-mars" class="w-3.5 h-3.5"></i>Gender</p><p id="pGender" class="text-white skel rounded w-16">&nbsp;</p></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1 flex items-center gap-1.5"><i data-lucide="droplet" class="w-3.5 h-3.5"></i>Blood group</p><p id="pBlood" class="text-white skel rounded w-12">&nbsp;</p></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1 flex items-center gap-1.5"><i data-lucide="fingerprint" class="w-3.5 h-3.5"></i>National ID</p><p id="pNid" class="text-white font-mono skel rounded w-24">&nbsp;</p></div>
+          <div class="col-span-2"><p class="text-[11px] text-[var(--text-mid)] mb-1 flex items-center gap-1.5"><i data-lucide="home" class="w-3.5 h-3.5"></i>Present address</p><p id="pPresentAddr" class="text-white skel rounded w-full">&nbsp;</p></div>
+          <div class="col-span-2"><p class="text-[11px] text-[var(--text-mid)] mb-1 flex items-center gap-1.5"><i data-lucide="map" class="w-3.5 h-3.5"></i>Permanent address</p><p id="pPermanentAddr" class="text-white skel rounded w-full">&nbsp;</p></div>
+        </div>
+      </section>
+
+      <!-- ============ 3. CONTACT INFORMATION ============ -->
+      <section class="lg:col-span-6 glass glass-card p-6 anim-fade-up" style="animation-delay:.14s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Contact Information</h3>
+          <i data-lucide="contact" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="space-y-3 text-[13px]">
+          <div class="flex items-center justify-between glass rounded-xl px-3.5 py-2.5"><span class="text-[var(--text-mid)] flex items-center gap-2"><i data-lucide="mail" class="w-3.5 h-3.5"></i>Email</span><span id="cEmail" class="text-white skel rounded w-32">&nbsp;</span></div>
+          <div class="flex items-center justify-between glass rounded-xl px-3.5 py-2.5"><span class="text-[var(--text-mid)] flex items-center gap-2"><i data-lucide="phone" class="w-3.5 h-3.5"></i>Phone</span><span id="cPhone" class="text-white skel rounded w-24">&nbsp;</span></div>
+          <div class="flex items-center justify-between glass rounded-xl px-3.5 py-2.5"><span class="text-[var(--text-mid)] flex items-center gap-2"><i data-lucide="phone-call" class="w-3.5 h-3.5"></i>Emergency contact</span><span id="cEmergency" class="text-white skel rounded w-24">&nbsp;</span></div>
+          <div class="flex items-center justify-between glass rounded-xl px-3.5 py-2.5"><span class="text-[var(--text-mid)] flex items-center gap-2"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i>Address on file</span><span id="cAddress" class="text-white truncate max-w-[140px] skel rounded">&nbsp;</span></div>
+        </div>
+      </section>
+
+      <!-- ============ 4. EMPLOYMENT INFORMATION ============ -->
+      <section class="lg:col-span-6 glass glass-card p-6 anim-fade-up" style="animation-delay:.17s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Employment Information</h3>
+          <i data-lucide="building-2" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="grid grid-cols-2 gap-4 text-[13px]">
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Department</p><p id="eDept" class="text-white skel rounded w-20">&nbsp;</p></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Designation</p><p id="eDesignation" class="text-white skel rounded w-20">&nbsp;</p></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Joining date</p><p id="eJoinDate" class="text-white skel rounded w-20">&nbsp;</p></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Shift</p><p id="eShift" class="text-white skel rounded w-16">&nbsp;</p></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Employment status</p><p id="eStatus" class="skel rounded w-16">&nbsp;</p></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Manager</p><p id="eManager" class="text-white skel rounded w-24">&nbsp;</p></div>
+        </div>
+      </section>
+
+      <!-- ============ 5. ACCOUNT INFORMATION ============ -->
+      <section class="lg:col-span-6 glass glass-card p-6 anim-fade-up" style="animation-delay:.20s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Account Information</h3>
+          <i data-lucide="shield-user" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="grid grid-cols-2 gap-4 text-[13px]">
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Role</p><p id="aRole" class="text-white skel rounded w-16">&nbsp;</p></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Session status</p><span id="aSession" class="badge badge-green">Active</span></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Last login</p><p id="aLastLogin" class="text-white skel rounded w-24">&nbsp;</p></div>
+          <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Account created</p><p id="aCreated" class="text-white skel rounded w-24">&nbsp;</p></div>
+        </div>
+      </section>
+
+      <!-- ============ 6. SALARY INFORMATION ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.23s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Salary Information</h3>
+          <i data-lucide="wallet" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <p class="text-[11px] text-[var(--text-mid)] uppercase tracking-wide mb-1">Current salary</p>
+        <p id="sBase" class="font-display text-2xl font-bold text-white mb-4 skel rounded w-28">&nbsp;</p>
+        <div class="space-y-2 text-[13px]">
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Bonus</span><span id="sBonus" class="text-green-400 font-mono">—</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Allowance</span><span id="sAllowance" class="text-green-400 font-mono">—</span></div>
+          <div class="flex items-center justify-between"><span class="text-[var(--text-mid)]">Payment method</span><span id="sMethod" class="text-white">—</span></div>
+        </div>
+      </section>
+
+      <!-- ============ 10. DOCUMENTS ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.26s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Documents</h3>
+          <i data-lucide="folder-open" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div id="documentsList" class="space-y-2.5">
+          <div class="skel h-11 rounded-lg"></div>
+          <div class="skel h-11 rounded-lg"></div>
+          <div class="skel h-11 rounded-lg"></div>
+        </div>
+      </section>
+
+      <!-- ============ 13. SECURITY ============ -->
+      <section class="lg:col-span-4 glass glass-card p-6 anim-fade-up" style="animation-delay:.29s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-semibold text-white text-[15px]">Security</h3>
+          <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="space-y-2.5">
+          <button id="changePasswordBtn" class="btn-ghost w-full flex items-center justify-between px-4 py-3 text-[13px]">
+            <span class="flex items-center gap-2.5"><i data-lucide="key-round" class="w-4 h-4"></i>Change password</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-[var(--text-low)]"></i>
+          </button>
+          <button id="forgotPasswordBtn" class="btn-ghost w-full flex items-center justify-between px-4 py-3 text-[13px]">
+            <span class="flex items-center gap-2.5"><i data-lucide="mail-question" class="w-4 h-4"></i>Forgot password</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-[var(--text-low)]"></i>
+          </button>
+          <button id="logoutAllBtn" class="btn-danger-ghost w-full flex items-center justify-between px-4 py-3 text-[13px]">
+            <span class="flex items-center gap-2.5"><i data-lucide="log-out" class="w-4 h-4"></i>Logout from all devices</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- ============ 9. RECENT ACTIVITIES TIMELINE ============ -->
+      <section class="lg:col-span-12 glass glass-card p-6 anim-fade-up" style="animation-delay:.32s">
+        <h3 class="font-display font-semibold text-white text-[15px] mb-4">Recent Activities</h3>
+        <div id="activityTimeline" class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+          <div class="skel h-10 rounded-lg mb-3"></div>
+          <div class="skel h-10 rounded-lg mb-3"></div>
+          <div class="skel h-10 rounded-lg mb-3"></div>
+          <div class="skel h-10 rounded-lg mb-3"></div>
+        </div>
+      </section>
+
+    </div>
+
+    <footer class="mt-8 pb-4 text-center text-[12px] text-[var(--text-low)]">
+      ABASHON Consultancy &amp; Construction — Employee Management System
+    </footer>
+  </main>
+</div>
+
+<!-- ============================================================
+     12. EDIT PROFILE MODAL
+============================================================ -->
+<div id="editModalBackdrop" class="hidden">
+  <div class="glass-strong w-full max-w-2xl max-h-[88vh] overflow-y-auto p-6 lg:p-7 anim-scale-in">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-display text-lg font-bold text-white">Edit Profile</h3>
+      <button id="closeEditModalBtn" class="btn-ghost w-9 h-9 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+    <form id="editProfileForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div><label class="field-label">Full name</label><input class="field-input" name="full_name" type="text" required /></div>
+      <div><label class="field-label">Phone</label><input class="field-input" name="phone" type="tel" /></div>
+      <div><label class="field-label">Email</label><input class="field-input" name="email" type="email" required /></div>
+      <div><label class="field-label">Emergency contact</label><input class="field-input" name="emergency_contact" type="tel" /></div>
+      <div><label class="field-label">Date of birth</label><input class="field-input" name="date_of_birth" type="date" /></div>
+      <div>
+        <label class="field-label">Gender</label>
+        <select class="field-input" name="gender">
+          <option value="">Select</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div><label class="field-label">Blood group</label><input class="field-input" name="blood_group" type="text" placeholder="e.g. O+" /></div>
+      <div><label class="field-label">National ID</label><input class="field-input" name="national_id" type="text" /></div>
+      <div class="sm:col-span-2"><label class="field-label">Present address</label><textarea class="field-input" name="present_address" rows="2"></textarea></div>
+      <div class="sm:col-span-2"><label class="field-label">Permanent address</label><textarea class="field-input" name="permanent_address" rows="2"></textarea></div>
+      <p id="editFormError" class="hidden sm:col-span-2 text-[12.5px] text-red-400 flex items-center gap-1.5"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i><span></span></p>
+      <div class="sm:col-span-2 flex items-center justify-end gap-3 mt-2">
+        <button type="button" id="cancelEditBtn" class="btn-ghost px-5 py-2.5 text-[13px]">Cancel</button>
+        <button type="submit" id="saveEditBtn" class="btn-primary px-5 py-2.5 text-[13px] flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i>Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toastContainer" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2.5 w-[320px] max-w-[90vw]"></div>
+
+<!-- ============================================================
+     APPLICATION JAVASCRIPT
+     Shared backbone (config, utils, session guard, clock, toast)
+     kept identical to employee-dashboard.html; loaders below are
+     specific to the Profile page.
+============================================================ -->
+<script>
+/* ---------------------------------------------------------------
+   0. SUPABASE CONFIGURATION — identical client as the dashboard.
+   Expected additional columns on `employees` used by this page:
+     date_of_birth date, gender text, blood_group text, national_id text,
+     present_address text, permanent_address text, emergency_contact text,
+     manager_name text, role text, employee_type text, payment_method text
+   Additional tables used by this page:
+     documents(id uuid pk, employee_id uuid, doc_type text, file_name text,
+       file_url text, uploaded_at timestamptz default now())
+     Storage bucket: "avatars" (public) for profile photo uploads.
+--------------------------------------------------------------- */
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ---------------------------------------------------------------
+   1. GLOBAL STATE
+--------------------------------------------------------------- */
+const AppState = {
+  session: null,
+  employee: null,
+};
+
+/* ---------------------------------------------------------------
+   2. UTILITIES — identical to employee-dashboard.html
+--------------------------------------------------------------- */
+function $(id){ return document.getElementById(id); }
+
+function formatCurrency(n){
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return '৳' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+
+function formatDate(dateLike){
+  if (!dateLike) return '—';
+  return new Date(dateLike).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function timeAgo(dateLike){
+  if (!dateLike) return '—';
+  const diffMs = Date.now() - new Date(dateLike).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h ago';
+  return Math.floor(hrs / 24) + 'd ago';
+}
+
+function unskel(el){ if (el) el.classList.remove('skel'); }
+
+function showToast(message, type){
+  type = type || 'info';
+  const colors = {
+    success: 'border-green-500/30 text-green-400',
+    error: 'border-red-500/30 text-red-400',
+    info: 'border-amber-500/30 text-amber-400',
+  };
+  const icons = { success: 'check-circle-2', error: 'alert-circle', info: 'info' };
+  const toast = document.createElement('div');
+  toast.className = 'glass-strong rounded-xl px-4 py-3 flex items-center gap-2.5 border anim-fade-up shadow-glass ' + (colors[type] || colors.info);
+  toast.innerHTML = '<i data-lucide="' + (icons[type] || icons.info) + '" class="w-4 h-4 shrink-0"></i>' +
+    '<span class="text-[13px] text-[var(--text-hi)] flex-1">' + message + '</span>';
+  $('toastContainer').appendChild(toast);
+  lucide.createIcons();
+  setTimeout(() => {
+    toast.style.transition = 'opacity .4s ease, transform .4s ease';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(20px)';
+    setTimeout(() => toast.remove(), 400);
+  }, 4200);
+}
+
+/* ---------------------------------------------------------------
+   3. SESSION GUARD — identical to employee-dashboard.html
+--------------------------------------------------------------- */
+async function guardSession(){
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error || !data.session){
+    window.location.href = 'employee-login.html';
+    return null;
+  }
+  AppState.session = data.session;
+  return data.session;
+}
+
+/* ---------------------------------------------------------------
+   4. LIVE CLOCK — identical to employee-dashboard.html
+--------------------------------------------------------------- */
+function tickClock(){
+  const now = new Date();
+  $('liveClock').textContent = now.toLocaleTimeString([], { hour12: true });
+  $('liveDate').textContent = now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/* ---------------------------------------------------------------
+   5. PROFILE DATA LOADERS  (all dynamic — no hardcoded data)
+--------------------------------------------------------------- */
+async function loadEmployeeProfile(){
+  const userId = AppState.session.user.id;
+  const { data, error } = await supabaseClient
+    .from('employees')
+    .select('*')
+    .eq('auth_user_id', userId)
+    .single();
+
+  if (error || !data){
+    showToast('Could not load employee profile.', 'error');
+    return;
+  }
+  AppState.employee = data;
+
+  // Navbar (shared)
+  $('navProfilePhoto').src = data.photo_url || ''; unskel($('navProfilePhoto'));
+  $('navProfileName').textContent = data.full_name || '—'; unskel($('navProfileName'));
+  $('navProfileRole').textContent = data.designation || '—'; unskel($('navProfileRole'));
+
+  // Header
+  $('headerPhoto').src = data.photo_url || ''; unskel($('headerPhoto'));
+  $('headerName').textContent = data.full_name || '—'; unskel($('headerName'));
+  $('headerDesignation').textContent = data.designation || '—'; unskel($('headerDesignation'));
+  $('headerDepartment').textContent = data.department || '—'; unskel($('headerDepartment'));
+  $('headerEmpId').textContent = data.employee_id || '—'; unskel($('headerEmpId'));
+  const isActive = (data.employment_status || '').toLowerCase() === 'active';
+  const headerBadge = $('headerStatusBadge');
+  headerBadge.textContent = data.employment_status || 'Unknown';
+  headerBadge.className = 'badge ' + (isActive ? 'badge-green' : 'badge-red');
+
+  // Personal information
+  $('pDob').textContent = data.date_of_birth ? formatDate(data.date_of_birth) : '—'; unskel($('pDob'));
+  $('pGender').textContent = data.gender || '—'; unskel($('pGender'));
+  $('pBlood').textContent = data.blood_group || '—'; unskel($('pBlood'));
+  $('pNid').textContent = data.national_id || '—'; unskel($('pNid'));
+  $('pPresentAddr').textContent = data.present_address || '—'; unskel($('pPresentAddr'));
+  $('pPermanentAddr').textContent = data.permanent_address || '—'; unskel($('pPermanentAddr'));
+
+  // Contact information
+  $('cEmail').textContent = data.email || '—'; unskel($('cEmail'));
+  $('cPhone').textContent = data.phone || '—'; unskel($('cPhone'));
+  $('cEmergency').textContent = data.emergency_contact || '—'; unskel($('cEmergency'));
+  $('cAddress').textContent = data.present_address || '—'; unskel($('cAddress'));
+
+  // Employment information
+  $('eDept').textContent = data.department || '—'; unskel($('eDept'));
+  $('eDesignation').textContent = data.designation || '—'; unskel($('eDesignation'));
+  $('eJoinDate').textContent = formatDate(data.joining_date); unskel($('eJoinDate'));
+  $('eShift').textContent = data.shift || '—'; unskel($('eShift'));
+  const eStatusEl = $('eStatus');
+  eStatusEl.innerHTML = '<span class="badge ' + (isActive ? 'badge-green' : 'badge-red') + '">' + (data.employment_status || 'Unknown') + '</span>';
+  $('eManager').textContent = data.manager_name || '—'; unskel($('eManager'));
+
+  // Account information
+  $('aRole').textContent = data.role || 'Employee'; unskel($('aRole'));
+  $('aLastLogin').textContent = AppState.session.user.last_sign_in_at ? formatDate(AppState.session.user.last_sign_in_at) : '—'; unskel($('aLastLogin'));
+  $('aCreated').textContent = AppState.session.user.created_at ? formatDate(AppState.session.user.created_at) : '—'; unskel($('aCreated'));
+
+  // Salary information
+  $('sBase').textContent = formatCurrency(data.salary_base); unskel($('sBase'));
+  $('sBonus').textContent = '+' + formatCurrency(data.salary_bonus);
+  $('sAllowance').textContent = '+' + formatCurrency(data.salary_allowance);
+  $('sMethod').textContent = data.payment_method || 'Bank transfer';
+
+  computeProfileCompletion(data);
+  populateEditForm(data);
+  lucide.createIcons();
+}
+
+function computeProfileCompletion(data){
+  const requiredFields = [
+    ['full_name', 'Name'], ['email', 'Email'], ['phone', 'Phone'], ['photo_url', 'Photo'],
+    ['department', 'Department'], ['designation', 'Designation'], ['date_of_birth', 'Date of birth'],
+    ['gender', 'Gender'], ['blood_group', 'Blood group'], ['national_id', 'National ID'],
+    ['present_address', 'Present address'], ['permanent_address', 'Permanent address'],
+    ['emergency_contact', 'Emergency contact'], ['manager_name', 'Manager'],
+  ];
+  const missing = requiredFields.filter(([key]) => !data[key]);
+  const pct = Math.round(((requiredFields.length - missing.length) / requiredFields.length) * 100);
+
+  $('completionPct').textContent = pct + '%';
+  const circumference = 251.2;
+  $('completionRing').style.strokeDashoffset = circumference - (circumference * pct / 100);
+
+  const missingWrap = $('missingFieldsList');
+  if (missing.length === 0){
+    missingWrap.innerHTML = '<span class="badge badge-green"><i data-lucide="check" class="w-3 h-3"></i>All set</span>';
+  } else {
+    missingWrap.innerHTML = missing.slice(0, 4).map(([, label]) => '<span class="badge badge-amber">' + label + '</span>').join('') +
+      (missing.length > 4 ? '<span class="badge badge-amber">+' + (missing.length - 4) + ' more</span>' : '');
+  }
+  lucide.createIcons();
+}
+
+async function loadStatistics(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+  const todayStr = now.toISOString().slice(0, 10);
+
+  const [attendanceRes, tasksRes, leaveRes] = await Promise.all([
+    supabaseClient.from('attendance').select('date, working_minutes, status').eq('employee_id', empId).gte('date', startOfMonth),
+    supabaseClient.from('tasks').select('status').eq('employee_id', empId),
+    supabaseClient.from('leave_balances').select('*').eq('employee_id', empId).maybeSingle(),
+  ]);
+
+  // Attendance %
+  if (attendanceRes.data){
+    const daysSoFar = new Date().getDate();
+    const presentDays = attendanceRes.data.filter(r => r.status && r.status !== 'absent').length;
+    const pct = daysSoFar ? Math.round((presentDays / daysSoFar) * 100) : 0;
+    $('statAttendance').textContent = Math.min(100, pct) + '%'; unskel($('statAttendance'));
+
+    const monthMinutes = attendanceRes.data.reduce((sum, r) => sum + (r.working_minutes || 0), 0);
+    $('statHours').textContent = Math.round(monthMinutes / 60) + 'h'; unskel($('statHours'));
+  }
+
+  // Tasks
+  if (tasksRes.data){
+    $('statCompleted').textContent = tasksRes.data.filter(t => t.status === 'completed').length; unskel($('statCompleted'));
+    $('statPending').textContent = tasksRes.data.filter(t => t.status === 'pending').length; unskel($('statPending'));
+  }
+
+  // Leaves
+  if (leaveRes.data){
+    const taken = (leaveRes.data.casual_used || 0) + (leaveRes.data.medical_used || 0) + (leaveRes.data.annual_used || 0);
+    $('statLeaves').textContent = taken; unskel($('statLeaves'));
+  }
+}
+
+async function loadDocuments(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+  const { data, error } = await supabaseClient.from('documents').select('*').eq('employee_id', empId).order('uploaded_at', { ascending: false });
+
+  const wrap = $('documentsList');
+  if (error || !data || data.length === 0){
+    wrap.innerHTML = '<p class="text-[12.5px] text-[var(--text-mid)] text-center py-4">No documents uploaded yet.</p>';
+    return;
+  }
+  const iconFor = t => ({ nid: 'fingerprint', cv: 'file-text', certificate: 'award', appointment_letter: 'file-signature', resume: 'file-user' }[t] || 'file');
+  const labelFor = t => ({ nid: 'National ID', cv: 'CV', certificate: 'Certificate', appointment_letter: 'Appointment Letter', resume: 'Resume' }[t] || (t || 'Document'));
+
+  wrap.innerHTML = data.map(doc => (
+    '<div class="glass rounded-xl p-3 flex items-center justify-between gap-3">' +
+      '<div class="flex items-center gap-2.5 min-w-0">' +
+        '<div class="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0"><i data-lucide="' + iconFor(doc.doc_type) + '" class="w-4 h-4 text-amber-400"></i></div>' +
+        '<div class="min-w-0"><p class="text-[12.5px] text-white font-medium truncate">' + labelFor(doc.doc_type) + '</p><p class="text-[10.5px] text-[var(--text-low)]">' + timeAgo(doc.uploaded_at) + '</p></div>' +
+      '</div>' +
+      '<a href="' + (doc.file_url || '#') + '" target="_blank" rel="noopener" class="btn-ghost w-8 h-8 flex items-center justify-center shrink-0"><i data-lucide="download" class="w-3.5 h-3.5"></i></a>' +
+    '</div>'
+  )).join('');
+  lucide.createIcons();
+}
+
+async function loadActivityTimeline(){
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+  const { data, error } = await supabaseClient
+    .from('activity_log').select('*').eq('employee_id', empId)
+    .order('created_at', { ascending: false }).limit(8);
+
+  const wrap = $('activityTimeline');
+  if (error || !data || data.length === 0){
+    wrap.innerHTML = '<p class="text-[12.5px] text-[var(--text-mid)] text-center py-4 col-span-2">No recent activity.</p>';
+    return;
+  }
+  const iconFor = t => ({ clock_in: 'log-in', clock_out: 'log-out', task_completed: 'check-circle-2', leave_applied: 'plane', salary_updated: 'wallet', profile_updated: 'user-cog' }[t] || 'circle');
+
+  wrap.innerHTML = data.map(a => (
+    '<div class="flex gap-3 pb-4">' +
+      '<div class="w-7 h-7 rounded-full glass flex items-center justify-center shrink-0 border-amber-500/25">' +
+        '<i data-lucide="' + iconFor(a.type) + '" class="w-3.5 h-3.5 text-amber-400"></i>' +
+      '</div>' +
+      '<div class="min-w-0 pt-0.5">' +
+        '<p class="text-[12.5px] text-white leading-snug">' + (a.description || a.type) + '</p>' +
+        '<p class="text-[10.5px] text-[var(--text-low)]">' + timeAgo(a.created_at) + '</p>' +
+      '</div>' +
+    '</div>'
+  )).join('');
+  lucide.createIcons();
+}
+
+/* ---------------------------------------------------------------
+   6. PROFILE PHOTO UPLOAD → Supabase Storage
+--------------------------------------------------------------- */
+async function handlePhotoUpload(file){
+  const empId = AppState.employee?.id;
+  if (!empId || !file) return;
+
+  showToast('Uploading photo…', 'info');
+  const filePath = `employee-${empId}/${Date.now()}-${file.name}`;
+
+  const { error: uploadError } = await supabaseClient.storage.from('avatars').upload(filePath, file, { upsert: true });
+  if (uploadError){ showToast('Photo upload failed.', 'error'); return; }
+
+  const { data: publicUrlData } = supabaseClient.storage.from('avatars').getPublicUrl(filePath);
+  const newUrl = publicUrlData.publicUrl;
+
+  const { error: updateError } = await supabaseClient.from('employees').update({ photo_url: newUrl }).eq('id', empId);
+  if (updateError){ showToast('Photo uploaded, but profile update failed.', 'error'); return; }
+
+  $('headerPhoto').src = newUrl;
+  $('navProfilePhoto').src = newUrl;
+  AppState.employee.photo_url = newUrl;
+  showToast('Profile photo updated.', 'success');
+}
+
+/* ---------------------------------------------------------------
+   7. EDIT PROFILE MODAL
+--------------------------------------------------------------- */
+function populateEditForm(data){
+  const form = $('editProfileForm');
+  Object.keys(form.elements).forEach(() => {}); // no-op guard for older browsers
+  const fields = ['full_name','phone','email','emergency_contact','date_of_birth','gender','blood_group','national_id','present_address','permanent_address'];
+  fields.forEach(key => {
+    if (form.elements[key]) form.elements[key].value = data[key] || '';
+  });
+}
+
+function openEditModal(){ $('editModalBackdrop').classList.remove('hidden'); lucide.createIcons(); }
+function closeEditModal(){ $('editModalBackdrop').classList.add('hidden'); $('editFormError').classList.add('hidden'); }
+
+async function handleSaveProfile(evt){
+  evt.preventDefault();
+  const empId = AppState.employee?.id;
+  if (!empId) return;
+
+  const form = $('editProfileForm');
+  const formData = new FormData(form);
+  const payload = Object.fromEntries(formData.entries());
+
+  if (!payload.full_name.trim() || !payload.email.trim()){
+    const err = $('editFormError');
+    err.querySelector('span').textContent = 'Full name and email are required.';
+    err.classList.remove('hidden');
+    return;
+  }
+
+  const saveBtn = $('saveEditBtn');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving…';
+  lucide.createIcons();
+
+  const { error } = await supabaseClient.from('employees').update(payload).eq('id', empId);
+
+  saveBtn.disabled = false;
+  saveBtn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Save changes';
+  lucide.createIcons();
+
+  if (error){ showToast('Could not save profile changes.', 'error'); return; }
+
+  showToast('Profile updated successfully.', 'success');
+  closeEditModal();
+  await loadEmployeeProfile();
+}
+
+/* ---------------------------------------------------------------
+   8. SECURITY ACTIONS
+--------------------------------------------------------------- */
+async function handleChangePassword(){
+  const newPassword = window.prompt('Enter a new password (minimum 8 characters):');
+  if (!newPassword) return;
+  if (newPassword.length < 8){ showToast('Password must be at least 8 characters.', 'error'); return; }
+  const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+  if (error){ showToast('Could not update password.', 'error'); return; }
+  showToast('Password updated successfully.', 'success');
+}
+
+async function handleForgotPassword(){
+  const email = AppState.employee?.email;
+  if (!email){ showToast('No email on file for this account.', 'error'); return; }
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+  if (error){ showToast('Could not send reset email.', 'error'); return; }
+  showToast('Password reset email sent to ' + email, 'success');
+}
+
+async function handleLogoutAllDevices(){
+  const confirmed = window.confirm('This will sign you out on every device. Continue?');
+  if (!confirmed) return;
+  const { error } = await supabaseClient.auth.signOut({ scope: 'global' });
+  if (error){ showToast('Could not sign out of all devices.', 'error'); return; }
+  window.location.href = 'employee-login.html';
+}
+
+/* ---------------------------------------------------------------
+   9. SIDEBAR / NAVBAR / MODAL INTERACTIONS
+--------------------------------------------------------------- */
+function initUIControls(){
+  $('collapseBtn').addEventListener('click', () => document.body.classList.toggle('sidebar-collapsed'));
+  $('mobileMenuBtn').addEventListener('click', () => document.body.classList.add('sidebar-mobile-open'));
+  $('sidebarBackdrop').addEventListener('click', () => document.body.classList.remove('sidebar-mobile-open'));
+
+  $('themeToggleBtn').addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+    showToast('Theme preference saved.', 'info');
+  });
+
+  $('logoutBtn').addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'employee-login.html';
+  });
+
+  // Edit profile modal
+  $('openEditModalBtn').addEventListener('click', openEditModal);
+  $('editCoverHint').addEventListener('click', openEditModal);
+  $('closeEditModalBtn').addEventListener('click', closeEditModal);
+  $('cancelEditBtn').addEventListener('click', closeEditModal);
+  $('editModalBackdrop').addEventListener('click', (e) => { if (e.target === $('editModalBackdrop')) closeEditModal(); });
+  $('editProfileForm').addEventListener('submit', handleSaveProfile);
+
+  // Photo upload
+  $('photoUploadBtn').addEventListener('click', () => $('photoFileInput').click());
+  $('photoFileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) handlePhotoUpload(file);
+  });
+
+  // Security
+  $('changePasswordBtn').addEventListener('click', handleChangePassword);
+  $('forgotPasswordBtn').addEventListener('click', handleForgotPassword);
+  $('logoutAllBtn').addEventListener('click', handleLogoutAllDevices);
+}
+
+/* ---------------------------------------------------------------
+   10. BOOTSTRAP
+--------------------------------------------------------------- */
+async function bootstrap(){
+  lucide.createIcons();
+  initUIControls();
+
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  const session = await guardSession();
+  if (!session) return;
+
+  await loadEmployeeProfile();
+
+  await Promise.all([
+    loadStatistics(),
+    loadDocuments(),
+    loadActivityTimeline(),
+  ]);
+
+  lucide.createIcons();
+}
+
+document.addEventListener('DOMContentLoaded', bootstrap);
+</script>
 </body>
 </html>
