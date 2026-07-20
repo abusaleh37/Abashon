@@ -637,7 +637,7 @@ async function loadSalaryData(){
   if (!empId) return;
 
   const { data, error } = await supabaseClient
-    .from('salary')
+    .from('Salary')
     .select('*')
     .eq('employee_id', empId)
     .order('salary_year', { ascending: false });
