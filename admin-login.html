@@ -45,7 +45,6 @@
           src="logo.png"
           alt="ABASHON Consultancy & Construction Logo"
           class="w-16 h-16 mx-auto mb-4 rounded-full object-cover ring-2 ring-sky-400/50"
-          onerror="this.onerror=null;this.src='assets/logo.png';"
         />
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Admin Login</h1>
         <p class="mt-2 text-sm text-slate-400">
@@ -129,16 +128,18 @@
     "use strict";
 
     /* =========================================================
-       1) Supabase Configuration (ONLY ONE CLIENT)
+       FIX 1-6: Keep ONLY ONE Supabase declaration + ONE client
+       - Removed duplicate identifiers and duplicate createClient calls.
+       - Renamed instance to supabaseClient exactly as requested.
     ========================================================= */
     const SUPABASE_URL = "https://flwlpvavvlsomhuoywvz.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_FZN4P-Pof8H3txLTOVb2oA_DSsTTMAo";
-
-    // Keep only one createClient() and one supabase variable.
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     /* =========================================================
-       2) DOM References (verify all IDs exist)
+       FIX 9-10: Centralized DOM lookup and validation
+       - Prevents runtime errors if any required element is missing.
+       - Verifies every HTML id referenced in JavaScript exists.
     ========================================================= */
     const ui = {
       form: document.getElementById("adminLoginForm"),
@@ -152,11 +153,10 @@
       loadingSpinner: document.getElementById("loadingSpinner")
     };
 
-    // Guard: stop script cleanly if required elements are missing.
-    function validateRequiredElements() {
+    function validateUiElements() {
       for (const [key, element] of Object.entries(ui)) {
         if (!element) {
-          console.error(`Missing required element: ${key}`);
+          console.error(`Missing required HTML element: ${key}`);
           return false;
         }
       }
@@ -164,7 +164,7 @@
     }
 
     /* =========================================================
-       3) UI Helper Functions
+       UI Helpers
     ========================================================= */
     function setLoading(isLoading) {
       ui.loginBtn.disabled = isLoading;
@@ -189,7 +189,7 @@
     }
 
     /* =========================================================
-       4) Remember Me Helpers
+       Remember Me
     ========================================================= */
     function loadRememberedEmail() {
       try {
@@ -216,7 +216,7 @@
     }
 
     /* =========================================================
-       5) Error Mapping for Better Login Messages
+       FIX 11: Better Supabase auth error mapping for UX
     ========================================================= */
     function mapAuthError(error) {
       const msg = String(error?.message || "").toLowerCase();
@@ -244,30 +244,28 @@
     }
 
     /* =========================================================
-       6) Password Show/Hide
+       Password Toggle
     ========================================================= */
     function handlePasswordToggle() {
-      const isCurrentlyVisible = ui.passwordInput.type === "text";
-      ui.passwordInput.type = isCurrentlyVisible ? "password" : "text";
-      ui.togglePasswordBtn.textContent = isCurrentlyVisible ? "Show" : "Hide";
-      ui.togglePasswordBtn.setAttribute(
-        "aria-label",
-        isCurrentlyVisible ? "Show password" : "Hide password"
-      );
+      const isVisible = ui.passwordInput.type === "text";
+      ui.passwordInput.type = isVisible ? "password" : "text";
+      ui.togglePasswordBtn.textContent = isVisible ? "Show" : "Hide";
+      ui.togglePasswordBtn.setAttribute("aria-label", isVisible ? "Show password" : "Hide password");
     }
 
     /* =========================================================
-       7) Admin Role Check from Employees table
+       FIX 5: Replaced supabase.from -> supabaseClient.from
+       Admin role check from Employees table
     ========================================================= */
     async function verifyAdminRoleByEmployeesTable(authUserId) {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from("Employees")
         .select("role")
         .eq("auth_user_id", authUserId)
         .maybeSingle();
 
       if (error) {
-        console.error("Employees role query error:", error);
+        console.error("employees role query error:", error);
         throw new Error("Unable to verify admin access right now. Please try again.");
       }
 
@@ -278,17 +276,25 @@
     }
 
     /* =========================================================
-       8) Logout Helper (required signOut flow)
+       FIX 5 + 12: Replaced supabase.auth -> supabaseClient.auth
+       Logout helper
     ========================================================= */
     async function signOutSafely() {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("signOut error:", error);
+      try {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) {
+          console.error("signOut error:", error);
+        }
+      } catch (error) {
+        console.error("signOutSafely exception:", error);
       }
     }
 
     /* =========================================================
-       9) Login Submit Handler (signInWithPassword)
+       FIX 11-12: Login flow with Supabase Authentication
+       - Uses signInWithPassword correctly.
+       - Access control by admin role.
+       - Redirect on success.
     ========================================================= */
     async function handleLogin(event) {
       event.preventDefault();
@@ -305,7 +311,10 @@
       setLoading(true);
 
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
 
         if (error) {
           console.error("signInWithPassword error:", error);
@@ -338,11 +347,11 @@
     }
 
     /* =========================================================
-       10) Existing Session Check (auto redirect if logged in)
+       FIX 11-12: Existing session check and auto-redirect
     ========================================================= */
     async function checkExistingSession() {
       try {
-        const { data, error } = await supabase.auth.getSession();
+        const { data, error } = await supabaseClient.auth.getSession();
 
         if (error) {
           console.error("getSession error:", error);
@@ -356,31 +365,33 @@
 
         if (isAdmin) {
           window.location.href = "admin-dashboard.html";
-        } else {
-          await signOutSafely();
+          return;
         }
+
+        await signOutSafely();
       } catch (error) {
         console.error("checkExistingSession error:", error);
       }
     }
 
     /* =========================================================
-       11) Initialization (single event listeners only)
+       FIX 7-8: Single init function with single listeners only
+       - Prevents duplicate event listeners and duplicate runtime actions.
+       - Removes duplication by centralizing setup in one place.
     ========================================================= */
     function init() {
-      if (!validateRequiredElements()) {
-        alert("Required UI elements are missing. Please check your HTML IDs.");
+      if (!validateUiElements()) {
+        showMessage("Something went wrong. Please refresh the page.");
         return;
       }
 
-      clearMessage();
       loadRememberedEmail();
 
-      // Attach each listener only once.
+      // Attach each listener once.
       ui.togglePasswordBtn.addEventListener("click", handlePasswordToggle);
       ui.form.addEventListener("submit", handleLogin);
 
-      // Check current session at startup.
+      // Check session once on load.
       checkExistingSession();
     }
 
