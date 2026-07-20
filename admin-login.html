@@ -8,7 +8,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Supabase JS v2 (single import only) -->
+  <!-- Supabase JS v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -45,6 +45,7 @@
           src="logo.png"
           alt="ABASHON Consultancy & Construction Logo"
           class="w-16 h-16 mx-auto mb-4 rounded-full object-cover ring-2 ring-sky-400/50"
+          onerror="this.onerror=null;this.src='assets/logo.png';"
         />
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Admin Login</h1>
         <p class="mt-2 text-sm text-slate-400">
@@ -127,16 +128,18 @@
   <script>
     "use strict";
 
-    // IMPORTANT: Paste your real Supabase credentials below.
+    /* =========================================================
+       1) Supabase Configuration (ONLY ONE CLIENT)
+    ========================================================= */
     const SUPABASE_URL = "https://flwlpvavvlsomhuoywvz.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_FZN4P-Pof8H3txLTOVb2oA_DSsTTMAo";
 
-    // Single Supabase client initialization only
-    const supabase = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
+    // Keep only one createClient() and one supabase variable.
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    /* =========================================================
+       2) DOM References (verify all IDs exist)
+    ========================================================= */
     const ui = {
       form: document.getElementById("adminLoginForm"),
       emailInput: document.getElementById("email"),
@@ -149,40 +152,45 @@
       loadingSpinner: document.getElementById("loadingSpinner")
     };
 
-    function setLoading(isLoading) {
-      try {
-        ui.loginBtn.disabled = isLoading;
-        ui.loadingSpinner.classList.toggle("hidden", !isLoading);
-        ui.loginBtnText.textContent = isLoading ? "Signing in..." : "Login";
-      } catch (error) {
-        console.error("setLoading error:", error);
+    // Guard: stop script cleanly if required elements are missing.
+    function validateRequiredElements() {
+      for (const [key, element] of Object.entries(ui)) {
+        if (!element) {
+          console.error(`Missing required element: ${key}`);
+          return false;
+        }
       }
+      return true;
+    }
+
+    /* =========================================================
+       3) UI Helper Functions
+    ========================================================= */
+    function setLoading(isLoading) {
+      ui.loginBtn.disabled = isLoading;
+      ui.loadingSpinner.classList.toggle("hidden", !isLoading);
+      ui.loginBtnText.textContent = isLoading ? "Signing in..." : "Login";
     }
 
     function clearMessage() {
-      try {
-        ui.statusMessage.textContent = "";
-        ui.statusMessage.className = "hidden text-sm rounded-lg px-3 py-2";
-      } catch (error) {
-        console.error("clearMessage error:", error);
-      }
+      ui.statusMessage.textContent = "";
+      ui.statusMessage.className = "hidden text-sm rounded-lg px-3 py-2";
     }
 
     function showMessage(message, type = "error") {
-      try {
-        const baseClass = "text-sm rounded-lg px-3 py-2";
-        const typeClass =
-          type === "success"
-            ? "text-emerald-300 bg-emerald-950/40 border border-emerald-900/60"
-            : "text-red-400 bg-red-950/40 border border-red-900/60";
+      const baseClass = "text-sm rounded-lg px-3 py-2";
+      const typeClass =
+        type === "success"
+          ? "text-emerald-300 bg-emerald-950/40 border border-emerald-900/60"
+          : "text-red-400 bg-red-950/40 border border-red-900/60";
 
-        ui.statusMessage.className = `${baseClass} ${typeClass}`;
-        ui.statusMessage.textContent = message;
-      } catch (error) {
-        console.error("showMessage error:", error);
-      }
+      ui.statusMessage.className = `${baseClass} ${typeClass}`;
+      ui.statusMessage.textContent = message;
     }
 
+    /* =========================================================
+       4) Remember Me Helpers
+    ========================================================= */
     function loadRememberedEmail() {
       try {
         const rememberedEmail = localStorage.getItem("adminRememberedEmail");
@@ -207,79 +215,81 @@
       }
     }
 
+    /* =========================================================
+       5) Error Mapping for Better Login Messages
+    ========================================================= */
     function mapAuthError(error) {
-      try {
-        const msg = (error?.message || "").toLowerCase();
+      const msg = String(error?.message || "").toLowerCase();
 
-        if (msg.includes("invalid login credentials") || msg.includes("invalid password")) {
-          return "Invalid password. Please try again.";
-        }
-        if (msg.includes("user not found") || msg.includes("invalid email")) {
-          return "User not found. Please check your email.";
-        }
-        if (msg.includes("network") || msg.includes("failed to fetch") || msg.includes("fetch")) {
-          return "Network error. Please check your internet connection and try again.";
-        }
-        if (msg.includes("access denied")) {
-          return "Access Denied";
-        }
-        if (msg.includes("email not confirmed")) {
-          return "Email not confirmed. Please verify your email before login.";
-        }
-
-        return error?.message || "Login failed. Please try again.";
-      } catch (mapError) {
-        console.error("mapAuthError error:", mapError);
-        return "Login failed. Please try again.";
+      if (msg.includes("invalid login credentials")) {
+        return "Invalid email or password. Please try again.";
       }
+      if (msg.includes("invalid password")) {
+        return "Invalid password. Please try again.";
+      }
+      if (msg.includes("user not found") || msg.includes("invalid email")) {
+        return "User not found. Please check your email.";
+      }
+      if (msg.includes("email not confirmed")) {
+        return "Email not confirmed. Please verify your email before login.";
+      }
+      if (msg.includes("network") || msg.includes("failed to fetch") || msg.includes("fetch")) {
+        return "Network error. Please check your internet connection and try again.";
+      }
+      if (msg.includes("access denied")) {
+        return "Access Denied";
+      }
+
+      return error?.message || "Login failed. Please try again.";
     }
 
+    /* =========================================================
+       6) Password Show/Hide
+    ========================================================= */
     function handlePasswordToggle() {
-      try {
-        const showing = ui.passwordInput.type === "text";
-        ui.passwordInput.type = showing ? "password" : "text";
-        ui.togglePasswordBtn.textContent = showing ? "Show" : "Hide";
-        ui.togglePasswordBtn.setAttribute("aria-label", showing ? "Show password" : "Hide password");
-      } catch (error) {
-        console.error("handlePasswordToggle error:", error);
-      }
+      const isCurrentlyVisible = ui.passwordInput.type === "text";
+      ui.passwordInput.type = isCurrentlyVisible ? "password" : "text";
+      ui.togglePasswordBtn.textContent = isCurrentlyVisible ? "Show" : "Hide";
+      ui.togglePasswordBtn.setAttribute(
+        "aria-label",
+        isCurrentlyVisible ? "Show password" : "Hide password"
+      );
     }
 
+    /* =========================================================
+       7) Admin Role Check from Employees table
+    ========================================================= */
     async function verifyAdminRoleByEmployeesTable(authUserId) {
-      try {
-        // Uses required table and column names exactly as requested.
-        const { data, error } = await supabase
-          .from("Employees")
-          .select("role")
-          .eq("auth_user_id", authUserId)
-          .maybeSingle();
+      const { data, error } = await supabase
+        .from("Employees")
+        .select("role")
+        .eq("auth_user_id", authUserId)
+        .maybeSingle();
 
-        if (error) {
-          console.error("employees role query error:", error);
-          throw new Error("Unable to verify admin access right now. Please try again.");
-        }
-
-        if (!data) return false;
-
-        const role = String(data.role || "").trim().toLowerCase();
-        return role === "admin";
-      } catch (error) {
-        console.error("verifyAdminRoleByEmployeesTable error:", error);
-        throw error;
+      if (error) {
+        console.error("Employees role query error:", error);
+        throw new Error("Unable to verify admin access right now. Please try again.");
       }
+
+      if (!data) return false;
+
+      const role = String(data.role || "").trim().toLowerCase();
+      return role === "admin";
     }
 
+    /* =========================================================
+       8) Logout Helper (required signOut flow)
+    ========================================================= */
     async function signOutSafely() {
-      try {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-          console.error("signOut error:", error);
-        }
-      } catch (error) {
-        console.error("signOutSafely exception:", error);
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("signOut error:", error);
       }
     }
 
+    /* =========================================================
+       9) Login Submit Handler (signInWithPassword)
+    ========================================================= */
     async function handleLogin(event) {
       event.preventDefault();
       clearMessage();
@@ -295,10 +305,7 @@
       setLoading(true);
 
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
         if (error) {
           console.error("signInWithPassword error:", error);
@@ -308,7 +315,6 @@
 
         const authenticatedUser = data?.user;
         if (!authenticatedUser?.id) {
-          console.error("Authenticated user missing after login:", data);
           showMessage("User not found. Please check your email.");
           return;
         }
@@ -331,6 +337,9 @@
       }
     }
 
+    /* =========================================================
+       10) Existing Session Check (auto redirect if logged in)
+    ========================================================= */
     async function checkExistingSession() {
       try {
         const { data, error } = await supabase.auth.getSession();
@@ -347,28 +356,32 @@
 
         if (isAdmin) {
           window.location.href = "admin-dashboard.html";
-          return;
+        } else {
+          await signOutSafely();
         }
-
-        await signOutSafely();
       } catch (error) {
         console.error("checkExistingSession error:", error);
       }
     }
 
+    /* =========================================================
+       11) Initialization (single event listeners only)
+    ========================================================= */
     function init() {
-      try {
-        loadRememberedEmail();
-        ui.togglePasswordBtn.addEventListener("click", handlePasswordToggle);
-        ui.form.addEventListener("submit", handleLogin);
-
-        checkExistingSession().catch((error) => {
-          console.error("checkExistingSession promise error:", error);
-        });
-      } catch (error) {
-        console.error("init error:", error);
-        showMessage("Something went wrong. Please refresh the page.");
+      if (!validateRequiredElements()) {
+        alert("Required UI elements are missing. Please check your HTML IDs.");
+        return;
       }
+
+      clearMessage();
+      loadRememberedEmail();
+
+      // Attach each listener only once.
+      ui.togglePasswordBtn.addEventListener("click", handlePasswordToggle);
+      ui.form.addEventListener("submit", handleLogin);
+
+      // Check current session at startup.
+      checkExistingSession();
     }
 
     init();
