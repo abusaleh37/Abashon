@@ -633,7 +633,11 @@ async function loadEmployeeProfile(){
    6. LOAD SALARY DATA
 --------------------------------------------------------------- */
 async function loadSalaryData(){
+
   const empId = AppState.employee?.id;
+
+  console.log("Employee ID:", empId);
+
   if (!empId) return;
 
   const { data, error } = await supabaseClient
@@ -641,6 +645,30 @@ async function loadSalaryData(){
     .select('*')
     .eq('employee_id', empId)
     .order('salary_year', { ascending: false });
+
+  console.log("Salary Data:", data);
+  console.log("Salary Error:", error);
+
+  if (error){
+    showToast('Database error while loading salary.', 'error');
+    $('historyBody').innerHTML =
+      '<tr><td colspan="6" class="text-center text-[var(--text-mid)] py-6">Could not load salary records.</td></tr>';
+    return;
+  }
+
+  AppState.rows = data || [];
+  AppState.filtered = [...AppState.rows];
+
+  if (!AppState.rows.length){
+    $('periodLabel').textContent = 'No records';
+    $('historyBody').innerHTML =
+      '<tr><td colspan="6" class="text-center text-[var(--text-mid)] py-6">No salary records found.</td></tr>';
+    return;
+  }
+
+  renderCurrentSalary();
+  renderHistory();
+}
 
   if (error){
     showToast('Database error while loading salary.', 'error');
