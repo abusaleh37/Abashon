@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Akther Plaza in Akther Shopping Complex, Sylhet by ABASHON Consultancy & Construction - Commercial Complex project with completed delivery status." />
+    <title>Akther Plaza | ABASHON Consultancy & Construction</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              slate: {
+                950: "#16181b",
+                900: "#1a1c1e",
+                850: "#222528",
+              },
+              gold: {
+                DEFAULT: "#c5a059",
+                light: "#d4b06a",
+                dark: "#a8843f",
+              },
+            },
+            fontFamily: {
+              display: ["Cormorant Garamond", "Georgia", "serif"],
+              sans: ["Noto Sans Bengali", "system-ui", "sans-serif"],
+            },
+            boxShadow: {
+              hero: "0 24px 80px rgba(0, 0, 0, 0.45)",
+              card: "0 8px 32px rgba(0, 0, 0, 0.35)",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-slate-950 font-sans text-white antialiased" data-project-slug="akther-plaza">
+    <header class="border-b border-white/5 bg-slate-950/95 backdrop-blur-md">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <a href="../index.html" class="min-w-0 shrink">
+          <span class="block font-display text-xl font-semibold leading-none tracking-wide text-gold sm:text-2xl">ABASHON</span>
+          <span class="mt-0.5 block text-[10px] font-medium uppercase tracking-[0.18em] text-white/55 sm:text-[11px]">
+            Consultancy &amp; Construction
+          </span>
+        </a>
+        <a href="../index.html#portfolio" class="inline-flex items-center rounded-md border border-gold/40 px-4 py-2 text-sm font-medium text-gold transition hover:border-gold hover:bg-gold/10">Back to Portfolio</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="border-b border-white/5 bg-slate-900 px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+        <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-2 lg:items-center">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-gold/90">Enterprise Project Showcase</p>
+            <h1 class="mt-3 font-display text-3xl font-semibold tracking-wide text-gold sm:text-4xl" data-project="name">Akther Plaza</h1>
+            <p class="mt-4 text-sm leading-relaxed text-white/70" data-project="description"></p>
+            <div class="mt-6 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-wide">
+              <span class="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-white/80">Location: <span data-project="location"></span></span>
+              <span class="rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-gold">Category: <span data-project="category"></span></span>
+              <span class="rounded-full border border-emerald-500/35 bg-emerald-500/10 px-3 py-1.5 text-emerald-300">Status: <span data-project="status"></span></span>
+            </div>
+            <a id="project-brochure-link" href="#" class="mt-6 inline-flex items-center rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-gold-light">Download Project Brochure (PDF)</a>
+          </div>
+          <div class="overflow-hidden rounded-2xl border border-white/10 bg-slate-850 shadow-hero">
+            <img id="project-hero-image" src="" alt="" class="h-full w-full object-cover" />
+          </div>
+        </div>
+      </section>
+
+      <section class="px-4 py-12 sm:px-6 lg:px-8">
+        <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-3">
+          <article class="rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-card lg:col-span-1">
+            <h2 class="font-display text-2xl font-semibold tracking-wide text-gold">Project Snapshot</h2>
+            <dl class="mt-5 space-y-4 text-sm">
+              <div>
+                <dt class="text-white/55">Project Title</dt>
+                <dd class="font-medium text-white" data-project="name"></dd>
+              </div>
+              <div>
+                <dt class="text-white/55">Location</dt>
+                <dd class="font-medium text-white" data-project="location"></dd>
+              </div>
+              <div>
+                <dt class="text-white/55">Project Category</dt>
+                <dd class="font-medium text-white" data-project="category"></dd>
+              </div>
+              <div>
+                <dt class="text-white/55">Completion Status</dt>
+                <dd class="font-medium text-white"><span data-project="status"></span> (<span data-project="status-bn"></span>)</dd>
+              </div>
+              <div>
+                <dt class="text-white/55">Client Information</dt>
+                <dd class="font-medium text-white" data-project="client"></dd>
+              </div>
+            </dl>
+          </article>
+
+          <div class="space-y-8 lg:col-span-2">
+            <article class="rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-card">
+              <h2 class="font-display text-2xl font-semibold tracking-wide text-gold">Project Description</h2>
+              <p class="mt-4 text-sm leading-relaxed text-white/75" data-project="description"></p>
+            </article>
+
+            <article class="rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-card">
+              <h2 class="font-display text-2xl font-semibold tracking-wide text-gold">Scope of Consultancy</h2>
+              <ul class="mt-4 grid gap-3" data-project="scope"></ul>
+            </article>
+
+            <article class="rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-card">
+              <h2 class="font-display text-2xl font-semibold tracking-wide text-gold">Engineering Details</h2>
+              <ul class="mt-4 grid gap-3" data-project="engineering"></ul>
+            </article>
+
+            <article class="rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-card">
+              <h2 class="font-display text-2xl font-semibold tracking-wide text-gold">Structural Information</h2>
+              <ul class="mt-4 grid gap-3" data-project="structural"></ul>
+            </article>
+
+            <article class="rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-card">
+              <h2 class="font-display text-2xl font-semibold tracking-wide text-gold">Project Challenges</h2>
+              <ul class="mt-4 grid gap-3" data-project="challenges"></ul>
+            </article>
+
+            <article class="rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-card">
+              <h2 class="font-display text-2xl font-semibold tracking-wide text-gold">Solutions</h2>
+              <ul class="mt-4 grid gap-3" data-project="solutions"></ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="border-t border-white/5 px-4 py-12 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl">
+          <h2 class="font-display text-2xl font-semibold tracking-wide text-gold">Project Gallery</h2>
+          <div class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-project="gallery"></div>
+        </div>
+      </section>
+
+      <section class="border-t border-white/5 bg-slate-900 px-4 py-12 sm:px-6 lg:px-8">
+        <div class="mx-auto flex max-w-7xl flex-col gap-6 rounded-2xl border border-gold/25 bg-slate-850 p-6 shadow-card sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="font-display text-2xl font-semibold text-gold">Start Your Next Engineering Project</h2>
+            <p class="mt-2 text-sm text-white/75">Connect with ABASHON Consultancy & Construction for end-to-end design, supervision and execution support.</p>
+          </div>
+          <a href="../index.html#team" class="inline-flex w-fit items-center justify-center rounded-md bg-gold px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-gold-light">Contact Our Team</a>
+        </div>
+      </section>
+
+      <section class="px-4 py-10 sm:px-6 lg:px-8">
+        <nav class="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" aria-label="Project navigation">
+          <a id="project-prev-link" href="#" class="rounded-md border border-white/20 px-4 py-2 text-sm text-white/80 transition hover:border-gold/50 hover:text-gold"></a>
+          <a href="../index.html#portfolio" class="rounded-md border border-gold/40 px-4 py-2 text-sm font-medium text-gold transition hover:border-gold hover:bg-gold/10">Back to Portfolio</a>
+          <a id="project-next-link" href="#" class="rounded-md border border-white/20 px-4 py-2 text-sm text-white/80 transition hover:border-gold/50 hover:text-gold sm:text-right"></a>
+        </nav>
+      </section>
+    </main>
+
+    <script src="../assets/js/projects-data.js"></script>
+    <script src="../assets/js/project-detail.js"></script>
+  </body>
+</html>
