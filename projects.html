@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>ABASHON | Projects</title>
+<meta name="description" content="ABASHON Consultancy & Construction — Projects" />
+
+<!-- ============================================================
+     FONTS
+============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<!-- ============================================================
+     TAILWIND CSS (CDN)
+============================================================ -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+        colors: {
+          ink: {
+            950: '#070B14',
+            900: '#0A0F1C',
+            850: '#0D1424',
+            800: '#131B2E',
+            700: '#1A2338',
+            600: '#243149',
+          },
+          amber: {
+            400: '#FBC56A',
+            500: '#F5A524',
+            600: '#D98A0F',
+          },
+        },
+        boxShadow: {
+          glass: '0 8px 32px rgba(0,0,0,0.35)',
+          'glow-amber': '0 0 0 1px rgba(245,165,36,0.25), 0 0 24px rgba(245,165,36,0.12)',
+        },
+      },
+    },
+  };
+</script>
+
+<!-- ============================================================
+     ICONS / CHARTS / SUPABASE
+============================================================ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- ============================================================
+     GLOBAL DESIGN SYSTEM (shared across every page — unchanged)
+============================================================ -->
+<style>
+  :root{
+    --bg-0:#070B14;
+    --bg-1:#0A0F1C;
+    --bg-2:#0D1424;
+    --bg-3:#131B2E;
+    --glass-bg: rgba(255,255,255,0.045);
+    --glass-bg-strong: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.09);
+    --glass-border-hover: rgba(245,165,36,0.35);
+    --line-blueprint: rgba(148,178,255,0.055);
+    --amber: #F5A524;
+    --amber-soft: #FBC56A;
+    --blue: #3B82F6;
+    --cyan: #22D3EE;
+    --green: #22C55E;
+    --red: #EF4444;
+    --violet:#8B7CF6;
+    --text-hi:#EDF1F7;
+    --text-mid:#93A0B4;
+    --text-low:#5C6B82;
+    --sidebar-w: 272px;
+    --sidebar-w-collapsed: 84px;
+    --navbar-h: 76px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    background:
+      radial-gradient(1100px 600px at 85% -10%, rgba(245,165,36,0.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 20%, rgba(59,130,246,0.08), transparent 55%),
+      var(--bg-0);
+    color:var(--text-hi);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---- Blueprint grid backdrop : the signature texture of this system ---- */
+  .blueprint{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line-blueprint) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-blueprint) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(1200px 800px at 30% 10%, #000 0%, transparent 75%);
+            mask-image: radial-gradient(1200px 800px at 30% 10%, #000 0%, transparent 75%);
+    opacity:.7;
+  }
+
+  h1,h2,h3,h4,.font-display{ font-family:'Space Grotesk', sans-serif; letter-spacing:-0.01em; }
+  .font-mono{ font-family:'JetBrains Mono', monospace; }
+
+  /* ---- Scrollbars ---- */
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:rgba(245,165,36,0.25); border-radius:99px; }
+  ::-webkit-scrollbar-thumb:hover{ background:rgba(245,165,36,0.45); }
+
+  /* ---- Glass primitives (reused by every card, every page) ---- */
+  .glass{
+    background: var(--glass-bg);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    border-radius: 20px;
+  }
+  .glass-strong{
+    background: var(--glass-bg-strong);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-radius: 20px;
+  }
+  .glass-card{
+    position:relative;
+    overflow:hidden;
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .35s ease, box-shadow .35s ease;
+  }
+  .glass-card::before{
+    content:"";
+    position:absolute; inset:0; border-radius:inherit; padding:1px;
+    background: linear-gradient(135deg, rgba(245,165,36,0.35), rgba(255,255,255,0) 35%, rgba(59,130,246,0.25) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity:0; transition:opacity .35s ease;
+    pointer-events:none;
+  }
+  .glass-card:hover{ transform:translateY(-3px); box-shadow:0 16px 40px rgba(0,0,0,0.45); }
+  .glass-card:hover::before{ opacity:1; }
+
+  .divider-blueprint{
+    height:1px;
+    background: repeating-linear-gradient(90deg, rgba(245,165,36,0.35) 0 6px, transparent 6px 12px);
+  }
+
+  /* ---- Sidebar ---- */
+  #sidebar{
+    width:var(--sidebar-w);
+    transition: width .3s cubic-bezier(.2,.8,.2,1), transform .3s ease;
+  }
+  body.sidebar-collapsed #sidebar{ width:var(--sidebar-w-collapsed); }
+  body.sidebar-collapsed .sidebar-label{ opacity:0; width:0; }
+  body.sidebar-collapsed #brandText{ opacity:0; width:0; }
+  #mainWrap{ margin-left:var(--sidebar-w); transition:margin-left .3s cubic-bezier(.2,.8,.2,1); }
+  body.sidebar-collapsed #mainWrap{ margin-left:var(--sidebar-w-collapsed); }
+
+  .nav-item{
+    position:relative;
+    display:flex; align-items:center; gap:14px;
+    padding:11px 16px; margin:2px 12px;
+    border-radius:12px;
+    color:var(--text-mid);
+    font-size:14px; font-weight:500;
+    transition:all .25s ease;
+    white-space:nowrap;
+  }
+  .nav-item:hover{ color:var(--text-hi); background:rgba(255,255,255,0.05); }
+  .nav-item.active{
+    color:#0A0F1C;
+    background: linear-gradient(135deg, var(--amber-soft), var(--amber));
+    box-shadow: 0 6px 18px rgba(245,165,36,0.28);
+    font-weight:600;
+  }
+  .nav-item.active svg{ stroke:#0A0F1C; }
+  .sidebar-label{ transition:opacity .2s ease, width .2s ease; overflow:hidden; }
+
+  /* ---- Badges ---- */
+  .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.02em; }
+  .badge-green{ color:var(--green); background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); }
+  .badge-amber{ color:var(--amber-soft); background:rgba(245,165,36,0.12); border:1px solid rgba(245,165,36,0.28); }
+  .badge-red{ color:var(--red); background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.28); }
+  .badge-blue{ color:#93C5FD; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.28); }
+  .badge-violet{ color:#C4B5FD; background:rgba(139,124,246,0.12); border:1px solid rgba(139,124,246,0.28); }
+
+  .btn-primary{
+    background:linear-gradient(135deg, var(--amber-soft), var(--amber));
+    color:#0A0F1C; font-weight:600; border-radius:12px;
+    transition:transform .2s ease, box-shadow .2s ease;
+    box-shadow:0 8px 20px rgba(245,165,36,0.22);
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(245,165,36,0.32); }
+  .btn-primary:active{ transform:translateY(0); }
+  .btn-primary:disabled{ opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  .btn-ghost{
+    background:rgba(255,255,255,0.04); border:1px solid var(--glass-border); color:var(--text-hi);
+    border-radius:12px; transition:all .2s ease;
+  }
+  .btn-ghost:hover{ background:rgba(255,255,255,0.08); border-color:var(--glass-border-hover); }
+  .btn-ghost:disabled{ opacity:.4; cursor:not-allowed; }
+
+  /* ---- Loading skeleton ---- */
+  .skel{ position:relative; overflow:hidden; background:rgba(255,255,255,0.06); border-radius:8px; color:transparent !important; }
+  .skel::after{
+    content:""; position:absolute; inset:0; transform:translateX(-100%);
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent);
+    animation:shimmer 1.4s infinite;
+  }
+  @keyframes shimmer{ 100%{ transform:translateX(100%); } }
+
+  /* ---- Progress ring ---- */
+  .ring-svg{ transform:rotate(-90deg); }
+  .ring-bg{ stroke:rgba(255,255,255,0.07); }
+  .ring-fg{ stroke-linecap:round; transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1); }
+
+  /* ---- Entrance animations ---- */
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes scaleIn{ from{ opacity:0; transform:scale(.96); } to{ opacity:1; transform:scale(1); } }
+  .anim-fade-up{ animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both; }
+  .anim-scale-in{ animation:scaleIn .5s cubic-bezier(.2,.8,.2,1) both; }
+  .anim-fade-in{ animation:fadeIn .6s ease both; }
+
+  /* ---- Live pulse dot ---- */
+  .pulse-dot{ position:relative; }
+  .pulse-dot::after{
+    content:""; position:absolute; inset:-4px; border-radius:99px;
+    border:1.5px solid var(--green); animation:pulseRing 1.8s ease-out infinite;
+  }
+  @keyframes pulseRing{ 0%{ opacity:.9; transform:scale(.7);} 100%{ opacity:0; transform:scale(1.9);} }
+
+  /* ---- Timeline ---- */
+  .timeline-line{ background:linear-gradient(180deg, var(--amber), rgba(245,165,36,0)); width:2px; }
+
+  /* ---- Scroll marquee / fade masks ---- */
+  .scroll-y-fade{ mask-image:linear-gradient(180deg, transparent, #000 8%, #000 92%, transparent); }
+
+  input[type="text"]:focus, input[type="search"]:focus, select:focus{ outline:none; }
+  ::placeholder{ color:var(--text-low); }
+
+  @media (max-width: 1024px){
+    #sidebar{ position:fixed; z-index:50; top:0; left:0; height:100vh; transform:translateX(-100%); }
+    body.sidebar-mobile-open #sidebar{ transform:translateX(0); }
+    #mainWrap, body.sidebar-collapsed #mainWrap{ margin-left:0; }
+    #sidebarBackdrop{ display:none; }
+    body.sidebar-mobile-open #sidebarBackdrop{ display:block; }
+  }
+
+  /* ============================================================
+     PAGE-SPECIFIC: ATTENDANCE CALENDAR + TABLE + ANALYTICS
+     (built on top of the shared primitives above)
+  ============================================================ */
+
+  /* Calendar grid */
+  .cal-cell{
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:2px;
+    font-size:12.5px; font-weight:600; color:var(--text-mid);
+    background:rgba(255,255,255,0.03);
+    border:1px solid transparent;
+    transition: all .2s ease;
+    cursor:default;
+    position:relative;
+  }
+  .cal-cell:hover{ background:rgba(255,255,255,0.07); }
+  .cal-cell.empty{ background:transparent; }
+  .cal-cell .dot{ width:5px; height:5px; border-radius:99px; }
+  .cal-cell.present{ background:rgba(34,197,94,0.10); color:#86EFAC; border-color:rgba(34,197,94,0.22); }
+  .cal-cell.absent{ background:rgba(239,68,68,0.10); color:#FCA5A5; border-color:rgba(239,68,68,0.22); }
+  .cal-cell.leave{ background:rgba(139,124,246,0.10); color:#C4B5FD; border-color:rgba(139,124,246,0.22); }
+  .cal-cell.holiday{ background:rgba(59,130,246,0.10); color:#93C5FD; border-color:rgba(59,130,246,0.22); }
+  .cal-cell.half{ background:rgba(245,165,36,0.10); color:#FBC56A; border-color:rgba(245,165,36,0.22); }
+  .cal-cell.today{ box-shadow: 0 0 0 2px var(--amber) inset; color:#fff; }
+  .cal-weekday{ font-size:10.5px; font-weight:700; letter-spacing:.08em; color:var(--text-low); text-align:center; text-transform:uppercase; }
+
+  /* History table */
+  .att-table{ width:100%; border-collapse:separate; border-spacing:0; }
+  .att-table thead th{
+    text-align:left; font-size:10.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--text-low); padding:0 14px 10px; white-space:nowrap;
+  }
+  .att-table thead th.sortable{ cursor:pointer; user-select:none; }
+  .att-table thead th.sortable:hover{ color:var(--text-mid); }
+  .att-table tbody tr{ transition: background .2s ease; }
+  .att-table tbody tr:hover{ background:rgba(255,255,255,0.035); }
+  .att-table tbody td{ padding:12px 14px; font-size:13px; border-top:1px solid rgba(255,255,255,0.06); white-space:nowrap; }
+  .att-table tbody tr:first-child td{ border-top:none; }
+
+  .page-btn{
+    width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-size:12.5px; font-weight:600; color:var(--text-mid);
+    background:rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+    transition: all .2s ease;
+  }
+  .page-btn:hover:not(:disabled){ background:rgba(255,255,255,0.08); color:var(--text-hi); }
+  .page-btn.active{ background:linear-gradient(135deg, var(--amber-soft), var(--amber)); color:#0A0F1C; border-color:transparent; }
+  .page-btn:disabled{ opacity:.35; cursor:not-allowed; }
+
+  .filter-chip{
+    padding:7px 13px; border-radius:99px; font-size:12.5px; font-weight:600; color:var(--text-mid);
+    background:rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+    transition:all .2s ease; white-space:nowrap;
+  }
+  .filter-chip:hover{ color:var(--text-hi); background:rgba(255,255,255,0.07); }
+  .filter-chip.active{
+    color:#0A0F1C; background:linear-gradient(135deg, var(--amber-soft), var(--amber)); border-color:transparent;
+  }
+
+  /* Quick action tile */
+  .qa-tile{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+    padding:16px 10px; border-radius:16px;
+    background:rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+    transition: all .2s ease; text-align:center;
+  }
+  .qa-tile:hover:not(:disabled){ background:rgba(255,255,255,0.07); border-color:var(--glass-border-hover); transform:translateY(-2px); }
+  .qa-tile:disabled{ opacity:.35; cursor:not-allowed; }
+  .qa-tile .qa-icon{
+    width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center;
+  }
+
+  /* ============================================================
+     PAGE-SPECIFIC: PROJECTS GRID / CARD / MODAL
+     (built on top of the shared primitives above)
+  ============================================================ */
+
+  .stat-tile{
+    background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:16px;
+    padding:16px; transition: all .25s ease;
+  }
+  .stat-tile:hover{ background:rgba(255,255,255,0.06); border-color:var(--glass-border-hover); transform:translateY(-2px); }
+
+  .badge-violet{ color:#C4B5FD; background:rgba(139,124,246,0.12); border:1px solid rgba(139,124,246,0.28); }
+  .badge-slate{ color:#94A3B8; background:rgba(148,163,184,0.12); border:1px solid rgba(148,163,184,0.28); }
+
+  /* Project card */
+  .project-card{
+    background: var(--glass-bg);
+    border:1px solid var(--glass-border);
+    border-radius:20px;
+    overflow:hidden;
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s ease, box-shadow .3s ease;
+  }
+  .project-card:hover{ transform:translateY(-4px); border-color:var(--glass-border-hover); box-shadow:0 16px 36px rgba(0,0,0,0.4); }
+  .project-cover{
+    height:150px; width:100%; object-fit:cover; background:
+      repeating-linear-gradient(135deg, rgba(245,165,36,0.10) 0 2px, transparent 2px 26px),
+      linear-gradient(120deg, #16233F 0%, #0D1424 60%, #1C1408 130%);
+  }
+  .project-progress-track{ height:6px; border-radius:99px; background:rgba(255,255,255,0.07); overflow:hidden; }
+  .project-progress-fill{ height:100%; border-radius:99px; background:linear-gradient(90deg, var(--amber-soft), var(--amber)); transition:width 1s cubic-bezier(.2,.8,.2,1); }
+
+  /* Modal (shared pattern with Edit Profile modal on other pages) */
+  #projectModalBackdrop{
+    position:fixed; inset:0; z-index:90; background:rgba(4,7,14,0.7); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .field-input{
+    width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--glass-border);
+    border-radius:12px; padding:10px 14px; font-size:13.5px; color:var(--text-hi);
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .field-input:focus{ outline:none; background:rgba(255,255,255,0.06); border-color:var(--glass-border-hover); }
+  .field-label{ font-size:11.5px; font-weight:600; color:var(--text-mid); margin-bottom:6px; display:block; }
+
+  .view-toggle-btn{
+    width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); color:var(--text-mid);
+    transition:all .2s ease;
+  }
+  .view-toggle-btn.active{ color:#0A0F1C; background:linear-gradient(135deg, var(--amber-soft), var(--amber)); border-color:transparent; }
+</style>
+</head>
+
+<body class="font-body">
+<div class="blueprint"></div>
+
+<!-- Mobile backdrop -->
+<div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden"></div>
+
+<!-- ============================================================
+     SIDEBAR  (reused exactly — Attendance marked active)
+============================================================ -->
+<aside id="sidebar" class="fixed top-0 left-0 h-screen z-50 flex flex-col glass-strong border-r border-white/5">
+  <!-- Brand -->
+  <div class="flex items-center gap-3 px-5 h-[76px] shrink-0 border-b border-white/5">
+    <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-glow-amber">
+      <i data-lucide="hard-hat" class="w-5 h-5 text-ink-900"></i>
+    </div>
+    <div id="brandText" class="sidebar-label leading-tight overflow-hidden">
+      <p class="font-display font-bold text-[15px] text-white tracking-tight">ABASHON</p>
+      <p class="text-[10.5px] text-[var(--text-mid)] tracking-wide">Consultancy &amp; Construction</p>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4">
+    <p class="sidebar-label px-6 mb-2 text-[10.5px] font-semibold tracking-[.14em] text-[var(--text-low)] uppercase">Workspace</p>
+    <a href="employee-dashboard.html" data-page="dashboard" class="nav-item">
+      <i data-lucide="layout-dashboard" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Dashboard</span>
+    </a>
+    <a href="employee-profile.html" data-page="profile" class="nav-item">
+      <i data-lucide="user-circle-2" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">My Profile</span>
+    </a>
+    <a href="attendance.html" data-page="attendance" class="nav-item">
+      <i data-lucide="calendar-check-2" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Attendance</span>
+    </a>
+    <a href="my-tasks.html" data-page="tasks" class="nav-item">
+      <i data-lucide="list-checks" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">My Tasks</span>
+    </a>
+    <a href="projects.html" data-page="projects" class="nav-item active">
+      <i data-lucide="building-2" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Projects</span>
+    </a>
+    <a href="salary.html" data-page="salary" class="nav-item">
+      <i data-lucide="wallet" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Salary</span>
+    </a>
+    <a href="leave-request.html" data-page="leave" class="nav-item">
+      <i data-lucide="plane" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Leave Request</span>
+    </a>
+    <a href="notifications.html" data-page="notifications" class="nav-item">
+      <i data-lucide="bell" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Notifications</span>
+    </a>
+
+    <p class="sidebar-label px-6 mt-5 mb-2 text-[10.5px] font-semibold tracking-[.14em] text-[var(--text-low)] uppercase">System</p>
+    <a href="settings.html" data-page="settings" class="nav-item">
+      <i data-lucide="settings" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Settings</span>
+    </a>
+    <button id="logoutBtn" class="nav-item w-[calc(100%-24px)] text-left">
+      <i data-lucide="log-out" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Logout</span>
+    </button>
+  </nav>
+
+  <!-- Collapse toggle -->
+  <div class="p-3 border-t border-white/5 shrink-0">
+    <button id="collapseBtn" class="nav-item w-full justify-center lg:justify-start">
+      <i data-lucide="panel-left-close" class="w-[18px] h-[18px] shrink-0"></i>
+      <span class="sidebar-label">Collapse</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN WRAPPER
+============================================================ -->
+<div id="mainWrap" class="relative z-10 min-h-screen flex flex-col">
+
+  <!-- ============================================================
+       NAVBAR (reused exactly)
+  ============================================================ -->
+  <header id="navbar" class="sticky top-0 z-30 h-[76px] shrink-0 glass-strong border-b border-white/5 flex items-center justify-between gap-4 px-4 lg:px-8">
+    <div class="flex items-center gap-3 min-w-0">
+      <button id="mobileMenuBtn" class="lg:hidden btn-ghost w-10 h-10 flex items-center justify-center shrink-0">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+      <div class="hidden md:flex items-center gap-2.5 glass px-4 py-2.5 w-72 xl:w-96">
+        <i data-lucide="search" class="w-4 h-4 text-[var(--text-low)] shrink-0"></i>
+        <input type="text" placeholder="Search employees, tasks, documents…" class="bg-transparent text-sm w-full text-[var(--text-hi)]" />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 lg:gap-3 shrink-0">
+      <!-- Digital clock -->
+      <div class="hidden md:flex flex-col items-end leading-tight mr-1">
+        <span id="liveClock" class="font-mono text-[15px] font-semibold text-amber-400 tracking-wider">--:--:--</span>
+        <span id="liveDate" class="text-[11px] text-[var(--text-mid)]">Loading date…</span>
+      </div>
+
+      <div class="hidden md:block w-px h-8 bg-white/10 mx-1"></div>
+
+      <!-- Theme toggle (prepared) -->
+      <button id="themeToggleBtn" class="btn-ghost w-10 h-10 flex items-center justify-center" title="Toggle theme">
+        <i data-lucide="moon" class="w-[18px] h-[18px]"></i>
+      </button>
+
+      <!-- Notification bell -->
+      <button id="notifBellBtn" class="btn-ghost relative w-10 h-10 flex items-center justify-center" title="Notifications">
+        <i data-lucide="bell" class="w-[18px] h-[18px]"></i>
+        <span id="notifBadge" class="hidden absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[10px] font-bold flex items-center justify-center text-white">0</span>
+      </button>
+
+      <div class="hidden md:block w-px h-8 bg-white/10 mx-1"></div>
+
+      <!-- Profile -->
+      <button id="profileMenuBtn" class="flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full glass hover:border-amber-500/30 transition-colors">
+        <img id="navProfilePhoto" src="" alt="" class="w-9 h-9 rounded-full object-cover skel bg-ink-700" />
+        <div class="hidden sm:block text-left leading-tight">
+          <p id="navProfileName" class="text-[13px] font-semibold text-white skel rounded w-24">&nbsp;</p>
+          <p id="navProfileRole" class="text-[11px] text-[var(--text-mid)] skel rounded w-16 mt-0.5">&nbsp;</p>
+        </div>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--text-mid)] hidden sm:block"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       PAGE CONTENT
+  ============================================================ -->
+  <main class="flex-1 px-4 lg:px-8 py-6 lg:py-8 max-w-[1680px] w-full mx-auto">
+
+    <!-- Page heading -->
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-6 anim-fade-up">
+      <div>
+        <p class="text-[11px] font-semibold tracking-[.16em] text-amber-400 uppercase mb-1">Employee Workspace</p>
+        <h1 class="font-display text-2xl lg:text-[28px] font-bold text-white">Projects</h1>
+      </div>
+      <button id="openAddProjectBtn" class="btn-primary px-4 py-2.5 text-[13px] flex items-center gap-2">
+        <i data-lucide="plus" class="w-4 h-4"></i> Add Project
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+      <!-- ============ SUMMARY STATS ============ -->
+      <section class="lg:col-span-12 grid grid-cols-2 sm:grid-cols-5 gap-3 anim-fade-up" style="animation-delay:.03s">
+        <div class="stat-tile glass-card flex flex-col items-center text-center">
+          <i data-lucide="building-2" class="w-4 h-4 text-amber-400 mb-2"></i>
+          <p id="statTotal" class="text-xl font-bold text-white font-mono skel rounded">0</p>
+          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">Total Projects</p>
+        </div>
+        <div class="stat-tile glass-card flex flex-col items-center text-center">
+          <i data-lucide="hammer" class="w-4 h-4 text-blue-400 mb-2"></i>
+          <p id="statOngoing" class="text-xl font-bold text-white font-mono skel rounded">0</p>
+          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">Ongoing</p>
+        </div>
+        <div class="stat-tile glass-card flex flex-col items-center text-center">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-green-400 mb-2"></i>
+          <p id="statCompleted" class="text-xl font-bold text-white font-mono skel rounded">0</p>
+          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">Completed</p>
+        </div>
+        <div class="stat-tile glass-card flex flex-col items-center text-center">
+          <i data-lucide="calendar-clock" class="w-4 h-4 text-cyan-400 mb-2"></i>
+          <p id="statPlanning" class="text-xl font-bold text-white font-mono skel rounded">0</p>
+          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">Planning</p>
+        </div>
+        <div class="stat-tile glass-card flex flex-col items-center text-center">
+          <i data-lucide="pause-circle" class="w-4 h-4 text-red-400 mb-2"></i>
+          <p id="statOnHold" class="text-xl font-bold text-white font-mono skel rounded">0</p>
+          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">On Hold</p>
+        </div>
+      </section>
+
+      <!-- ============ TOOLBAR ============ -->
+      <section class="lg:col-span-12 glass glass-card p-4 lg:p-5 anim-fade-up flex flex-wrap items-center justify-between gap-3" style="animation-delay:.06s">
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <div class="flex items-center gap-2 glass px-3.5 py-2.5 w-64">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--text-low)] shrink-0"></i>
+            <input type="text" id="projectSearch" placeholder="Search projects, clients, locations…" class="bg-transparent text-[13px] w-full text-[var(--text-hi)]" />
+          </div>
+          <button class="filter-chip active" data-status="all">All</button>
+          <button class="filter-chip" data-status="planning">Planning</button>
+          <button class="filter-chip" data-status="ongoing">Ongoing</button>
+          <button class="filter-chip" data-status="completed">Completed</button>
+          <button class="filter-chip" data-status="on_hold">On Hold</button>
+        </div>
+        <p id="projectCountLabel" class="text-[12px] text-[var(--text-mid)]">Loading projects…</p>
+      </section>
+
+      <!-- ============ PROJECTS GRID ============ -->
+      <section class="lg:col-span-12">
+        <div id="projectsGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+          <div class="skel h-72 rounded-2xl"></div>
+          <div class="skel h-72 rounded-2xl"></div>
+          <div class="skel h-72 rounded-2xl"></div>
+        </div>
+        <div id="projectsEmptyState" class="hidden glass glass-card p-10 text-center">
+          <i data-lucide="building-2" class="w-8 h-8 text-amber-400 mx-auto mb-3"></i>
+          <p class="text-white font-medium">No projects found</p>
+          <p class="text-[13px] text-[var(--text-mid)] mt-1">Try a different search or add a new project to get started.</p>
+        </div>
+      </section>
+
+    </div>
+
+    <footer class="mt-8 pb-4 text-center text-[12px] text-[var(--text-low)]">
+      ABASHON Consultancy &amp; Construction — Employee Management System
+    </footer>
+  </main>
+</div>
+
+<!-- ============================================================
+     ADD / EDIT PROJECT MODAL
+============================================================ -->
+<div id="projectModalBackdrop" class="hidden">
+  <div class="glass-strong w-full max-w-2xl max-h-[88vh] overflow-y-auto p-6 lg:p-7 anim-scale-in">
+    <div class="flex items-center justify-between mb-5">
+      <h3 id="projectModalTitle" class="font-display text-lg font-bold text-white">Add Project</h3>
+      <button id="closeProjectModalBtn" class="btn-ghost w-9 h-9 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+
+    <!-- Cover image upload -->
+    <div class="mb-5">
+      <label class="field-label">Cover image</label>
+      <div class="relative">
+        <img id="coverPreview" src="" alt="" class="hidden w-full h-40 object-cover rounded-xl border border-[var(--glass-border)]" />
+        <div id="coverPlaceholder" class="w-full h-40 rounded-xl border border-dashed border-[var(--glass-border)] flex flex-col items-center justify-center gap-2 text-[var(--text-mid)]">
+          <i data-lucide="image-plus" class="w-5 h-5"></i>
+          <span class="text-[12.5px]">No cover image selected</span>
+        </div>
+        <button type="button" id="coverUploadBtn" class="btn-ghost absolute bottom-3 right-3 text-[12px] px-3 py-2 flex items-center gap-1.5">
+          <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload
+        </button>
+        <input type="file" id="coverFileInput" accept="image/*" class="hidden" />
+      </div>
+    </div>
+
+    <form id="projectForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="sm:col-span-2"><label class="field-label">Project name</label><input class="field-input" name="project_name" type="text" required /></div>
+      <div><label class="field-label">Location</label><input class="field-input" name="location" type="text" /></div>
+      <div>
+        <label class="field-label">Project type</label>
+        <select class="field-input" name="project_type">
+          <option value="">Select</option>
+          <option>Residential</option>
+          <option>Commercial</option>
+          <option>Industrial</option>
+          <option>Infrastructure</option>
+          <option>Renovation</option>
+          <option>Interior</option>
+        </select>
+      </div>
+      <div><label class="field-label">Client name</label><input class="field-input" name="client_name" type="text" /></div>
+      <div><label class="field-label">Floors</label><input class="field-input" name="floors" type="text" placeholder="e.g. G+10" /></div>
+      <div><label class="field-label">Floor area (sqft)</label><input class="field-input" name="floor_area" type="number" step="0.01" min="0" /></div>
+      <div>
+        <label class="field-label">Status</label>
+        <select class="field-input" name="status">
+          <option value="planning">Planning</option>
+          <option value="ongoing">Ongoing</option>
+          <option value="completed">Completed</option>
+          <option value="on_hold">On Hold</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div><label class="field-label">Start date</label><input class="field-input" name="start_date" type="date" /></div>
+      <div><label class="field-label">Expected completion</label><input class="field-input" name="expected_completion_date" type="date" /></div>
+      <div><label class="field-label">Actual completion</label><input class="field-input" name="actual_completion_date" type="date" /></div>
+      <div class="sm:col-span-2">
+        <label class="field-label">Progress — <span id="progressValueLabel">0</span>%</label>
+        <input class="w-full accent-amber-500" name="progress" type="range" min="0" max="100" step="5" value="0" />
+      </div>
+      <div class="sm:col-span-2"><label class="field-label">Description</label><textarea class="field-input" name="description" rows="3"></textarea></div>
+
+      <p id="projectFormError" class="hidden sm:col-span-2 text-[12.5px] text-red-400 flex items-center gap-1.5"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i><span></span></p>
+
+      <div class="sm:col-span-2 flex items-center justify-end gap-3 mt-2">
+        <button type="button" id="cancelProjectBtn" class="btn-ghost px-5 py-2.5 text-[13px]">Cancel</button>
+        <button type="submit" id="saveProjectBtn" class="btn-primary px-5 py-2.5 text-[13px] flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i>Save Project</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     VIEW PROJECT DETAIL MODAL
+============================================================ -->
+<div id="viewModalBackdrop" class="hidden">
+  <div class="glass-strong w-full max-w-xl max-h-[88vh] overflow-y-auto anim-scale-in overflow-hidden">
+    <div class="relative">
+      <img id="viewCoverImg" src="" alt="" class="project-cover" />
+      <button id="closeViewModalBtn" class="btn-ghost absolute top-3 right-3 w-9 h-9 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
+      <span id="viewStatusBadge" class="badge badge-amber absolute top-3 left-3">—</span>
+    </div>
+    <div class="p-6 lg:p-7">
+      <h3 id="viewProjectName" class="font-display text-xl font-bold text-white mb-1">—</h3>
+      <p id="viewLocation" class="text-[13px] text-[var(--text-mid)] flex items-center gap-1.5 mb-4"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i><span>—</span></p>
+
+      <div class="grid grid-cols-2 gap-4 text-[13px] mb-5">
+        <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Client</p><p id="viewClient" class="text-white">—</p></div>
+        <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Project type</p><p id="viewType" class="text-white">—</p></div>
+        <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Floors</p><p id="viewFloors" class="text-white">—</p></div>
+        <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Floor area</p><p id="viewFloorArea" class="text-white">—</p></div>
+        <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Start date</p><p id="viewStartDate" class="text-white">—</p></div>
+        <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Expected completion</p><p id="viewExpectedDate" class="text-white">—</p></div>
+      </div>
+
+      <div class="mb-5">
+        <div class="flex items-center justify-between text-[12px] mb-1.5">
+          <span class="text-[var(--text-mid)]">Progress</span>
+          <span id="viewProgressLabel" class="text-white font-medium">0%</span>
+        </div>
+        <div class="project-progress-track"><div id="viewProgressBar" class="project-progress-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="mb-5">
+        <p class="text-[11px] font-semibold tracking-wide text-[var(--text-mid)] uppercase mb-1.5">Description</p>
+        <p id="viewDescription" class="text-[13px] text-white leading-relaxed">—</p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5">
+        <button id="viewEditBtn" class="btn-ghost px-4 py-2.5 text-[13px] flex items-center gap-2"><i data-lucide="square-pen" class="w-4 h-4"></i>Edit</button>
+        <button id="viewDeleteBtn" class="btn-danger-ghost px-4 py-2.5 text-[13px] flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i>Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toastContainer" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2.5 w-[320px] max-w-[90vw]"></div>
+
+<!-- ============================================================
+     APPLICATION JAVASCRIPT
+     (shared backbone — supabaseClient, guardSession, toast, clock —
+     identical architecture to every other page, extended for Projects)
+============================================================ -->
+<script>
+/* ---------------------------------------------------------------
+   0. SUPABASE CONFIGURATION
+   Same project keys as every other page — do not create a second client.
+
+   Table used by this page (exactly as specified):
+     projects(
+       id uuid pk, project_name text, location text, project_type text,
+       client_name text, floors text, floor_area numeric,
+       start_date date, expected_completion_date date, actual_completion_date date,
+       status text, progress int, description text, cover_image_url text,
+       created_at timestamptz default now()
+     )
+   Storage bucket: "project-covers" (public) for cover image uploads.
+
+   NOTE: this table has no employee_id column, so — as specified — every
+   logged-in employee can view and add company projects here. If you later
+   want to restrict who can edit/delete a project, add a `created_by uuid`
+   column referencing employees(id) and enforce it with a Supabase RLS
+   policy (e.g. `created_by = auth.uid()` for update/delete).
+--------------------------------------------------------------- */
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ---------------------------------------------------------------
+   1. GLOBAL STATE
+--------------------------------------------------------------- */
+const AppState = {
+  session: null,
+  employee: null,
+  allProjects: [],
+  filtered: [],
+  statusFilter: 'all',
+  searchQuery: '',
+  editingProjectId: null,
+  pendingCoverFile: null,
+  pendingCoverPreviewUrl: null,
+  activeViewProject: null,
+};
+
+/* ---------------------------------------------------------------
+   2. UTILITIES
+--------------------------------------------------------------- */
+function $(id){ return document.getElementById(id); }
+
+function formatDate(dateLike){
+  if (!dateLike) return '—';
+  return new Date(dateLike).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function unskel(el){ if (el) el.classList.remove('skel'); }
+
+function showToast(message, type){
+  type = type || 'info';
+  const colors = {
+    success: 'border-green-500/30 text-green-400',
+    error: 'border-red-500/30 text-red-400',
+    info: 'border-amber-500/30 text-amber-400',
+  };
+  const icons = { success: 'check-circle-2', error: 'alert-circle', info: 'info' };
+  const toast = document.createElement('div');
+  toast.className = 'glass-strong rounded-xl px-4 py-3 flex items-center gap-2.5 border anim-fade-up shadow-glass ' + (colors[type] || colors.info);
+  toast.innerHTML = '<i data-lucide="' + (icons[type] || icons.info) + '" class="w-4 h-4 shrink-0"></i>' +
+    '<span class="text-[13px] text-[var(--text-hi)] flex-1">' + message + '</span>';
+  $('toastContainer').appendChild(toast);
+  lucide.createIcons();
+  setTimeout(() => {
+    toast.style.transition = 'opacity .4s ease, transform .4s ease';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(20px)';
+    setTimeout(() => toast.remove(), 400);
+  }, 4200);
+}
+
+function statusBadgeClass(status){
+  return { planning: 'badge-blue', ongoing: 'badge-amber', completed: 'badge-green', on_hold: 'badge-red', cancelled: 'badge-slate' }[status] || 'badge-slate';
+}
+function statusLabel(status){
+  return { planning: 'Planning', ongoing: 'Ongoing', completed: 'Completed', on_hold: 'On Hold', cancelled: 'Cancelled' }[status] || (status || 'Unknown');
+}
+
+/* ---------------------------------------------------------------
+   3. SESSION GUARD (identical to every protected page)
+--------------------------------------------------------------- */
+async function guardSession(){
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error || !data.session){
+    window.location.href = 'employee-login.html';
+    return null;
+  }
+  AppState.session = data.session;
+  return data.session;
+}
+
+/* ---------------------------------------------------------------
+   4. LIVE CLOCK
+--------------------------------------------------------------- */
+function tickClock(){
+  const now = new Date();
+  $('liveClock').textContent = now.toLocaleTimeString([], { hour12: true });
+  $('liveDate').textContent = now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/* ---------------------------------------------------------------
+   5. EMPLOYEE PROFILE (navbar only — this page is company-wide)
+--------------------------------------------------------------- */
+async function loadEmployeeProfile(){
+  const userId = AppState.session.user.id;
+  const { data, error } = await supabaseClient
+    .from('employees')
+    .select('*')
+    .eq('auth_user_id', userId)
+    .single();
+
+  if (error || !data){
+    showToast('Could not load employee profile.', 'error');
+    return;
+  }
+  AppState.employee = data;
+
+  $('navProfilePhoto').src = data.photo_url || ''; unskel($('navProfilePhoto'));
+  $('navProfileName').textContent = data.full_name || '—'; unskel($('navProfileName'));
+  $('navProfileRole').textContent = data.designation || '—'; unskel($('navProfileRole'));
+
+  lucide.createIcons();
+}
+
+/* ---------------------------------------------------------------
+   6. PROJECTS DATA — load, filter, render
+--------------------------------------------------------------- */
+async function loadProjects(){
+  const { data, error } = await supabaseClient
+    .from('projects').select('*').order('created_at', { ascending: false });
+
+  if (error){
+    showToast('Could not load projects.', 'error');
+    $('projectsGrid').innerHTML = '';
+    $('projectsEmptyState').classList.remove('hidden');
+    return;
+  }
+
+  AppState.allProjects = data || [];
+  renderStats(AppState.allProjects);
+  applyFilters();
+}
+
+function renderStats(projects){
+  const count = status => projects.filter(p => p.status === status).length;
+  $('statTotal').textContent = projects.length; unskel($('statTotal'));
+  $('statOngoing').textContent = count('ongoing'); unskel($('statOngoing'));
+  $('statCompleted').textContent = count('completed'); unskel($('statCompleted'));
+  $('statPlanning').textContent = count('planning'); unskel($('statPlanning'));
+  $('statOnHold').textContent = count('on_hold'); unskel($('statOnHold'));
+}
+
+function applyFilters(){
+  const q = AppState.searchQuery.toLowerCase().trim();
+  const status = AppState.statusFilter;
+
+  AppState.filtered = AppState.allProjects.filter(p => {
+    const haystack = [p.project_name, p.location, p.client_name].filter(Boolean).join(' ').toLowerCase();
+    const matchesQuery = !q || haystack.includes(q);
+    const matchesStatus = status === 'all' || p.status === status;
+    return matchesQuery && matchesStatus;
+  });
+
+  renderProjectsGrid();
+}
+
+function renderProjectsGrid(){
+  const grid = $('projectsGrid');
+  const empty = $('projectsEmptyState');
+  const rows = AppState.filtered;
+
+  $('projectCountLabel').textContent = rows.length + ' project' + (rows.length === 1 ? '' : 's') + ' found';
+
+  if (rows.length === 0){
+    grid.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  grid.innerHTML = rows.map(p => (
+    '<div class="project-card anim-fade-up" data-id="' + p.id + '">' +
+      '<div class="relative">' +
+        (p.cover_image_url
+          ? '<img src="' + p.cover_image_url + '" alt="" class="project-cover" />'
+          : '<div class="project-cover flex items-center justify-center"><i data-lucide="building-2" class="w-7 h-7 text-amber-400/50"></i></div>') +
+        '<span class="badge ' + statusBadgeClass(p.status) + ' absolute top-3 left-3">' + statusLabel(p.status) + '</span>' +
+        '<div class="absolute top-3 right-3 flex gap-1.5">' +
+          '<button class="btn-ghost w-8 h-8 flex items-center justify-center project-edit-btn" data-id="' + p.id + '" title="Edit"><i data-lucide="square-pen" class="w-3.5 h-3.5"></i></button>' +
+          '<button class="btn-danger-ghost w-8 h-8 flex items-center justify-center project-delete-btn" data-id="' + p.id + '" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="p-5 cursor-pointer project-card-body" data-id="' + p.id + '">' +
+        '<h4 class="font-display font-semibold text-white text-[15px] truncate">' + (p.project_name || 'Untitled project') + '</h4>' +
+        '<p class="text-[12.5px] text-[var(--text-mid)] flex items-center gap-1.5 mt-1"><i data-lucide="map-pin" class="w-3 h-3"></i><span class="truncate">' + (p.location || 'Location not set') + '</span></p>' +
+        '<div class="flex items-center gap-3 mt-3 text-[11.5px] text-[var(--text-mid)]">' +
+          '<span class="flex items-center gap-1"><i data-lucide="user" class="w-3 h-3"></i>' + (p.client_name || '—') + '</span>' +
+          '<span class="flex items-center gap-1"><i data-lucide="layers" class="w-3 h-3"></i>' + (p.floors || '—') + '</span>' +
+        '</div>' +
+        '<div class="mt-4">' +
+          '<div class="flex items-center justify-between text-[11px] mb-1.5"><span class="text-[var(--text-mid)]">Progress</span><span class="text-white font-medium">' + (p.progress || 0) + '%</span></div>' +
+          '<div class="project-progress-track"><div class="project-progress-fill" style="width:' + (p.progress || 0) + '%"></div></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  )).join('');
+
+  lucide.createIcons();
+  attachProjectCardEvents();
+}
+
+function attachProjectCardEvents(){
+  document.querySelectorAll('.project-card-body').forEach(el => {
+    el.addEventListener('click', () => openViewModal(el.dataset.id));
+  });
+  document.querySelectorAll('.project-edit-btn').forEach(el => {
+    el.addEventListener('click', (e) => { e.stopPropagation(); openEditModal(el.dataset.id); });
+  });
+  document.querySelectorAll('.project-delete-btn').forEach(el => {
+    el.addEventListener('click', (e) => { e.stopPropagation(); handleDeleteProject(el.dataset.id); });
+  });
+}
+
+/* ---------------------------------------------------------------
+   7. VIEW PROJECT MODAL
+--------------------------------------------------------------- */
+function openViewModal(id){
+  const project = AppState.allProjects.find(p => p.id === id);
+  if (!project) return;
+  AppState.activeViewProject = project;
+
+  $('viewCoverImg').src = project.cover_image_url || '';
+  $('viewStatusBadge').textContent = statusLabel(project.status);
+  $('viewStatusBadge').className = 'badge ' + statusBadgeClass(project.status) + ' absolute top-3 left-3';
+  $('viewProjectName').textContent = project.project_name || 'Untitled project';
+  $('viewLocation').querySelector('span').textContent = project.location || 'Location not set';
+  $('viewClient').textContent = project.client_name || '—';
+  $('viewType').textContent = project.project_type || '—';
+  $('viewFloors').textContent = project.floors || '—';
+  $('viewFloorArea').textContent = project.floor_area ? (Number(project.floor_area).toLocaleString() + ' sqft') : '—';
+  $('viewStartDate').textContent = formatDate(project.start_date);
+  $('viewExpectedDate').textContent = formatDate(project.expected_completion_date);
+  $('viewProgressLabel').textContent = (project.progress || 0) + '%';
+  $('viewProgressBar').style.width = (project.progress || 0) + '%';
+  $('viewDescription').textContent = project.description || 'No description provided.';
+
+  $('viewModalBackdrop').classList.remove('hidden');
+  lucide.createIcons();
+}
+function closeViewModal(){ $('viewModalBackdrop').classList.add('hidden'); }
+
+/* ---------------------------------------------------------------
+   8. ADD / EDIT PROJECT MODAL
+--------------------------------------------------------------- */
+function resetProjectForm(){
+  const form = $('projectForm');
+  form.reset();
+  form.elements['status'].value = 'planning';
+  form.elements['progress'].value = 0;
+  $('progressValueLabel').textContent = '0';
+  $('projectFormError').classList.add('hidden');
+  $('coverPreview').classList.add('hidden');
+  $('coverPreview').src = '';
+  $('coverPlaceholder').classList.remove('hidden');
+  AppState.pendingCoverFile = null;
+  AppState.pendingCoverPreviewUrl = null;
+  AppState.editingProjectId = null;
+}
+
+function openAddModal(){
+  resetProjectForm();
+  $('projectModalTitle').textContent = 'Add Project';
+  $('projectModalBackdrop').classList.remove('hidden');
+  lucide.createIcons();
+}
+
+function openEditModal(id){
+  const project = AppState.allProjects.find(p => p.id === id);
+  if (!project) return;
+
+  resetProjectForm();
+  AppState.editingProjectId = id;
+  $('projectModalTitle').textContent = 'Edit Project';
+
+  const form = $('projectForm');
+  const fields = ['project_name','location','project_type','client_name','floors','floor_area','status','start_date','expected_completion_date','actual_completion_date','description'];
+  fields.forEach(key => { if (form.elements[key]) form.elements[key].value = project[key] ?? ''; });
+  form.elements['progress'].value = project.progress || 0;
+  $('progressValueLabel').textContent = project.progress || 0;
+
+  if (project.cover_image_url){
+    $('coverPreview').src = project.cover_image_url;
+    $('coverPreview').classList.remove('hidden');
+    $('coverPlaceholder').classList.add('hidden');
+  }
+
+  closeViewModal();
+  $('projectModalBackdrop').classList.remove('hidden');
+  lucide.createIcons();
+}
+
+function closeProjectModal(){
+  $('projectModalBackdrop').classList.add('hidden');
+}
+
+function handleCoverFileSelected(file){
+  if (!file) return;
+  AppState.pendingCoverFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    $('coverPreview').src = e.target.result;
+    $('coverPreview').classList.remove('hidden');
+    $('coverPlaceholder').classList.add('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadCoverIfNeeded(){
+  if (!AppState.pendingCoverFile) return null;
+  const file = AppState.pendingCoverFile;
+  const filePath = `project-${Date.now()}-${file.name}`;
+
+  const { error: uploadError } = await supabaseClient.storage.from('project-covers').upload(filePath, file, { upsert: true });
+  if (uploadError){ showToast('Cover image upload failed.', 'error'); return null; }
+
+  const { data } = supabaseClient.storage.from('project-covers').getPublicUrl(filePath);
+  return data.publicUrl;
+}
+
+async function handleSaveProject(evt){
+  evt.preventDefault();
+  const form = $('projectForm');
+  const formData = new FormData(form);
+  const payload = Object.fromEntries(formData.entries());
+
+  if (!payload.project_name || !payload.project_name.trim()){
+    const err = $('projectFormError');
+    err.querySelector('span').textContent = 'Project name is required.';
+    err.classList.remove('hidden');
+    return;
+  }
+
+  payload.floor_area = payload.floor_area ? Number(payload.floor_area) : null;
+  payload.progress = payload.progress ? parseInt(payload.progress, 10) : 0;
+  ['start_date','expected_completion_date','actual_completion_date'].forEach(k => { if (!payload[k]) payload[k] = null; });
+
+  const saveBtn = $('saveProjectBtn');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving…';
+  lucide.createIcons();
+
+  const uploadedUrl = await uploadCoverIfNeeded();
+  if (uploadedUrl) payload.cover_image_url = uploadedUrl;
+
+  let error;
+  if (AppState.editingProjectId){
+    ({ error } = await supabaseClient.from('projects').update(payload).eq('id', AppState.editingProjectId));
+  } else {
+    ({ error } = await supabaseClient.from('projects').insert(payload));
+  }
+
+  saveBtn.disabled = false;
+  saveBtn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Save Project';
+  lucide.createIcons();
+
+  if (error){ showToast('Could not save project.', 'error'); return; }
+
+  showToast(AppState.editingProjectId ? 'Project updated successfully.' : 'Project added successfully.', 'success');
+  closeProjectModal();
+  await loadProjects();
+}
+
+async function handleDeleteProject(id){
+  const confirmed = window.confirm('Delete this project? This cannot be undone.');
+  if (!confirmed) return;
+
+  const { error } = await supabaseClient.from('projects').delete().eq('id', id);
+  if (error){ showToast('Could not delete project.', 'error'); return; }
+
+  showToast('Project deleted.', 'success');
+  closeViewModal();
+  await loadProjects();
+}
+
+/* ---------------------------------------------------------------
+   9. SIDEBAR / NAVBAR / TOOLBAR INTERACTIONS
+--------------------------------------------------------------- */
+function initUIControls(){
+  $('collapseBtn').addEventListener('click', () => document.body.classList.toggle('sidebar-collapsed'));
+  $('mobileMenuBtn').addEventListener('click', () => document.body.classList.add('sidebar-mobile-open'));
+  $('sidebarBackdrop').addEventListener('click', () => document.body.classList.remove('sidebar-mobile-open'));
+
+  $('themeToggleBtn').addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+    showToast('Theme preference saved.', 'info');
+  });
+
+  $('logoutBtn').addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'employee-login.html';
+  });
+
+  // Toolbar
+  $('projectSearch').addEventListener('input', (e) => { AppState.searchQuery = e.target.value; applyFilters(); });
+  document.querySelectorAll('.filter-chip[data-status]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip[data-status]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      AppState.statusFilter = btn.dataset.status;
+      applyFilters();
+    });
+  });
+
+  // Add / edit modal
+  $('openAddProjectBtn').addEventListener('click', openAddModal);
+  $('closeProjectModalBtn').addEventListener('click', closeProjectModal);
+  $('cancelProjectBtn').addEventListener('click', closeProjectModal);
+  $('projectModalBackdrop').addEventListener('click', (e) => { if (e.target === $('projectModalBackdrop')) closeProjectModal(); });
+  $('projectForm').addEventListener('submit', handleSaveProject);
+  $('projectForm').elements['progress'].addEventListener('input', (e) => { $('progressValueLabel').textContent = e.target.value; });
+
+  $('coverUploadBtn').addEventListener('click', () => $('coverFileInput').click());
+  $('coverFileInput').addEventListener('change', (e) => handleCoverFileSelected(e.target.files[0]));
+
+  // View modal
+  $('closeViewModalBtn').addEventListener('click', closeViewModal);
+  $('viewModalBackdrop').addEventListener('click', (e) => { if (e.target === $('viewModalBackdrop')) closeViewModal(); });
+  $('viewEditBtn').addEventListener('click', () => { if (AppState.activeViewProject) openEditModal(AppState.activeViewProject.id); });
+  $('viewDeleteBtn').addEventListener('click', () => { if (AppState.activeViewProject) handleDeleteProject(AppState.activeViewProject.id); });
+}
+
+/* ---------------------------------------------------------------
+   10. BOOTSTRAP
+--------------------------------------------------------------- */
+async function bootstrap(){
+  lucide.createIcons();
+  initUIControls();
+
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  const session = await guardSession();
+  if (!session) return;
+
+  await loadEmployeeProfile();
+  await loadProjects();
+
+  lucide.createIcons();
+}
+
+document.addEventListener('DOMContentLoaded', bootstrap);
+</script>
+</body>
+</html>
