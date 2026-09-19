@@ -434,7 +434,7 @@
       <i data-lucide="building-2" class="w-[18px] h-[18px] shrink-0"></i>
       <span class="sidebar-label">Projects</span>
     </a>
-    <a href="salary.html" data-page="salary" class="nav-item">
+    <a href="employee-salary.html" data-page="salary" class="nav-item">
       <i data-lucide="wallet" class="w-[18px] h-[18px] shrink-0"></i>
       <span class="sidebar-label">Salary</span>
     </a>
@@ -532,14 +532,14 @@
         <h1 class="font-display text-2xl lg:text-[28px] font-bold text-white">Projects</h1>
       </div>
       <button id="openAddProjectBtn" class="btn-primary px-4 py-2.5 text-[13px] flex items-center gap-2">
-        <i data-lucide="plus" class="w-4 h-4"></i> Add Project
+        <i data-lucide="plus" class="w-4 h-4"></i> + Add Project
       </button>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
       <!-- ============ SUMMARY STATS ============ -->
-      <section class="lg:col-span-12 grid grid-cols-2 sm:grid-cols-5 gap-3 anim-fade-up" style="animation-delay:.03s">
+      <section class="lg:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-3 anim-fade-up" style="animation-delay:.03s">
         <div class="stat-tile glass-card flex flex-col items-center text-center">
           <i data-lucide="building-2" class="w-4 h-4 text-amber-400 mb-2"></i>
           <p id="statTotal" class="text-xl font-bold text-white font-mono skel rounded">0</p>
@@ -547,23 +547,13 @@
         </div>
         <div class="stat-tile glass-card flex flex-col items-center text-center">
           <i data-lucide="hammer" class="w-4 h-4 text-blue-400 mb-2"></i>
-          <p id="statOngoing" class="text-xl font-bold text-white font-mono skel rounded">0</p>
-          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">Ongoing</p>
+          <p id="statActive" class="text-xl font-bold text-white font-mono skel rounded">0</p>
+          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">Active</p>
         </div>
         <div class="stat-tile glass-card flex flex-col items-center text-center">
           <i data-lucide="check-circle-2" class="w-4 h-4 text-green-400 mb-2"></i>
           <p id="statCompleted" class="text-xl font-bold text-white font-mono skel rounded">0</p>
           <p class="text-[10.5px] text-[var(--text-mid)] mt-1">Completed</p>
-        </div>
-        <div class="stat-tile glass-card flex flex-col items-center text-center">
-          <i data-lucide="calendar-clock" class="w-4 h-4 text-cyan-400 mb-2"></i>
-          <p id="statPlanning" class="text-xl font-bold text-white font-mono skel rounded">0</p>
-          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">Planning</p>
-        </div>
-        <div class="stat-tile glass-card flex flex-col items-center text-center">
-          <i data-lucide="pause-circle" class="w-4 h-4 text-red-400 mb-2"></i>
-          <p id="statOnHold" class="text-xl font-bold text-white font-mono skel rounded">0</p>
-          <p class="text-[10.5px] text-[var(--text-mid)] mt-1">On Hold</p>
         </div>
       </section>
 
@@ -574,11 +564,6 @@
             <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--text-low)] shrink-0"></i>
             <input type="text" id="projectSearch" placeholder="Search projects, clients, locations…" class="bg-transparent text-[13px] w-full text-[var(--text-hi)]" />
           </div>
-          <button class="filter-chip active" data-status="all">All</button>
-          <button class="filter-chip" data-status="planning">Planning</button>
-          <button class="filter-chip" data-status="ongoing">Ongoing</button>
-          <button class="filter-chip" data-status="completed">Completed</button>
-          <button class="filter-chip" data-status="on_hold">On Hold</button>
         </div>
         <p id="projectCountLabel" class="text-[12px] text-[var(--text-mid)]">Loading projects…</p>
       </section>
@@ -615,28 +600,12 @@
       <button id="closeProjectModalBtn" class="btn-ghost w-9 h-9 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
     </div>
 
-    <!-- Cover image upload -->
-    <div class="mb-5">
-      <label class="field-label">Cover image</label>
-      <div class="relative">
-        <img id="coverPreview" src="" alt="" class="hidden w-full h-40 object-cover rounded-xl border border-[var(--glass-border)]" />
-        <div id="coverPlaceholder" class="w-full h-40 rounded-xl border border-dashed border-[var(--glass-border)] flex flex-col items-center justify-center gap-2 text-[var(--text-mid)]">
-          <i data-lucide="image-plus" class="w-5 h-5"></i>
-          <span class="text-[12.5px]">No cover image selected</span>
-        </div>
-        <button type="button" id="coverUploadBtn" class="btn-ghost absolute bottom-3 right-3 text-[12px] px-3 py-2 flex items-center gap-1.5">
-          <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload
-        </button>
-        <input type="file" id="coverFileInput" accept="image/*" class="hidden" />
-      </div>
-    </div>
-
     <form id="projectForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div class="sm:col-span-2"><label class="field-label">Project name</label><input class="field-input" name="project_name" type="text" required /></div>
-      <div><label class="field-label">Location</label><input class="field-input" name="location" type="text" /></div>
+      <div><label class="field-label">Location</label><input class="field-input" name="location" type="text" required /></div>
       <div>
         <label class="field-label">Project type</label>
-        <select class="field-input" name="project_type">
+        <select class="field-input" name="project_type" required>
           <option value="">Select</option>
           <option>Residential</option>
           <option>Commercial</option>
@@ -646,27 +615,24 @@
           <option>Interior</option>
         </select>
       </div>
-      <div><label class="field-label">Client name</label><input class="field-input" name="client_name" type="text" /></div>
-      <div><label class="field-label">Floors</label><input class="field-input" name="floors" type="text" placeholder="e.g. G+10" /></div>
-      <div><label class="field-label">Floor area (sqft)</label><input class="field-input" name="floor_area" type="number" step="0.01" min="0" /></div>
+      <div><label class="field-label">Client name</label><input class="field-input" name="client_name" type="text" required /></div>
+      <div><label class="field-label">Number of Floors</label><input class="field-input" name="floors" type="text" placeholder="e.g. G+10" required /></div>
+      <div><label class="field-label">Floor area (sqft)</label><input class="field-input" name="floor_area" type="number" step="0.01" min="0" required /></div>
       <div>
         <label class="field-label">Status</label>
-        <select class="field-input" name="status">
-          <option value="planning">Planning</option>
-          <option value="ongoing">Ongoing</option>
-          <option value="completed">Completed</option>
-          <option value="on_hold">On Hold</option>
-          <option value="cancelled">Cancelled</option>
+        <select class="field-input" name="status" required>
+          <option value="Active">Active</option>
+          <option value="Completed">Completed</option>
         </select>
       </div>
-      <div><label class="field-label">Start date</label><input class="field-input" name="start_date" type="date" /></div>
-      <div><label class="field-label">Expected completion</label><input class="field-input" name="expected_completion_date" type="date" /></div>
-      <div><label class="field-label">Actual completion</label><input class="field-input" name="actual_completion_date" type="date" /></div>
+      <div><label class="field-label">Start date</label><input class="field-input" name="start_date" type="date" required /></div>
+      <div><label class="field-label">Expected completion</label><input class="field-input" name="expected_completion_date" type="date" required /></div>
       <div class="sm:col-span-2">
         <label class="field-label">Progress — <span id="progressValueLabel">0</span>%</label>
-        <input class="w-full accent-amber-500" name="progress" type="range" min="0" max="100" step="5" value="0" />
+        <input class="w-full accent-amber-500" name="progress" type="range" min="0" max="100" step="1" value="0" />
       </div>
       <div class="sm:col-span-2"><label class="field-label">Description</label><textarea class="field-input" name="description" rows="3"></textarea></div>
+      <div class="sm:col-span-2"><label class="field-label">Cover Image URL</label><input class="field-input" name="cover_image_url" type="url" placeholder="https://example.com/image.jpg" /></div>
 
       <p id="projectFormError" class="hidden sm:col-span-2 text-[12.5px] text-red-400 flex items-center gap-1.5"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i><span></span></p>
 
@@ -699,6 +665,8 @@
         <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Floor area</p><p id="viewFloorArea" class="text-white">—</p></div>
         <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Start date</p><p id="viewStartDate" class="text-white">—</p></div>
         <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Expected completion</p><p id="viewExpectedDate" class="text-white">—</p></div>
+        <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Actual completion</p><p id="viewActualDate" class="text-white">—</p></div>
+        <div><p class="text-[11px] text-[var(--text-mid)] mb-1">Created at</p><p id="viewCreatedAt" class="text-white">—</p></div>
       </div>
 
       <div class="mb-5">
@@ -743,8 +711,6 @@
        status text, progress int, description text, cover_image_url text,
        created_at timestamptz default now()
      )
-   Storage bucket: "project-covers" (public) for cover image uploads.
-
    NOTE: this table has no employee_id column, so — as specified — every
    logged-in employee can view and add company projects here. If you later
    want to restrict who can edit/delete a project, add a `created_by uuid`
@@ -763,11 +729,8 @@ const AppState = {
   employee: null,
   allProjects: [],
   filtered: [],
-  statusFilter: 'all',
   searchQuery: '',
   editingProjectId: null,
-  pendingCoverFile: null,
-  pendingCoverPreviewUrl: null,
   activeViewProject: null,
 };
 
@@ -782,6 +745,27 @@ function formatDate(dateLike){
 }
 
 function unskel(el){ if (el) el.classList.remove('skel'); }
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+function isSafeCoverUrl(url){
+  if (!url) return false;
+  try {
+    const parsed = new URL(url, window.location.href);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+function normalizeStatus(status){
+  return status === 'Completed' ? 'Completed' : 'Active';
+}
+function normalizeProgress(status, progressValue){
+  if (status === 'Completed') return 100;
+  const parsed = Number(progressValue);
+  if (!Number.isFinite(parsed)) return 0;
+  return Math.min(100, Math.max(0, Math.round(parsed)));
+}
 
 function showToast(message, type){
   type = type || 'info';
@@ -805,12 +789,8 @@ function showToast(message, type){
   }, 4200);
 }
 
-function statusBadgeClass(status){
-  return { planning: 'badge-blue', ongoing: 'badge-amber', completed: 'badge-green', on_hold: 'badge-red', cancelled: 'badge-slate' }[status] || 'badge-slate';
-}
-function statusLabel(status){
-  return { planning: 'Planning', ongoing: 'Ongoing', completed: 'Completed', on_hold: 'On Hold', cancelled: 'Cancelled' }[status] || (status || 'Unknown');
-}
+function statusBadgeClass(status){ return status === 'Completed' ? 'badge-green' : 'badge-amber'; }
+function statusLabel(status){ return normalizeStatus(status); }
 
 /* ---------------------------------------------------------------
    3. SESSION GUARD (identical to every protected page)
@@ -878,23 +858,17 @@ async function loadProjects(){
 }
 
 function renderStats(projects){
-  const count = status => projects.filter(p => p.status === status).length;
+  const count = status => projects.filter(p => normalizeStatus(p.status) === status).length;
   $('statTotal').textContent = projects.length; unskel($('statTotal'));
-  $('statOngoing').textContent = count('ongoing'); unskel($('statOngoing'));
-  $('statCompleted').textContent = count('completed'); unskel($('statCompleted'));
-  $('statPlanning').textContent = count('planning'); unskel($('statPlanning'));
-  $('statOnHold').textContent = count('on_hold'); unskel($('statOnHold'));
+  $('statActive').textContent = count('Active'); unskel($('statActive'));
+  $('statCompleted').textContent = count('Completed'); unskel($('statCompleted'));
 }
 
 function applyFilters(){
   const q = AppState.searchQuery.toLowerCase().trim();
-  const status = AppState.statusFilter;
-
   AppState.filtered = AppState.allProjects.filter(p => {
     const haystack = [p.project_name, p.location, p.client_name].filter(Boolean).join(' ').toLowerCase();
-    const matchesQuery = !q || haystack.includes(q);
-    const matchesStatus = status === 'all' || p.status === status;
-    return matchesQuery && matchesStatus;
+    return !q || haystack.includes(q);
   });
 
   renderProjectsGrid();
@@ -915,30 +889,41 @@ function renderProjectsGrid(){
   empty.classList.add('hidden');
 
   grid.innerHTML = rows.map(p => (
+    (() => {
+      const coverUrl = isSafeCoverUrl(p.cover_image_url) ? p.cover_image_url : '';
+      const safeName = escapeHtml(p.project_name || 'Untitled project');
+      const safeLocation = escapeHtml(p.location || 'Location not set');
+      const safeClient = escapeHtml(p.client_name || '—');
+      const safeFloors = escapeHtml(p.floors || '—');
+      const progress = normalizeProgress(normalizeStatus(p.status), p.progress);
+      const safeId = escapeHtml(p.id || '');
+      return (
     '<div class="project-card anim-fade-up" data-id="' + p.id + '">' +
       '<div class="relative">' +
-        (p.cover_image_url
-          ? '<img src="' + p.cover_image_url + '" alt="" class="project-cover" />'
+        (coverUrl
+          ? '<img src="' + escapeHtml(coverUrl) + '" alt="" class="project-cover" />'
           : '<div class="project-cover flex items-center justify-center"><i data-lucide="building-2" class="w-7 h-7 text-amber-400/50"></i></div>') +
-        '<span class="badge ' + statusBadgeClass(p.status) + ' absolute top-3 left-3">' + statusLabel(p.status) + '</span>' +
+        '<span class="badge ' + statusBadgeClass(normalizeStatus(p.status)) + ' absolute top-3 left-3">' + statusLabel(p.status) + '</span>' +
         '<div class="absolute top-3 right-3 flex gap-1.5">' +
-          '<button class="btn-ghost w-8 h-8 flex items-center justify-center project-edit-btn" data-id="' + p.id + '" title="Edit"><i data-lucide="square-pen" class="w-3.5 h-3.5"></i></button>' +
-          '<button class="btn-danger-ghost w-8 h-8 flex items-center justify-center project-delete-btn" data-id="' + p.id + '" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>' +
+          '<button class="btn-ghost w-8 h-8 flex items-center justify-center project-edit-btn" data-id="' + safeId + '" title="Edit"><i data-lucide="square-pen" class="w-3.5 h-3.5"></i></button>' +
+          '<button class="btn-danger-ghost w-8 h-8 flex items-center justify-center project-delete-btn" data-id="' + safeId + '" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>' +
         '</div>' +
       '</div>' +
-      '<div class="p-5 cursor-pointer project-card-body" data-id="' + p.id + '">' +
-        '<h4 class="font-display font-semibold text-white text-[15px] truncate">' + (p.project_name || 'Untitled project') + '</h4>' +
-        '<p class="text-[12.5px] text-[var(--text-mid)] flex items-center gap-1.5 mt-1"><i data-lucide="map-pin" class="w-3 h-3"></i><span class="truncate">' + (p.location || 'Location not set') + '</span></p>' +
+      '<div class="p-5 cursor-pointer project-card-body" data-id="' + safeId + '">' +
+        '<h4 class="font-display font-semibold text-white text-[15px] truncate">' + safeName + '</h4>' +
+        '<p class="text-[12.5px] text-[var(--text-mid)] flex items-center gap-1.5 mt-1"><i data-lucide="map-pin" class="w-3 h-3"></i><span class="truncate">' + safeLocation + '</span></p>' +
         '<div class="flex items-center gap-3 mt-3 text-[11.5px] text-[var(--text-mid)]">' +
-          '<span class="flex items-center gap-1"><i data-lucide="user" class="w-3 h-3"></i>' + (p.client_name || '—') + '</span>' +
-          '<span class="flex items-center gap-1"><i data-lucide="layers" class="w-3 h-3"></i>' + (p.floors || '—') + '</span>' +
+          '<span class="flex items-center gap-1"><i data-lucide="user" class="w-3 h-3"></i>' + safeClient + '</span>' +
+          '<span class="flex items-center gap-1"><i data-lucide="layers" class="w-3 h-3"></i>' + safeFloors + '</span>' +
         '</div>' +
         '<div class="mt-4">' +
-          '<div class="flex items-center justify-between text-[11px] mb-1.5"><span class="text-[var(--text-mid)]">Progress</span><span class="text-white font-medium">' + (p.progress || 0) + '%</span></div>' +
-          '<div class="project-progress-track"><div class="project-progress-fill" style="width:' + (p.progress || 0) + '%"></div></div>' +
+          '<div class="flex items-center justify-between text-[11px] mb-1.5"><span class="text-[var(--text-mid)]">Progress</span><span class="text-white font-medium">' + progress + '%</span></div>' +
+          '<div class="project-progress-track"><div class="project-progress-fill" style="width:' + progress + '%"></div></div>' +
         '</div>' +
       '</div>' +
     '</div>'
+      );
+    })()
   )).join('');
 
   lucide.createIcons();
@@ -965,9 +950,11 @@ function openViewModal(id){
   if (!project) return;
   AppState.activeViewProject = project;
 
-  $('viewCoverImg').src = project.cover_image_url || '';
-  $('viewStatusBadge').textContent = statusLabel(project.status);
-  $('viewStatusBadge').className = 'badge ' + statusBadgeClass(project.status) + ' absolute top-3 left-3';
+  const normalizedStatus = normalizeStatus(project.status);
+  const coverUrl = isSafeCoverUrl(project.cover_image_url) ? project.cover_image_url : '';
+  $('viewCoverImg').src = coverUrl || 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420"><rect width="1200" height="420" fill="#131B2E"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#F5A524" font-family="Inter" font-size="28">No Cover Image</text></svg>');
+  $('viewStatusBadge').textContent = normalizedStatus;
+  $('viewStatusBadge').className = 'badge ' + statusBadgeClass(normalizedStatus) + ' absolute top-3 left-3';
   $('viewProjectName').textContent = project.project_name || 'Untitled project';
   $('viewLocation').querySelector('span').textContent = project.location || 'Location not set';
   $('viewClient').textContent = project.client_name || '—';
@@ -976,8 +963,11 @@ function openViewModal(id){
   $('viewFloorArea').textContent = project.floor_area ? (Number(project.floor_area).toLocaleString() + ' sqft') : '—';
   $('viewStartDate').textContent = formatDate(project.start_date);
   $('viewExpectedDate').textContent = formatDate(project.expected_completion_date);
-  $('viewProgressLabel').textContent = (project.progress || 0) + '%';
-  $('viewProgressBar').style.width = (project.progress || 0) + '%';
+  $('viewActualDate').textContent = formatDate(project.actual_completion_date);
+  $('viewCreatedAt').textContent = formatDate(project.created_at);
+  const progress = normalizeProgress(normalizedStatus, project.progress);
+  $('viewProgressLabel').textContent = progress + '%';
+  $('viewProgressBar').style.width = progress + '%';
   $('viewDescription').textContent = project.description || 'No description provided.';
 
   $('viewModalBackdrop').classList.remove('hidden');
@@ -991,15 +981,10 @@ function closeViewModal(){ $('viewModalBackdrop').classList.add('hidden'); }
 function resetProjectForm(){
   const form = $('projectForm');
   form.reset();
-  form.elements['status'].value = 'planning';
+  form.elements['status'].value = 'Active';
   form.elements['progress'].value = 0;
   $('progressValueLabel').textContent = '0';
   $('projectFormError').classList.add('hidden');
-  $('coverPreview').classList.add('hidden');
-  $('coverPreview').src = '';
-  $('coverPlaceholder').classList.remove('hidden');
-  AppState.pendingCoverFile = null;
-  AppState.pendingCoverPreviewUrl = null;
   AppState.editingProjectId = null;
 }
 
@@ -1019,16 +1004,11 @@ function openEditModal(id){
   $('projectModalTitle').textContent = 'Edit Project';
 
   const form = $('projectForm');
-  const fields = ['project_name','location','project_type','client_name','floors','floor_area','status','start_date','expected_completion_date','actual_completion_date','description'];
+  const fields = ['project_name','location','project_type','client_name','floors','floor_area','status','start_date','expected_completion_date','description','cover_image_url'];
   fields.forEach(key => { if (form.elements[key]) form.elements[key].value = project[key] ?? ''; });
-  form.elements['progress'].value = project.progress || 0;
-  $('progressValueLabel').textContent = project.progress || 0;
-
-  if (project.cover_image_url){
-    $('coverPreview').src = project.cover_image_url;
-    $('coverPreview').classList.remove('hidden');
-    $('coverPlaceholder').classList.add('hidden');
-  }
+  form.elements['status'].value = normalizeStatus(project.status);
+  form.elements['progress'].value = normalizeProgress(normalizeStatus(project.status), project.progress);
+  $('progressValueLabel').textContent = form.elements['progress'].value;
 
   closeViewModal();
   $('projectModalBackdrop').classList.remove('hidden');
@@ -1037,30 +1017,6 @@ function openEditModal(id){
 
 function closeProjectModal(){
   $('projectModalBackdrop').classList.add('hidden');
-}
-
-function handleCoverFileSelected(file){
-  if (!file) return;
-  AppState.pendingCoverFile = file;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    $('coverPreview').src = e.target.result;
-    $('coverPreview').classList.remove('hidden');
-    $('coverPlaceholder').classList.add('hidden');
-  };
-  reader.readAsDataURL(file);
-}
-
-async function uploadCoverIfNeeded(){
-  if (!AppState.pendingCoverFile) return null;
-  const file = AppState.pendingCoverFile;
-  const filePath = `project-${Date.now()}-${file.name}`;
-
-  const { error: uploadError } = await supabaseClient.storage.from('project-covers').upload(filePath, file, { upsert: true });
-  if (uploadError){ showToast('Cover image upload failed.', 'error'); return null; }
-
-  const { data } = supabaseClient.storage.from('project-covers').getPublicUrl(filePath);
-  return data.publicUrl;
 }
 
 async function handleSaveProject(evt){
@@ -1076,17 +1032,46 @@ async function handleSaveProject(evt){
     return;
   }
 
+  const requiredFields = ['location', 'project_type', 'client_name', 'floors', 'floor_area', 'start_date', 'expected_completion_date'];
+  if (requiredFields.some((field) => !payload[field] || !String(payload[field]).trim())){
+    const err = $('projectFormError');
+    err.querySelector('span').textContent = 'Please fill in all required fields.';
+    err.classList.remove('hidden');
+    return;
+  }
+
+  payload.status = normalizeStatus(payload.status);
+  payload.progress = normalizeProgress(payload.status, payload.progress);
+  if (payload.status === 'Completed' && payload.progress !== 100){
+    payload.progress = 100;
+  }
+  if (payload.progress < 0 || payload.progress > 100){
+    const err = $('projectFormError');
+    err.querySelector('span').textContent = 'Progress must be between 0 and 100.';
+    err.classList.remove('hidden');
+    return;
+  }
+  if (payload.cover_image_url && !isSafeCoverUrl(payload.cover_image_url)){
+    const err = $('projectFormError');
+    err.querySelector('span').textContent = 'Cover Image URL must be a valid http/https URL.';
+    err.classList.remove('hidden');
+    return;
+  }
+
   payload.floor_area = payload.floor_area ? Number(payload.floor_area) : null;
-  payload.progress = payload.progress ? parseInt(payload.progress, 10) : 0;
-  ['start_date','expected_completion_date','actual_completion_date'].forEach(k => { if (!payload[k]) payload[k] = null; });
+  payload.cover_image_url = payload.cover_image_url ? payload.cover_image_url.trim() : null;
+  ['start_date', 'expected_completion_date'].forEach(k => { if (!payload[k]) payload[k] = null; });
+  payload.project_name = payload.project_name.trim();
+  payload.location = payload.location.trim();
+  payload.client_name = payload.client_name.trim();
+  payload.floors = payload.floors.trim();
+  payload.description = payload.description ? payload.description.trim() : null;
+  delete payload.actual_completion_date;
 
   const saveBtn = $('saveProjectBtn');
   saveBtn.disabled = true;
   saveBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving…';
   lucide.createIcons();
-
-  const uploadedUrl = await uploadCoverIfNeeded();
-  if (uploadedUrl) payload.cover_image_url = uploadedUrl;
 
   let error;
   if (AppState.editingProjectId){
@@ -1138,14 +1123,6 @@ function initUIControls(){
 
   // Toolbar
   $('projectSearch').addEventListener('input', (e) => { AppState.searchQuery = e.target.value; applyFilters(); });
-  document.querySelectorAll('.filter-chip[data-status]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-chip[data-status]').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      AppState.statusFilter = btn.dataset.status;
-      applyFilters();
-    });
-  });
 
   // Add / edit modal
   $('openAddProjectBtn').addEventListener('click', openAddModal);
@@ -1154,9 +1131,6 @@ function initUIControls(){
   $('projectModalBackdrop').addEventListener('click', (e) => { if (e.target === $('projectModalBackdrop')) closeProjectModal(); });
   $('projectForm').addEventListener('submit', handleSaveProject);
   $('projectForm').elements['progress'].addEventListener('input', (e) => { $('progressValueLabel').textContent = e.target.value; });
-
-  $('coverUploadBtn').addEventListener('click', () => $('coverFileInput').click());
-  $('coverFileInput').addEventListener('change', (e) => handleCoverFileSelected(e.target.files[0]));
 
   // View modal
   $('closeViewModalBtn').addEventListener('click', closeViewModal);
